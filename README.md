@@ -37,3 +37,14 @@ so you MUST read each entry carefully every time you are setting metadata. Trust
 I still set metadata blocks backwards half the time.
 
 Anyways, hope this is useful!
+
+Possible Future Features:
+
+- Ability to set default x/y/z offsets for your structure
+- Easy Structure Removal (maybe)
+- Tile Entity Data??? Not sure how to go about that.
+
+Known Bugs:
+
+- Doors: When you alter the default orientation of a structure, the doors will not be set correctly. Keeping the
+    default orientation and rotating based on player view, however, works fine.
