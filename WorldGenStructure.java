@@ -56,6 +56,9 @@ public class WorldGenStructure extends WorldGenerator
 	/** Stores amount to offset structure's location in the world, if any. */
 	private int offsetX = 0, offsetY = 0, offsetZ = 0;
 	
+	/** When true all blocks will be set to air within the structure's area. */
+	private boolean removeStructure = false;
+	
 	/**
 	 * This stores all the blocks for a structure in an array.
 	 * 
@@ -205,8 +208,8 @@ public class WorldGenStructure extends WorldGenerator
 	public WorldGenStructure(int facing, int[][][][] blocks) {
 		this.facing = facing;
 		this.blockArray = blocks;
-		this.structureFacing = EAST;
-		this.manualRotations = 0;
+		//this.structureFacing = EAST;
+		//this.manualRotations = 0;
 	}
 
 	/**
@@ -217,7 +220,7 @@ public class WorldGenStructure extends WorldGenerator
 		this.facing = facing;
 		this.structureFacing = structureFacing;
 		this.blockArray = blocks;
-		this.manualRotations = 0;
+		//this.manualRotations = 0;
 	}
 	
 	/**
@@ -233,7 +236,7 @@ public class WorldGenStructure extends WorldGenerator
 		this.facing = facing;
 		this.blockArray = blocks;
 		this.structureFacing = structureFacing;
-		this.manualRotations = 0;
+		//this.manualRotations = 0;
 		this.offsetX = offX;
 		this.offsetY = offY;
 		this.offsetZ = offZ;
@@ -244,11 +247,11 @@ public class WorldGenStructure extends WorldGenerator
 	 */
 	public WorldGenStructure(boolean par1) {
 		super(par1);
-		this.structureFacing = EAST;
-		this.manualRotations = 0;
-		this.offsetX = 0;
-		this.offsetY = 0;
-		this.offsetZ = 0;
+		//this.structureFacing = EAST;
+		//this.manualRotations = 0;
+		//this.offsetX = 0;
+		//this.offsetY = 0;
+		//this.offsetZ = 0;
 	}
 	
 	/**
@@ -296,6 +299,16 @@ public class WorldGenStructure extends WorldGenerator
 	public final String currentStructureFacing()
 	{
 		return (this.structureFacing == EAST ? "East" : this.structureFacing == WEST ? "West" : this.structureFacing == NORTH ? "North" : "South");
+	}
+	
+	/**
+	 * Toggles between generate and remove structure setting.
+	 * Returns value for ease of reference.
+	 */
+	public final boolean toggleRemove()
+	{
+		this.removeStructure = !this.removeStructure;
+		return this.removeStructure;
 	}
 
 	/**
@@ -348,16 +361,20 @@ public class WorldGenStructure extends WorldGenerator
 						System.out.println("[GEN STRUCTURE] Error computing number of rotations.");
 						break;
 					}
-					
-					if (meta != NO_METADATA)
+					if (this.removeStructure)
+						world.setBlockToAir(rotX, posY + y + offsetY, rotZ);
+					else
 					{
-						meta = getMetadata(blockArray[y][x][z][0], meta, facing);
-						if (flag == 0) flag = 2;
+						if (meta != NO_METADATA)
+						{
+							meta = getMetadata(blockArray[y][x][z][0], meta, facing);
+							if (flag == 0) flag = 2;
+						}
+
+						world.setBlock(rotX, posY + y + offsetY, rotZ, blockArray[y][x][z][0], meta, flag);
+
+						setMetadata(world, rotX, posY + y + offsetY, rotZ, meta, facing);
 					}
-
-					world.setBlock(rotX, posY + y + offsetY, rotZ, blockArray[y][x][z][0], meta, flag);
-
-					setMetadata(world, rotX, posY + y + offsetY, rotZ, meta, facing);
 				}
 			}
 		}

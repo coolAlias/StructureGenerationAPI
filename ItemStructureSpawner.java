@@ -68,6 +68,9 @@ public class ItemStructureSpawner extends BaseModItem
 				this.offsetX = this.offsetY = this.offsetZ = 0;
 				player.addChatMessage("[STRUCTURE GEN] Offset x y z reset to 0.");
 			}
+			else if (Keyboard.isKeyDown(Keyboard.KEY_V)) {
+				player.addChatMessage("[STRUCTURE GEN] Structure will " + (gen.toggleRemove() ? "be removed" : "generate") + " on right click.");
+			}
 			else if (Keyboard.isKeyDown(Keyboard.KEY_I)) {
 				this.increment = !this.increment;
 				player.addChatMessage("[STRUCTURE GEN] Offsets will now " + (this.increment ? "increment." : "decrement."));
