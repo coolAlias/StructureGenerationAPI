@@ -270,9 +270,10 @@ public class WorldGenStructure extends WorldGenerator
 	 * Sets the amount by which to offset the structure's generated location in the world.
 	 * -x values will move the structure away from the player, +x towards the player
 	 * +/-z will move the structure to the left/right of the player
-	 * @param offX Amount to offset the structure's location along the east-west axis
+	 * These will auto-adjust based on rotation, so x is always towards or away from player
+	 * @param offX Amount to offset the structure's location towards/away from player
 	 * @param offY Amount to offset the structure's location along the vertical axis
-	 * @param offZ Amount to offset the structure's location along the north-south axis
+	 * @param offZ Amount to offset the structure's location left/right of the player
 	 */
 	public final void setOffset(int offX, int offY, int offZ) {
 		this.offsetX = offX;
@@ -309,7 +310,8 @@ public class WorldGenStructure extends WorldGenerator
 		int centerX = blockArray[0].length / 2, centerZ = blockArray[0][0].length / 2;
 		// The number of 90 degree rotations to perform based on default structure facing and current player facing
 		int rotation = (((this.structureFacing == NORTH || this.structureFacing == SOUTH) ? this.structureFacing + 2 : this.structureFacing) + this.facing) % 4;
-
+		setOffsetFromRotation();
+		
 		for (int y = 0; y < blockArray.length; ++y)
 		{
 			for (int x = 0; x < blockArray[0].length; ++x)
@@ -583,5 +585,21 @@ public class WorldGenStructure extends WorldGenerator
 		
 		world.setBlockMetadataWithNotify(x, y, z, meta1, 2);
 		world.setBlockMetadataWithNotify(x, y - 1, z, meta2, 2);
+	}
+	
+	/**
+	 * Adjusts offsetX and offsetZ amounts to compensate for manual rotation
+	 */
+	private final void setOffsetFromRotation()
+	{
+		int x, z;
+		
+		for (int i = 0; i < this.manualRotations; ++i)
+		{
+			x = -this.offsetZ;
+			z = this.offsetX;
+			this.offsetX = x;
+			this.offsetZ = z;
+		}
 	}
 }
