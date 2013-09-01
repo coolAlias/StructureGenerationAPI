@@ -46,4 +46,4 @@ Possible Future Features:
 
 Known Bugs:
 
-- Doors: When you change the structure's orientation to the axis opposite its default, doors will open the opposite direction.
+- Currently none known.
