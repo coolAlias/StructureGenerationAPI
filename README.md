@@ -46,5 +46,4 @@ Possible Future Features:
 
 Known Bugs:
 
-- Doors: When you alter the default orientation of a structure, the doors will not be set correctly. Keeping the
-    default orientation and rotating based on player view, however, works fine.
+- Doors: When you change the structure's orientation to the axis opposite its default, doors will open the opposite direction.
