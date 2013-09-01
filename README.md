@@ -20,6 +20,8 @@ If you use the StructureGen mod Item StructureSpawner, these are the controls:
 
 'U' - reset x/y/z offsets to 0
 
+'V' - toggles between generate / remove structure
+
 Right click - spawn structure at tile location clicked
 
 Note that if you want to change what structure is spawned, you must do that manually in ItemStructureSpawner's
@@ -41,8 +43,7 @@ Anyways, hope this is useful!
 Possible Future Features:
 
 - Ability to set default x/y/z offsets for your structure
-- Easy Structure Removal (soon)
-- Tile Entity Data??? Not sure how to go about that.
+- Tile Entity Data??? If you can get me the NBT data, I can rotate it.
 
 Known Bugs:
 
