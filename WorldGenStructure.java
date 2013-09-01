@@ -287,7 +287,6 @@ public class WorldGenStructure extends WorldGenerator
 	public final void rotateStructureFacing() {
 		this.structureFacing = (this.structureFacing == EAST ? SOUTH : this.structureFacing + 1);
 		this.manualRotations = this.manualRotations == 3 ? 0 : this.manualRotations + 1;
-		System.out.println("[GEN STRUCTURE] Manual rotations: " + this.manualRotations);
 	}
 	
 	/**
@@ -553,7 +552,7 @@ public class WorldGenStructure extends WorldGenerator
 	{
 		int meta1 = world.getBlockMetadata(x, y, z);
 		// if flag is true, it is the top door block
-		boolean isTop = (meta1 & 8) != 0;
+		boolean isTop = (meta1 & 8) != 0, isOppositeAxis = this.manualRotations == 1 || this.manualRotations == 3;
 		// Since we're building from the bottom up, we do this from the top door block only so
 		// we are also able to modify the block below
 		if (!isTop) return;
@@ -573,6 +572,13 @@ public class WorldGenStructure extends WorldGenerator
 		{
 			meta1 = meta1 == 11 ? 8 : meta1 == 27 ? 24 : ++meta1;
 			meta2 = meta2 == 3 ? 0 : meta2 == 19 ? 16 : ++meta2;
+		}
+		// Adjust for manual rotations leading to axis opposite of default
+		if (isOppositeAxis)
+		{
+			int adj = (this.structureFacing + 1) % 4 != facing ? 2 : 3;
+			meta1 = meta1 == 11 ? 7 + adj : meta1 == 27 ? 23 + adj : meta1 + adj;
+			meta2 = meta2 == 3 ? -1 + adj : meta2 == 19 ? 15 + adj : meta2 + adj;
 		}
 		
 		world.setBlockMetadataWithNotify(x, y, z, meta1, 2);
