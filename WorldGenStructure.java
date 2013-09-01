@@ -48,7 +48,7 @@ public class WorldGenStructure extends WorldGenerator
 	public static final int SOUTH = 0, WEST = 1, NORTH = 2, EAST = 3;
 	
 	/** Stores the direction this structure faces. Default is EAST.*/
-	private int structureFacing = EAST;
+	private int structureFacing = EAST, manualRotations = 0;
 	
 	/** Stores the player's facing for structure generation */
 	private int facing;
@@ -97,10 +97,11 @@ public class WorldGenStructure extends WorldGenerator
 	 * Add 8 if the block is the head, and be sure to put it on the correct side of the base ;)
 	 * 
 	 * Doors:
-	 * Bottom block should have a value of 0,1,2,3 facing west, north, east, or south
-	 * Add 16 for hinges on right side, but this doesn't seem to work correctly - check
-	 * the wiki for more details: http://www.minecraftwiki.net/wiki/Data_values#Door
-	 * Top block's value should be bottom + 8
+	 * Bottom block stores facing: 0,1,2,3 for west, north, east, south
+	 * (so player looking east, south, west, north)
+	 * Add 4 to bottom block to set it sideways, at which point the side it is rendered
+	 * on is determined by the top block:
+	 * Top door will always have a value of 8 (hinge left) or 9 (hinge right).
 	 * 
 	 * Stairs:
 	 * 0,1,2,3 ascending east, west, south, north, +4 for descending
@@ -204,6 +205,8 @@ public class WorldGenStructure extends WorldGenerator
 	public WorldGenStructure(int facing, int[][][][] blocks) {
 		this.facing = facing;
 		this.blockArray = blocks;
+		this.structureFacing = EAST;
+		this.manualRotations = 0;
 	}
 
 	/**
@@ -214,6 +217,7 @@ public class WorldGenStructure extends WorldGenerator
 		this.facing = facing;
 		this.structureFacing = structureFacing;
 		this.blockArray = blocks;
+		this.manualRotations = 0;
 	}
 	
 	/**
@@ -229,6 +233,7 @@ public class WorldGenStructure extends WorldGenerator
 		this.facing = facing;
 		this.blockArray = blocks;
 		this.structureFacing = structureFacing;
+		this.manualRotations = 0;
 		this.offsetX = offX;
 		this.offsetY = offY;
 		this.offsetZ = offZ;
@@ -239,6 +244,11 @@ public class WorldGenStructure extends WorldGenerator
 	 */
 	public WorldGenStructure(boolean par1) {
 		super(par1);
+		this.structureFacing = EAST;
+		this.manualRotations = 0;
+		this.offsetX = 0;
+		this.offsetY = 0;
+		this.offsetZ = 0;
 	}
 	
 	/**
@@ -276,6 +286,8 @@ public class WorldGenStructure extends WorldGenerator
 	 */
 	public final void rotateStructureFacing() {
 		this.structureFacing = (this.structureFacing == EAST ? SOUTH : this.structureFacing + 1);
+		this.manualRotations = this.manualRotations == 3 ? 0 : this.manualRotations + 1;
+		System.out.println("[GEN STRUCTURE] Manual rotations: " + this.manualRotations);
 	}
 	
 	/**
@@ -359,8 +371,7 @@ public class WorldGenStructure extends WorldGenerator
 	 */
 	private final void setMetadata(World world, int x, int y, int z, int origMeta, int facing)
 	{
-		int meta = world.getBlockMetadata(x, y, z),
-			id = world.getBlockId(x, y, z);
+		int meta = world.getBlockMetadata(x, y, z), id = world.getBlockId(x, y, z);
 		
 		// chests may form large chests - happens automatically onBlockAdded
 		// also, chest facing is changed automatically, so re-set it here:
@@ -403,7 +414,7 @@ public class WorldGenStructure extends WorldGenerator
 		int rotation = (((this.structureFacing == NORTH || this.structureFacing == SOUTH) ? this.structureFacing + 2 : this.structureFacing) + this.facing) % 4;
 		
 		int meta = origMeta, tickDelay = meta >> 2, bit9 = meta >> 3,
-			bitface, bit4, bit8;
+			bitface, bit4, bit8, bit16;
 		
 		for (int i = 0; i < rotation; ++i)
 		{
@@ -411,11 +422,15 @@ public class WorldGenStructure extends WorldGenerator
 			bitface = meta % 4; // usually used for block's facing, such as for stairs
 			bit4 = meta & 4; // often stores an on/off value; for stairs, determines whether upside-down
 			bit8 = meta & 8; // often stores an on/off value, such as for a lever
+			bit16 = meta & 16;
 
 			if (Block.blocksList[id] instanceof BlockAnvil)
 				meta ^= 1;
 			else if (Block.blocksList[id] instanceof BlockBed)
 				meta = (bitface == 3 ? 0 : bitface + 1) | bit8;
+			// Don't change the top half of the door, so hinge always on same side
+			//else if (Block.blocksList[id] instanceof BlockDoor)
+				//meta = (bitface == 3 ? 0 : bitface + 1) | bit4 | bit8 | bit16;
 			else if (Block.blocksList[id] instanceof BlockButton || ((Block.blocksList[id] instanceof BlockTorch
 					|| Block.blocksList[id] instanceof BlockRedstoneTorch) && meta < 5))
 				meta = meta == 4 ? 1 : meta == 1 ? 3 : meta == 3 ? 2 : 4;
@@ -552,7 +567,7 @@ public class WorldGenStructure extends WorldGenerator
 		// adjust facing to match metadata direction values:
 		facing = (facing + 1) % 4;
 		// Number of 90 degree rotations required:
-		int rotations = Math.abs(origfacing - facing);
+		int rotations = (Math.abs(origfacing - facing) + this.manualRotations) % 4;
 		
 		for (int i = 0; i < rotations; ++i)
 		{
