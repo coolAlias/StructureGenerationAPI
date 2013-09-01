@@ -423,7 +423,7 @@ public class WorldGenStructure extends WorldGenerator
 				meta = (bitface == 3 ? 0 : bitface + 1) | bit4 | bit8;
 			else if (Block.blocksList[id] instanceof BlockFenceGate || Block.blocksList[id] instanceof BlockPumpkin
 					|| Block.blocksList[id] instanceof BlockEndPortalFrame || Block.blocksList[id] instanceof BlockTripWireSource)
-				meta = (meta == 0 ? 1 : meta == 1 ? 2 : meta == 2 ? 3 : 0) | bit4;
+				meta = (bitface == 3 ? 0 : bitface + 1) | bit4;
 			else if (Block.blocksList[id] instanceof BlockChest || Block.blocksList[id] instanceof BlockFurnace
 					|| Block.blocksList[id] instanceof BlockLadder || id == Block.signWall.blockID)
 					meta = meta == 2 ? 5 : meta == 5 ? 3 : meta == 3 ? 4 : 2;
