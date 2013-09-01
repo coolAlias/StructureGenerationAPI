@@ -325,10 +325,10 @@ public class StructureArrays
 					{0},{0},{0},{0},{0},{0}
 				},
 				{ // x = 1 z values:
-					{0},{0},{0},{0},{0},{0}
+					{0},{0},{Block.rail.blockID,6},{Block.rail.blockID,9},{0},{0}
 				},
 				{ // x = 2 z values:
-					{0},{0},{Block.rail.blockID,6},{Block.rail.blockID,9},{0},{0}
+					{0},{0},{Block.rail.blockID,1},{Block.rail.blockID,1},{0},{0}
 				},
 				{ // x = 3 z values:
 					{0},{0},{Block.rail.blockID,7},{Block.rail.blockID,8},{0},{0}
