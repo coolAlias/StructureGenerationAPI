@@ -9,10 +9,15 @@ simply a sort of demo mod I put together so you can try the tool out without hav
 If you use the StructureGen mod Item StructureSpawner, these are the controls:
 
 'O' - changes structure's default orientation by 90 degrees
+
 'I' - toggles between increment and decrement
+
 'X' - increments or decrements x value to offset spawn location
+
 'Y' - increments or decrements y value to offset spawn location
+
 'Z' - increments or decrements z value to offset spawn location
+
 'U' - reset x/y/z offsets to 0
 
 Right click - spawn structure at tile location clicked
@@ -25,3 +30,10 @@ Detailed instructions for creating your own structure are included in the Struct
 Read them carefully.
 
 Currently, I don't have tile entity data incorporated. I hope to add that in the future.
+
+Let me know if you find any bugs, but if it has to do with metadata blocks, please, before you submit a bug report,
+double and triple-check that you are setting metadata correctly. Each block has it's own way of determining facing,
+so you MUST read each entry carefully every time you are setting metadata. Trust me, even looking at the reference
+I still set metadata blocks backwards half the time.
+
+Anyways, hope this is useful!
