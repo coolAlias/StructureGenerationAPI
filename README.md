@@ -12,11 +12,11 @@ If you use the StructureGen mod Item StructureSpawner, these are the controls:
 
 'I' - toggles between increment and decrement
 
-'X' - increments or decrements x value to offset spawn location
+'X' - offsets the structure's spawn location towards (+) or away (-) from the player
 
 'Y' - increments or decrements y value to offset spawn location
 
-'Z' - increments or decrements z value to offset spawn location
+'Z' - offsets the structure's spawn location to the right (+) or left (-) of the player
 
 'U' - reset x/y/z offsets to 0
 
@@ -41,9 +41,9 @@ Anyways, hope this is useful!
 Possible Future Features:
 
 - Ability to set default x/y/z offsets for your structure
-- Easy Structure Removal (maybe)
+- Easy Structure Removal (soon)
 - Tile Entity Data??? Not sure how to go about that.
 
 Known Bugs:
 
-- Currently none known.
+- Currently none.
