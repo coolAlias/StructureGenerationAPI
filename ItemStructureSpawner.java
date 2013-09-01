@@ -2,7 +2,6 @@ package coolalias.structuregen;
 
 import org.lwjgl.input.Keyboard;
 
-import builder.structures.village.WorldGenNormalHut;
 import cpw.mods.fml.client.FMLClientHandler;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
