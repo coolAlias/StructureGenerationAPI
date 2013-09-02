@@ -190,37 +190,27 @@ public class WorldGenStructure extends WorldGenerator
 	 * Associated tile entity will determine skull type, as well as rotation if on floor.
 	 */
 	private int[][][][] blockArray;
-
-	/**
-	 * Constructs the structure generator with player's facing
-	 * Don't use, as values SOUTH and WEST might be confused with boolean values,
-	 * calling the super constructor instead
-	 */
-	/*
-	public WorldGenStructure(int facing) {
-		this.facing = facing;
-	}
-	*/
 	
 	/**
 	 * Constructs the generator with the player's facing and blockArray for the structure
 	 */
-	public WorldGenStructure(int facing, int[][][][] blocks) {
+	public WorldGenStructure(int facing, int[][][][] blocks)
+	{
+		super(false);
 		this.facing = facing;
 		this.blockArray = blocks;
-		//this.structureFacing = EAST;
-		//this.manualRotations = 0;
 	}
 
 	/**
 	 * Constructs the generator with the player's facing, the structure's front facing
 	 * and blockArray for the structure
 	 */
-	public WorldGenStructure(int facing, int[][][][] blocks, int structureFacing) {
+	public WorldGenStructure(int facing, int[][][][] blocks, int structureFacing)
+	{
+		super(false);
 		this.facing = facing;
 		this.structureFacing = structureFacing;
 		this.blockArray = blocks;
-		//this.manualRotations = 0;
 	}
 	
 	/**
@@ -232,26 +222,23 @@ public class WorldGenStructure extends WorldGenerator
 	 * @param offY Amount to offset the structure's location along the vertical axis
 	 * @param offZ Amount to offset the structure's location along the north-south axis
 	 */
-	public WorldGenStructure(int facing, int[][][][] blocks, int structureFacing, int offX, int offY, int offZ) {
+	public WorldGenStructure(int facing, int[][][][] blocks, int structureFacing, int offX, int offY, int offZ)
+	{
+		super(false);
 		this.facing = facing;
 		this.blockArray = blocks;
 		this.structureFacing = structureFacing;
-		//this.manualRotations = 0;
 		this.offsetX = offX;
 		this.offsetY = offY;
 		this.offsetZ = offZ;
 	}
 
 	/**
-	 * Super constructor. Will probably never use.
-	 */
+	 * Super constructor. par1 sets whether or not the generator should notify blocks of blocks it
+	 * changes. When the world is first generated, this is false, when saplings grow, this is true.
+     */
 	public WorldGenStructure(boolean par1) {
 		super(par1);
-		//this.structureFacing = EAST;
-		//this.manualRotations = 0;
-		//this.offsetX = 0;
-		//this.offsetY = 0;
-		//this.offsetZ = 0;
 	}
 	
 	/**
@@ -271,18 +258,31 @@ public class WorldGenStructure extends WorldGenerator
 	}
 	
 	/**
-	 * Sets the default direction the structure is facing. This side will always face the player
-	 * unless you manually rotate the structure with the rotateStructureFacing() method.
-	 */
-	public final void setStructureFacing(int facing) {
-		this.structureFacing = facing;
-	}
-	
-	/**
 	 * Sets the block array to generate
 	 */
 	public final void setBlockArray(int blocks[][][][]) {
 		this.blockArray = blocks;
+	}
+	
+	/**
+	 * Returns structure's width along the x axis or 0 if no structure has been set
+	 */
+	public final int getWidthX() {
+		return this.blockArray != null ? this.blockArray[0].length : 0;
+	}
+	
+	/**
+	 * Returns structure's width along the z axis or 0 if no structure has been set
+	 */
+	public final int getWidthZ() {
+		return this.blockArray != null ? this.blockArray[0][0].length : 0;
+	}
+	
+	/**
+	 * Returns structure's height or 0 if no structure has been set
+	 */
+	public final int getHeight() {
+		return this.blockArray != null ? this.blockArray.length : 0;
 	}
 	
 	/**
@@ -325,6 +325,14 @@ public class WorldGenStructure extends WorldGenerator
 	{
 		this.removeStructure = !this.removeStructure;
 		return this.removeStructure;
+	}
+	
+	/**
+	 * Returns true if the generator has enough information to generate a structure
+	 */
+	public final boolean canGenerate()
+	{
+		return this.blockArray != null;
 	}
 
 	/**
