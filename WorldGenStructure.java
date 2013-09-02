@@ -271,6 +271,14 @@ public class WorldGenStructure extends WorldGenerator
 	}
 	
 	/**
+	 * Sets the default direction the structure is facing. This side will always face the player
+	 * unless you manually rotate the structure with the rotateStructureFacing() method.
+	 */
+	public final void setStructureFacing(int facing) {
+		this.structureFacing = facing;
+	}
+	
+	/**
 	 * Sets the block array to generate
 	 */
 	public final void setBlockArray(int blocks[][][][]) {
@@ -313,7 +321,7 @@ public class WorldGenStructure extends WorldGenerator
 	 * Toggles between generate and remove structure setting.
 	 * Returns value for ease of reference.
 	 */
-	public final boolean toggleRemove()
+	public final boolean toggleRemoveStructure()
 	{
 		this.removeStructure = !this.removeStructure;
 		return this.removeStructure;
