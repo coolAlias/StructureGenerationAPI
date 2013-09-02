@@ -8,9 +8,9 @@ simply a sort of demo mod I put together so you can try the tool out without hav
 
 If you use the StructureGen mod Item StructureSpawner, these are the controls:
 
-'O' - changes structure's default orientation by 90 degrees
+'O' - changes structure's default orientation by 90 degrees. This will have the effect of changing which side spawns facing the player.
 
-'I' - toggles between increment and decrement
+'I' - toggles between increment and decrement offset values below
 
 'X' - offsets the structure's spawn location towards (+) or away (-) from the player
 
@@ -20,9 +20,9 @@ If you use the StructureGen mod Item StructureSpawner, these are the controls:
 
 'U' - reset x/y/z offsets to 0
 
-'V' - toggles between generate / remove structure
+'V' - toggles between generate / remove structure - when removing, be sure to click the EXACT position you clicked when spawning it
 
-Right click - spawn structure at tile location clicked
+Right click - spawn / remove structure at tile location clicked
 
 Note that if you want to change what structure is spawned, you must do that manually in ItemStructureSpawner's
 onItemUse method. Sorry for the inconvenience.
