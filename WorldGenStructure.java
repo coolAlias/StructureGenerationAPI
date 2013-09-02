@@ -263,6 +263,14 @@ public class WorldGenStructure extends WorldGenerator
 	}
 	
 	/**
+	 * Sets the default direction the structure is facing. This side will always face the player
+	 * unless you manually rotate the structure with the rotateStructureFacing() method.
+	 */
+	public final void setStructureFacing(int facing) {
+		this.structureFacing = facing;
+	}
+	
+	/**
 	 * Sets the block array to generate
 	 */
 	public final void setBlockArray(int blocks[][][][]) {
