@@ -34,6 +34,15 @@ public class StructureArrays
 	 * If it's easier for you to visualize adding lines along the east-west axis starting
 	 * in the northwest corner, adding blocks toward the east and lines toward the south,
 	 * put your z values first and x values second.
+	 * 
+	 * If you want any part of your structure to 'soft spawn', use the negative value of the
+	 * block ID. This will prevent your block from spawning in the world if another block
+	 * already exists at that location, allowing your structure to more naturally fit in with
+	 * the environment. To set an air block that doesn't overwrite pre-existing blocks, use
+	 * the value SET_NO_BLOCK instead of a block ID.
+	 * 
+	 * A quick example: Block.cobblestone.blockID will only spawn a cobblestone block if its
+	 * spawn location is air or occupied by a block such as grass that doesn't block movement.
 	 * =====================================================================================
 	 * 							IMPORTANT: NOTES ON SETTING METADATA
 	 * =====================================================================================
@@ -145,6 +154,56 @@ public class StructureArrays
 	 */
 	public static final int[][][][] blockArrayNPCHut =
 		{
+			{ // NEW y = 0 that demonstrates a layer of 'soft' spawning cobblestone
+				{ // x = 0
+					{-Block.cobblestone.blockID}, // z = 0
+					{-Block.cobblestone.blockID}, // z = 1
+					{-Block.cobblestone.blockID}, // z = 2
+					{-Block.cobblestone.blockID}, // z = 3
+					{-Block.cobblestone.blockID}, // z = 4
+					{-Block.cobblestone.blockID}, // z = 5
+				},
+				{ // x = 1
+					{-Block.cobblestone.blockID}, // z = 0
+					{-Block.cobblestone.blockID}, // z = 1
+					{-Block.cobblestone.blockID}, // z = 2
+					{-Block.cobblestone.blockID}, // z = 3
+					{-Block.cobblestone.blockID}, // z = 4
+					{-Block.cobblestone.blockID}, // z = 5
+				},
+				{ // x = 2
+					{-Block.cobblestone.blockID}, // z = 0
+					{-Block.cobblestone.blockID}, // z = 1
+					{-Block.cobblestone.blockID}, // z = 2
+					{-Block.cobblestone.blockID}, // z = 3
+					{-Block.cobblestone.blockID}, // z = 4
+					{-Block.cobblestone.blockID}, // z = 5
+				},
+				{ // x = 3
+					{-Block.cobblestone.blockID}, // z = 0
+					{-Block.cobblestone.blockID}, // z = 1
+					{-Block.cobblestone.blockID}, // z = 2
+					{-Block.cobblestone.blockID}, // z = 3
+					{-Block.cobblestone.blockID}, // z = 4
+					{-Block.cobblestone.blockID}, // z = 5
+				},
+				{ // x = 4
+					{-Block.cobblestone.blockID}, // z = 0
+					{-Block.cobblestone.blockID}, // z = 1
+					{-Block.cobblestone.blockID}, // z = 2
+					{-Block.cobblestone.blockID}, // z = 3
+					{-Block.cobblestone.blockID}, // z = 4
+					{-Block.cobblestone.blockID}, // z = 5
+				},
+				{ // x = 5
+					{-Block.cobblestone.blockID}, // z = 0
+					{-Block.cobblestone.blockID}, // z = 1
+					{-Block.cobblestone.blockID}, // z = 2
+					{-Block.cobblestone.blockID}, // z = 3
+					{-Block.cobblestone.blockID}, // z = 4
+					{-Block.cobblestone.blockID}, // z = 5
+				}
+			},
 			{ // y = 0
 				{ // x = 0 this is the western-most position in our structure
 					// z axis, so these are all the blocks in a north-south line at x = 0

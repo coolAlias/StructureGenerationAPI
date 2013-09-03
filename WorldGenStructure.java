@@ -42,7 +42,7 @@ public class WorldGenStructure extends WorldGenerator
 	public static final int NO_METADATA = 10000;
 	
 	/** Use this value to skip setting a block at an x,y,z coordinate for whatever reason. */
-	public static final int SET_NO_BLOCK = -1;
+	public static final int SET_NO_BLOCK = -10000;
 	
 	/** The directional values associated with player facing: */
 	public static final int SOUTH = 0, WEST = 1, NORTH = 2, EAST = 3;
@@ -301,6 +301,17 @@ public class WorldGenStructure extends WorldGenerator
 	}
 	
 	/**
+	 * Call this only after setting the blockArray. Set a default offset amount
+	 * that will keep the entire structure's boundaries from overlapping with
+	 * the position spawned at, so it will never spawn on the player.
+	 */
+	public final void setDefaultOffset() {
+		this.offsetX = (-getWidthX() - 5);
+		this.offsetY = 1;
+		this.offsetZ = 0;
+	}
+	
+	/**
 	 * This will rotate the structure's default facing 90 degrees clockwise.
 	 * Note that a different side will now face the player when generated.
 	 */
@@ -344,7 +355,12 @@ public class WorldGenStructure extends WorldGenerator
 	@Override
 	public boolean generate(World world, Random random, int posX, int posY, int posZ)
 	{
+		// We only want to generate server side
+		if (world.isRemote) { return false; }
+		
 		int centerX = blockArray[0].length / 2, centerZ = blockArray[0][0].length / 2;
+		// temporary storage for block id to spawn
+		int blockID;
 		// The number of 90 degree rotations to perform based on default structure facing and current player facing
 		int rotation = (((this.structureFacing == NORTH || this.structureFacing == SOUTH) ? this.structureFacing + 2 : this.structureFacing) + this.facing) % 4;
 		setOffsetFromRotation();
@@ -361,7 +377,7 @@ public class WorldGenStructure extends WorldGenerator
 					if (blockArray[y][x][z][0] == SET_NO_BLOCK) continue;
 					
 					int meta = (blockArray[y][x][z].length > 1 ? blockArray[y][x][z][1] : NO_METADATA);
-					int flag = (blockArray[y][x][z].length > 2 ? blockArray[y][x][z][2] : 0);
+					int flag = (blockArray[y][x][z].length > 2 ? blockArray[y][x][z][2] : 2);
 					int rotX = posX, rotZ = posZ;
 
 					switch(rotation) {
@@ -385,19 +401,30 @@ public class WorldGenStructure extends WorldGenerator
 						System.out.println("[GEN STRUCTURE] Error computing number of rotations.");
 						break;
 					}
-					if (this.removeStructure)
-						world.setBlockToAir(rotX, posY + y + offsetY, rotZ);
+					blockID = blockArray[y][x][z][0];
+					if (this.removeStructure) {
+						// only remove 'hard-spawned' blocks
+						if (blockID < 1)
+							world.setBlockToAir(rotX, posY + y + offsetY, rotZ);
+					}
 					else
 					{
-						if (meta != NO_METADATA)
+						// Allows 'soft-spawning' blocks to be spawned only in air or on blocks that allow movement, such as air or grass
+						if (blockID >= 0 || world.isAirBlock(rotX, posY + y + offsetY, rotZ) || 
+								(Block.blocksList[world.getBlockId(rotX, posY + y + offsetY, rotZ)] != null
+								&& !Block.blocksList[world.getBlockId(rotX, posY + y + offsetY, rotZ)].blockMaterial.blocksMovement()))
 						{
-							meta = getMetadata(blockArray[y][x][z][0], meta, facing);
-							if (flag == 0) flag = 2;
+							if (meta != NO_METADATA)
+								meta = getMetadata(Math.abs(blockID), meta, facing);
+							else
+								meta = 0;
+							
+							flag = flag == 0 ? 2 : flag;
+
+							world.setBlock(rotX, posY + y + offsetY, rotZ, Math.abs(blockID), meta, flag);
+
+							setMetadata(world, rotX, posY + y + offsetY, rotZ, meta, facing);
 						}
-
-						world.setBlock(rotX, posY + y + offsetY, rotZ, blockArray[y][x][z][0], meta, flag);
-
-						setMetadata(world, rotX, posY + y + offsetY, rotZ, meta, facing);
 					}
 				}
 			}
