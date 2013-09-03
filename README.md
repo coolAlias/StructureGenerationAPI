@@ -6,7 +6,21 @@ This is a tool I created to allow you to rotate and offset your custom structure
 The only 2 files you need are WorldGenStructure and StructureArrays as a demo / template. The rest of the files is
 simply a sort of demo mod I put together so you can try the tool out without having to set up a bunch of stuff.
 
-If you use the StructureGen mod Item StructureSpawner, these are the controls:
+Features
+========
+- Generate custom structures in the world with the click of a button
+- Auto-rotation of structures ensures it will always face the player
+- Default offset will place the structure so it never spawns on top of the player
+- Ability to manually change a structure's rotation or offset before spawning
+- Full metadata compatibility
+- Set any block as a 'buffer' so your structure spawns more naturally in the environment
+
+Demo Mod Included
+=================
+A ready-to-go mod that will help familiarize you with the capabilities and functionality of the Structure Generation
+Tool. There is currently no recipe for the item that spawns structures, so try it in Creative.
+
+These are the controls:
 
 'O' - changes structure's default orientation by 90 degrees. This will have the effect of changing which side spawns facing the player.
 
@@ -23,6 +37,15 @@ If you use the StructureGen mod Item StructureSpawner, these are the controls:
 'V' - toggles between generate / remove structure - when removing, be sure to click the EXACT position you clicked when spawning it
 
 Right click - spawn / remove structure at tile location clicked
+
+INSTALLATION
+============
+To test out the mod:
+Download the pre-compiled and zipped mod file and place it in your minecraft/mods folder. You're good to go!
+
+For creating your own structures:
+Just place the WorldGenStructure.java file in your mod package and import it into your classes as needed. You will
+need to make a class to store your structure arrays in order to have something to generate.
 
 Note that if you want to change what structure is spawned, you must do that manually in ItemStructureSpawner's
 onItemUse method. Sorry for the inconvenience.
@@ -42,9 +65,10 @@ Anyways, hope this is useful!
 
 Possible Future Features:
 
+- Compatibility with custom blocks
 - Ability to set default x/y/z offsets for your structure
 - Tile Entity Data??? If you can get me the NBT data, I can rotate it.
 
 Known Bugs:
 
-- Currently none.
+- Currently none
