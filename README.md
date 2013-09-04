@@ -63,7 +63,7 @@ Anyways, hope this is useful!
 
 Possible Future Features:
 
-- Compatibility with custom blocks
+- Ability to define custom block rotation
 - Ability to set default x/y/z offsets for your structure in the StructureArrays file
 
 Known Bugs:
