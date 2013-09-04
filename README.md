@@ -1,10 +1,9 @@
 StructureGenerationTool
 =======================
 
-This is a tool I created to allow you to rotate and offset your custom structures as they are generated in the world.
-
-The only 2 files you need are WorldGenStructure and StructureArrays as a demo / template. The rest of the files is
-simply a sort of demo mod I put together so you can try the tool out without having to set up a bunch of stuff.
+This is a tool I created to allow you to generate custom structures as well as rotate and offset your custom structures
+as they are generated in the world. Additionally, there are methods that allow you to set custom tile entity data, spawn
+entities or whatever else you can imagine.
 
 Features
 ========
@@ -12,8 +11,10 @@ Features
 - Auto-rotation of structures ensures it will always face the player
 - Default offset will place the structure so it never spawns on top of the player
 - Ability to manually change a structure's rotation or offset before spawning
-- Full metadata compatibility
+- Full metadata block rotation compatibility
 - Set any block as a 'buffer' so your structure spawns more naturally in the environment
+- Custom 'hooks' allow you to define specific behavior for any block set, such as setting tile entity data
+  or spawning entities at that location
 
 Demo Mod Included
 =================
@@ -38,23 +39,19 @@ These are the controls:
 
 Right click - spawn / remove structure at tile location clicked
 
+Note that if you want to change what structure is spawned, you must do that manually in ItemStructureSpawner's
+onItemUse method. Sorry for the inconvenience.
+
 INSTALLATION
 ============
 To test out the mod:
 Download the pre-compiled and zipped mod file and place it in your minecraft/mods folder. You're good to go!
 
 For creating your own structures:
-Just place the WorldGenStructure.java file in your mod package and import it into your classes as needed. You will
-need to make a class to store your structure arrays in order to have something to generate.
-
-Note that if you want to change what structure is spawned, you must do that manually in ItemStructureSpawner's
-onItemUse method. Sorry for the inconvenience.
-
-Detailed instructions for creating your own structure are included in the StructureArrays file.
-
-Read them carefully.
-
-Currently, I don't have tile entity data incorporated. I hope to add that in the future.
+1. Place the StructureGeneratorBase.java file in your mod package.
+2. Either use the included WorldGenStructure.java file or create your own class that extends StructureGeneratorBase
+3. Build your own structure arrays by following the guidelines in StructureArrays.java
+4. Use your WorldGenStructure class to generate your structures from whatever location you choose, such as a block or item
 
 Let me know if you find any bugs, but if it has to do with metadata blocks, please, before you submit a bug report,
 double and triple-check that you are setting metadata correctly. Each block has it's own way of determining facing,
@@ -66,8 +63,7 @@ Anyways, hope this is useful!
 Possible Future Features:
 
 - Compatibility with custom blocks
-- Ability to set default x/y/z offsets for your structure
-- Tile Entity Data??? If you can get me the NBT data, I can rotate it.
+- Ability to set default x/y/z offsets for your structure in the StructureArrays file
 
 Known Bugs:
 
