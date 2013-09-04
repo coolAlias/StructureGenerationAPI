@@ -40,14 +40,21 @@ import net.minecraft.world.gen.feature.WorldGenerator;
 
 public abstract class StructureGeneratorBase extends WorldGenerator
 {
-	/** Used to distinguish blocks with metadata value of 0 versus no metadata at all. */
-	public static final int NO_METADATA = Integer.MIN_VALUE;
-	
 	/** Use this value to skip setting a block at an x,y,z coordinate for whatever reason. */
 	public static final int SET_NO_BLOCK = Integer.MAX_VALUE;
 	
 	/** The directional values associated with player facing: */
 	public static final int SOUTH = 0, WEST = 1, NORTH = 2, EAST = 3;
+	
+	/** Valid rotation types. Each type is handled like vanilla blocks of this kind. */
+	public static enum ROTATION {ANVIL, DOOR, GENERIC, PISTON_CONTAINER, RAIL, REPEATER,
+		SIGNPOST, SKULL, STAIRS, TRAPDOOR, VINE, WALL_MOUNTED, WOOD};
+	
+	/**
+	 * Used to distinguish blocks with metadata value of 0 versus no metadata at all. 
+	 * Really more of an internal check. Users don't really need this.
+	 */
+	private static final int NO_METADATA = Integer.MIN_VALUE;
 	
 	/** Stores the direction this structure faces. Default is EAST.*/
 	private int structureFacing = EAST, manualRotations = 0;
@@ -63,10 +70,6 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 	
 	/** A mapping of block ids to rotation type for handling rotation. Allows custom blocks to be added. */
 	private static final Map<Integer, ROTATION> blockRotationData = new HashMap<Integer, ROTATION>();
-	
-	/** Valid rotation types. Each type is handled like vanilla blocks of this kind. */
-	public static enum ROTATION {ANVIL, DOOR, GENERIC, PISTON_CONTAINER, RAIL, REPEATER,
-		SIGNPOST, SKULL, STAIRS, TRAPDOOR, VINE, WALL_MOUNTED, WOOD};
 	
 	/** Stores the structure's data. See StructureArray.java for information on how create a blockArray. */
 	private int[][][][] blockArray;
@@ -263,7 +266,7 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 					int realID = (Math.abs(fakeID) > 4096 ? getRealBlockID(fakeID) : fakeID);
 					
 					if (Math.abs(realID) > 4096) {
-						System.out.println("[GEN STRUCTURE][SEVERE] Invalid block ID. Initial ID: " + fakeID + ", returned id from getRealID: " + realID);
+						System.out.println("[GEN STRUCTURE][WARNING] Invalid block ID. Initial ID: " + fakeID + ", returned id from getRealID: " + realID);
 						continue;
 					}
 
@@ -299,7 +302,7 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 								(Block.blocksList[world.getBlockId(rotX, rotY, rotZ)] != null
 								&& !Block.blocksList[world.getBlockId(rotX, rotY, rotZ)].blockMaterial.blocksMovement()))
 						{
-							if (blockRotationData.containsKey(realID))
+							if (meta != NO_METADATA && blockRotationData.containsKey(realID))
 								meta = getMetadata(Math.abs(realID), meta, facing);
 							else
 								meta = 0;
@@ -308,7 +311,8 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 
 							world.setBlock(rotX, rotY, rotZ, Math.abs(realID), meta, flag);
 							// Fixes things like rails that automatically update onBlockAdded from world.setBlock
-							setMetadata(world, rotX, rotY, rotZ, meta, facing);
+							if (blockRotationData.containsKey(realID))
+								setMetadata(world, rotX, rotY, rotZ, meta, facing);
 							
 							if (Math.abs(fakeID) > 4096) {
 								onCustomBlockAdded(world, rotX, rotY, rotZ, fakeID, customData);
