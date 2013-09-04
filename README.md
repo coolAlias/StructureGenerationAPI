@@ -48,6 +48,7 @@ To test out the mod:
 Download the pre-compiled and zipped mod file and place it in your minecraft/mods folder. You're good to go!
 
 For creating your own structures:
+
 1. Place the StructureGeneratorBase.java file in your mod package.
 2. Either use the included WorldGenStructure.java file or create your own class that extends StructureGeneratorBase
 3. Build your own structure arrays by following the guidelines in StructureArrays.java
