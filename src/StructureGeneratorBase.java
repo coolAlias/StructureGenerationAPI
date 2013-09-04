@@ -237,7 +237,7 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 	{
 		// We only want to generate server side and if blockArray has been set
 		if (world.isRemote) { return false; }
-		if (blockArray == null) { System.out.println("[GEN STRUCTURE] No structure array has been set."); return false; }
+		if (blockArray == null) { System.out.println("[GEN STRUCTURE][WARNING] No structure array has been set."); return false; }
 		
 		int centerX = blockArray[0].length / 2, centerZ = blockArray[0][0].length / 2;
 		int rotation = (((this.structureFacing == NORTH || this.structureFacing == SOUTH) ? this.structureFacing + 2 : this.structureFacing) + this.facing) % 4;
