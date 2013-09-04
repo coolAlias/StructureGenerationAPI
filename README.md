@@ -12,6 +12,7 @@ Features
 - Default offset will place the structure so it never spawns on top of the player
 - Ability to manually change a structure's rotation or offset before spawning
 - Full metadata block rotation compatibility
+- Compatibility with custom blocks; just use addCustomBlockRotation to define its rotation type
 - Set any block as a 'buffer' so your structure spawns more naturally in the environment
 - Custom 'hooks' allow you to define specific behavior for any block set, such as setting tile entity data
   or spawning entities at that location
@@ -63,7 +64,6 @@ Anyways, hope this is useful!
 
 Possible Future Features:
 
-- Ability to define custom block rotation
 - Ability to set default x/y/z offsets for your structure in the StructureArrays file
 
 Known Bugs:
