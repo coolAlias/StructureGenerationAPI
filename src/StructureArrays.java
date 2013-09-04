@@ -77,6 +77,9 @@ public class StructureArrays
 	 * Default structure facing is EAST, so I set all my metadata based on a player looking
 	 * WEST, e.g. if I want stairs leading away from the player, I set the metadata to 1.
 	 * 
+	 * The ROTATION type is in parentheses ( ), followed by metadata explanations for all blocks
+	 * that use that type. Use this as a guide for setting custom block rotation type.
+	 * 
 	 * (ANVIL) Anvils:
 	 * 0 sets the anvil's length along the north-south axis, 1 along east-west
 	 * Add 4 for slightly damaged, add 8 for very damaged. DON'T add 12!!!
@@ -108,7 +111,7 @@ public class StructureArrays
 	 * Pistons, Piston Extensions, Dispensers, Droppers and Hoppers:
 	 * Same as above; 0,1 down/up
 	 * 
-	 * Powered Rails: (yes, it uses PISTON, not RAIL)
+	 * Activated/Detector/Powered Rails: (yes, they use PISTON_CONTAINER, not RAIL)
 	 * Same as Rails for values 0-5. No corner pieces.
 	 * Add 8 if powered (should be set automatically, but maybe not)
 	 *
@@ -118,10 +121,10 @@ public class StructureArrays
 	 * 6,7,8,9 corner track: NW, NE, SE, SW corner
 	 * Corner pieces connect the opposite directions, so 6 (NW corner) connects to the south and east
 	 * 
-	 * (REPEATER)
-	 * Redstone Repeater and Comparator:
+	 * (REPEATER) Redstone Repeater and Comparator:
 	 * 0,1,2,3 facing north, east, south, west. Add 4 per tick delay beyond the first.
 	 * Example: Repeater facing south with 3 ticks = 2 + 4 + 4 = 10.
+	 * 
 	 * (SIGNPOST) Sign Posts:
 	 * 16 directions, 0 being due south and working clockwise towards south-southeast at 15
 	 * Keep in mind that this is the direction in which the writing will show, but the player
