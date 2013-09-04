@@ -77,41 +77,70 @@ public class StructureArrays
 	 * Default structure facing is EAST, so I set all my metadata based on a player looking
 	 * WEST, e.g. if I want stairs leading away from the player, I set the metadata to 1.
 	 * 
-	 * Anvils:
+	 * (ANVIL) Anvils:
 	 * 0 sets the anvil's length along the north-south axis, 1 along east-west
 	 * Add 4 for slightly damaged, add 8 for very damaged. DON'T add 12!!!
 	 * 
-	 * Beds:
-	 * 0,1,2,3 head is pointing south, west, north, east.
-	 * Add 8 if the block is the head, and be sure to put it on the correct side of the base ;)
-	 * 
-	 * Doors:
+	 * (DOOR) Doors:
 	 * Bottom block should have a value of 0,1,2,3 facing west, north, east, or south
 	 * Add 16 for hinges on right side, but this doesn't seem to work correctly - check
 	 * the wiki for more details: http://www.minecraftwiki.net/wiki/Data_values#Door
 	 * Top block's value should be bottom + 8
 	 * 
-	 * Stairs:
+	 * (GENERIC) Beds, Cocoas, Fence Gates, Pumpkins, Jack'o Lanterns, Tripwire Hooks, End Portal Frames:
+	 * 0,1,2,3 facing south, west, north, east. For cocoa, it is placed on the block to that side.
+	 * Add 4 for opened (gates), no face (pumpkins & jack'o lanterns), connected (tripwire hooks)
+	 * medium size (cocoa) or inserted eye (end portal frame)
+	 * Add 8 for large size (cocoa) or to set as head (bed) - be sure to put the head on the correct side
+	 * of the base ;)
+	 * 
+	 * (STAIRS) Stairs:
 	 * 0,1,2,3 ascending east, west, south, north, +4 for descending
 	 * 
-	 * Wood:
-	 * 0,1,2,3 Oak/Spruce/Birch/Jungle placed vertically
-	 * Add 4 will face east/west, add 8 will face north/south, add 12 bark only
-	 * 
-	 * Ladders, furnaces, chests, wall signs:
+	 * (PISTON_CONTAINER)
+	 * Chests, Furnaces, Ladders and Wall Signs:
 	 * 2,3,4,5 facing north, south, west, east
 	 * (ladders and signs placed on 'facing' side of the block: 2 will place on north side of block to the south)
 	 * RE: Chests - if you place two chests adjacent to each other but with different facings,
 	 * be prepared for weird things to happen as the code will try to enforce your chosen
 	 * facing. Don't say I didn't warn you.
 	 * 
-	 * Sign Posts:
+	 * Pistons, Piston Extensions, Dispensers, Droppers and Hoppers:
+	 * Same as above; 0,1 down/up
+	 * 
+	 * Powered Rails: (yes, it uses PISTON, not RAIL)
+	 * Same as Rails for values 0-5. No corner pieces.
+	 * Add 8 if powered (should be set automatically, but maybe not)
+	 *
+	 * (RAIL) Rails:
+	 * 0,1 flat track along north-south/east-west axis
+	 * 2,3,4,5 track ascending to the east, west, north, south
+	 * 6,7,8,9 corner track: NW, NE, SE, SW corner
+	 * Corner pieces connect the opposite directions, so 6 (NW corner) connects to the south and east
+	 * 
+	 * (REPEATER)
+	 * Redstone Repeater and Comparator:
+	 * 0,1,2,3 facing north, east, south, west. Add 4 per tick delay beyond the first.
+	 * Example: Repeater facing south with 3 ticks = 2 + 4 + 4 = 10.
+	 * (SIGNPOST) Sign Posts:
 	 * 16 directions, 0 being due south and working clockwise towards south-southeast at 15
 	 * Keep in mind that this is the direction in which the writing will show, but the player
 	 * will be looking at it from the opposite direction which may at first seem counter-intuitive.
 	 * I know I set mine backwards a few times.
 	 * See http://www.minecraftwiki.net/wiki/Data_values#Sign_Posts for exact details
 	 * 
+	 * (TRAPDOOR) Trapdoors:
+	 * 0,1,2,3 attached to the wall on the south, north, east or west. For example, if you
+	 * are facing west and want the trapdoor to open away from you, attach it to the wall
+	 * to the west (3), NOT east.
+	 * Add 4 if you want the trapdoor opened, add 8 if you want it attached to the top
+	 * half of the block (these are additive, so east wall open on upper half is 2+4+8 = 14)
+	 * 
+	 * (VINE) Vines:
+	 * 1,2,4,8 anchored to the south, west, north or east side of the vine block, NOT
+	 * neighboring block (so the position may be opposite what you think)
+	 * 
+	 * (WALL_MOUNTED)
 	 * Buttons and Torches (normal and redstone):
 	 * 1,2,3,4 pointing east, west, south, north.
 	 * Torches (both) only: 5,6 standing on floor / in ground (what's the difference?)
@@ -121,52 +150,11 @@ public class StructureArrays
 	 * 7,0 ceiling lever, south or east when off, +8 for switched on (might want
 	 * to set the flag value to 3 if switched on to notify neighboring blocks)
 	 * 
-	 * Redstone Repeater:
-	 * 0,1,2,3 facing north, east, south, west. Add 4 per tick delay beyond the first.
-	 * Example: Repeater facing south with 3 ticks = 2 + 4 + 4 = 10.
+	 * (WOOD) Wood:
+	 * 0,1,2,3 Oak/Spruce/Birch/Jungle placed vertically
+	 * Add 4 will face east/west, add 8 will face north/south, add 12 bark only
 	 * 
-	 * Dispensers, Droppers and Hoppers:
-	 * As ladder with the following: 0, 1 facing down or up (for Hopper, 1 is unattached
-	 * to container). Probably unnecessary, but add (1 >> 3)? for powered and updated (i.e. DON'T set flag to 3).
-	 * 
-	 * Pistons and Piston Extensions:
-	 * 0,1 down/up; 2,3,4,5 piston head is pointing north, south, west, east
-	 * Add 8 if the piston is pushed out (for base) or sticky (for extension)
-	 * Note that if you're not providing power to the piston base, it will retract
-	 * automatically and vice-versa if you are providing power, so it's not really
-	 * necessary to add the piston extension separately
-	 * 
-	 * Trapdoors:
-	 * 0,1,2,3 attached to the wall on the south, north, east or west. For example, if you
-	 * are facing west and want the trapdoor to open away from you, attach it to the wall
-	 * to the west (3), NOT east.
-	 * Add 4 if you want the trapdoor opened, add 8 if you want it attached to the top
-	 * half of the block (these are additive, so east wall open on upper half is 2+4+8 = 14)
-	 * 
-	 * Fence Gates, Pumpkins, Jack'o Lanterns, Tripwire Hooks, End Portal Frames:
-	 * 0,1,2,3 facing south, west, north, east.
-	 * Add 4 for opened (gates), no face (pumpkins & jack'o lanterns), connected (tripwire hooks)
-	 * or inserted eye (end portal frame)
-	 * 
-	 * Rails:
-	 * 0,1 flat track along north-south/east-west axis
-	 * 2,3,4,5 track ascending to the east, west, north, south
-	 * 6,7,8,9 corner track: NW, NE, SE, SW corner
-	 * Corner pieces connect the opposite directions, so 6 (NW corner) connects to the south and east
-	 * 
-	 * Powered Rails:
-	 * Same as Rails for values 0-5. No corner pieces.
-	 * Add 8 if powered (should be set automatically, but maybe not)
-	 * 
-	 * Cocoas:
-	 * 0,1,2,3 cocoa is on north, east, south, west side of adjacent block.
-	 * Add 4 for medium size, add 8 for large size.
-	 * 
-	 * Vines:
-	 * 1,2,4,8 anchored to the south, west, north or east side of the vine block, NOT
-	 * neighboring block (so the position may be opposite what you think)
-	 * 
-	 * Skull Blocks:
+	 * (SKULL) Skull Blocks:
 	 * 1 is on the floor, 2,3,4,5 on a wall and facing south, north, west, east.
 	 * Note that these are opposite from what the wiki claims, but it's what I saw in my
 	 * tests. For example, while looking WEST at a structure of facing EAST, no rotations
@@ -311,22 +299,22 @@ public class StructureArrays
 					{0},
 					{Block.planks.blockID},
 					{CUSTOM_CHEST,3,2,1},
-					{0},
+					{Block.dispenser.blockID,5},
 					{Block.planks.blockID},
 					{0}
 				},
 				{ // x = 4 z values:
-					{Block.ladder.blockID,2},
+					{Block.cocoaPlant.blockID,8},
 					{Block.wood.blockID},
 					{Block.planks.blockID},
-					{Block.doorWood.blockID},
+					{Block.doorWood.blockID,2},
 					{Block.wood.blockID},
 					{0}
 				},
 				{ // x = 5 z values:
 					// Note since these are all empty, you could leave this portion of the array out
 					// unless you want to force air to be spawned at these locations
-					{0},{0},{0},{0},{0},{0}
+					{Block.fenceGate.blockID,2},{0},{0},{0},{Block.signWall.blockID,5},{0}
 				}
 			},
 			{ // y = 2
@@ -338,7 +326,7 @@ public class StructureArrays
 				},
 				{ // x = 1 z values:
 					{0},{Block.planks.blockID},
-					{SPAWN_VILLAGER},{0},
+					{0},{0},
 					{Block.planks.blockID},{0}
 				},
 				{ // x = 2 z values:
@@ -350,14 +338,14 @@ public class StructureArrays
 				},
 				{ // x = 3 z values:
 					{0},{Block.planks.blockID},
-					{Block.woodenButton.blockID,2},{0},
+					{Block.woodenButton.blockID,2},{Block.dispenser.blockID,1},
 					{Block.planks.blockID},{0}
 				},
 				{ // x = 4 z values:
 					{Block.vine.blockID,1},
 					{Block.wood.blockID},
 					{Block.planks.blockID},
-					{Block.doorWood.blockID,8},
+					{Block.doorWood.blockID,10},
 					{Block.pumpkinLantern.blockID,3},{0}
 				},
 				{ // x = 5 z values:
