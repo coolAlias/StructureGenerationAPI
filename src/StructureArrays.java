@@ -4,6 +4,7 @@ import net.minecraft.block.Block;
 
 public class StructureArrays
 {
+	public static final int CUSTOM_CHEST = 4097, SPAWN_VILLAGER = 4098;
 	/**
 	 * This file contains a demo and a template structure to illustrate how to go about
 	 * creating your own. Use this in conjunction with the provided StructureGen mod to
@@ -35,6 +36,15 @@ public class StructureArrays
 	 * in the northwest corner, adding blocks toward the east and lines toward the south,
 	 * put your z values first and x values second.
 	 * 
+	 * The final array stores the following variables:
+	 * {blockID, metadata, flag, customData}
+	 * 
+	 * Note that you only need to fill this array up to the point you need, so if your block
+	 * doesn't use metadata, you could simply use {blockID} for the array, instead of {blockID, 0, 0, 0}
+	 * 
+	 * {blockID}
+	 * If left blank, the structure generator will skip the coordinate of the missing block.
+	 * 
 	 * If you want any part of your structure to 'soft spawn', use the negative value of the
 	 * block ID. This will prevent your block from spawning in the world if another block
 	 * already exists at that location, allowing your structure to more naturally fit in with
@@ -43,6 +53,23 @@ public class StructureArrays
 	 * 
 	 * A quick example: Block.cobblestone.blockID will only spawn a cobblestone block if its
 	 * spawn location is air or occupied by a block such as grass that doesn't block movement.
+	 * 
+	 * Values above 4096 are used to trigger a hook that allows custom manipulation of the block
+	 * via the method onCustomBlockAdded in WorldGenStructure. See that class for details.
+	 * 
+	 * {metadata}
+	 * Stores the block's metadata. If metadata determines orientation, see below for details on
+	 * setting the value correctly.
+	 * 
+	 * {flag}
+	 * Will automatically be set to 2 to notify the client if you don't set it yourself.
+	 * See 'World.setBlock' method for more information on setting your own flag.
+	 * 
+	 * {customData}
+	 * A value passed to the onCustomBlockAdded method. One could use this to subtype a block
+	 * ID, such as CUSTOM_CHEST with subtypes VILLAGE_BLACKSMITH, VILLAGE_LIBRARY, etc., to
+	 * set the number of random items to generate, to set villager type to spawn... you get
+	 * the idea.
 	 * =====================================================================================
 	 * 							IMPORTANT: NOTES ON SETTING METADATA
 	 * =====================================================================================
@@ -283,7 +310,7 @@ public class StructureArrays
 				{ // x = 3 z values:
 					{0},
 					{Block.planks.blockID},
-					{Block.chest.blockID,3},
+					{CUSTOM_CHEST,3,2,1},
 					{0},
 					{Block.planks.blockID},
 					{0}
@@ -311,7 +338,7 @@ public class StructureArrays
 				},
 				{ // x = 1 z values:
 					{0},{Block.planks.blockID},
-					{0},{0},
+					{SPAWN_VILLAGER},{0},
 					{Block.planks.blockID},{0}
 				},
 				{ // x = 2 z values:

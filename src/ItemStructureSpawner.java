@@ -13,7 +13,7 @@ import net.minecraft.world.World;
 
 public class ItemStructureSpawner extends BaseModItem
 {
-	private static final WorldGenStructure gen = new WorldGenStructure(true);
+	private static final StructureGeneratorBase gen = new WorldGenStructure(true);
 	
 	private int offsetX = 0, offsetY = 0, offsetZ = 0;
 	
