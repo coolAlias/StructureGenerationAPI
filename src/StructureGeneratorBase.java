@@ -360,7 +360,6 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 		if (blockArray == null) { System.out.println("[GEN STRUCTURE] No structure array has been set."); return false; }
 		
 		int centerX = blockArray[0].length / 2, centerZ = blockArray[0][0].length / 2;
-		int fakeID, realID;
 		int rotation = (((this.structureFacing == NORTH || this.structureFacing == SOUTH) ? this.structureFacing + 2 : this.structureFacing) + this.facing) % 4;
 		
 		setOffsetFromRotation();
@@ -379,7 +378,14 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 					int meta = (blockArray[y][x][z].length > 1 ? blockArray[y][x][z][1] : NO_METADATA);
 					int flag = (blockArray[y][x][z].length > 2 ? blockArray[y][x][z][2] : 2);
 					int customData = (blockArray[y][x][z].length > 3 ? blockArray[y][x][z][3] : 0);
-					int rotX = posX, rotZ = posZ;
+					int rotX = posX, rotZ = posZ, rotY = posY + y + offsetY;
+					int fakeID = blockArray[y][x][z][0];
+					int realID = (Math.abs(fakeID) > 4096 ? getRealBlockID(fakeID) : fakeID);
+					
+					if (Math.abs(realID) > 4096) {
+						System.out.println("[GEN STRUCTURE][SEVERE] Invalid block ID. Initial ID: " + fakeID + ", returned id from getRealID: " + realID);
+						continue;
+					}
 
 					switch(rotation) {
 					case 0: // Player is looking at the front of the default structure
@@ -402,23 +408,16 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 						System.out.println("[GEN STRUCTURE] Error computing number of rotations.");
 						break;
 					}
-					fakeID = blockArray[y][x][z][0];
-					realID = (Math.abs(fakeID) > 4096 ? getRealBlockID(fakeID) : fakeID);
-					
-					if (Math.abs(realID) > 4096) {
-						System.out.println("[GEN STRUCTURE][SEVERE] Invalid block ID. Initial ID: " + fakeID + ", returned id from getRealID: " + realID);
-						continue;
-					}
 					
 					if (this.removeStructure) {
-						world.setBlockToAir(rotX, posY + y + offsetY, rotZ);
+						world.setBlockToAir(rotX, rotY, rotZ);
 					}
 					else
 					{
 						// Allows 'soft-spawning' blocks to be spawned only in air or on blocks that allow movement, such as air or grass
-						if (realID >= 0 || world.isAirBlock(rotX, posY + y + offsetY, rotZ) || 
-								(Block.blocksList[world.getBlockId(rotX, posY + y + offsetY, rotZ)] != null
-								&& !Block.blocksList[world.getBlockId(rotX, posY + y + offsetY, rotZ)].blockMaterial.blocksMovement()))
+						if (realID >= 0 || world.isAirBlock(rotX, rotY, rotZ) || 
+								(Block.blocksList[world.getBlockId(rotX, rotY, rotZ)] != null
+								&& !Block.blocksList[world.getBlockId(rotX, rotY, rotZ)].blockMaterial.blocksMovement()))
 						{
 							if (meta != NO_METADATA)
 								meta = getMetadata(Math.abs(realID), meta, facing);
@@ -427,12 +426,12 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 							
 							flag = flag == 0 ? 2 : flag;
 
-							world.setBlock(rotX, posY + y + offsetY, rotZ, Math.abs(realID), meta, flag);
+							world.setBlock(rotX, rotY, rotZ, Math.abs(realID), meta, flag);
 
-							setMetadata(world, rotX, posY + y + offsetY, rotZ, meta, facing);
+							setMetadata(world, rotX, rotY, rotZ, meta, facing);
 							
 							if (Math.abs(fakeID) > 4096) {
-								onCustomBlockAdded(world, rotX, posY + y + offsetY, rotZ, fakeID, customData);
+								onCustomBlockAdded(world, rotX, rotY, rotZ, fakeID, customData);
 							}
 						}
 					}
