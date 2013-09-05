@@ -231,6 +231,7 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 			{
 				for (int z = 0; z < blockArray[y][x].length; ++z)
 				{
+					/*
 					// Threw an NPE once, so...
 					if (blockArray[y][x][z].length == 0) {
 						if (z < blockArray[y][x].length) {
@@ -242,8 +243,9 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 							return true;
 						}	
 					}
-					// If user decides not to set this block, so be it...
-					if (blockArray[y][x][z][0] == SET_NO_BLOCK) continue;
+					*/
+					// If no block data or user decides not to set this block, so be it...
+					if (blockArray[y][x][z].length == 0 || blockArray[y][x][z][0] == SET_NO_BLOCK) continue;
 					
 					int meta = (blockArray[y][x][z].length > 1 ? blockArray[y][x][z][1] : NO_METADATA);
 					int flag = (blockArray[y][x][z].length > 2 ? blockArray[y][x][z][2] : 2);
@@ -371,7 +373,7 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 		if (blockRotationData.get(id) == null) return;
 		switch(blockRotationData.get(id)) {
 		case PISTON_CONTAINER:
-			world.setBlockMetadataWithNotify(x, y, z, origMeta, 3);
+			world.setBlockMetadataWithNotify(x, y, z, origMeta, 2);
 			break;
 		case RAIL:
 			world.setBlockMetadataWithNotify(x, y, z, origMeta, 2);
