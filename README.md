@@ -20,10 +20,8 @@ Features
 Limitations
 ===========
 Due to the maximum byte limit of static initializers, the structure array size cannot exceed 65535 bytes. I spawned
-a structure containing 4800 blocks without reaching this limit; however, many of those blocks were air.
-
-If you don't need air to spawn, just use empty { } instead of {0} for that particular element and it may help keep
-the size down. Someone please correct me if I'm wrong on that :D
+a structure containing 4800 blocks without reaching this limit; however, many of those blocks were air, so if you can
+cut down on those, it will help somewhat.
 
 Otherwise, if your structure is really that big, consider building it in separate sections.
 
