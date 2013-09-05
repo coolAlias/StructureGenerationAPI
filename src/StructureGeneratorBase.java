@@ -223,14 +223,25 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 		
 		setOffsetFromRotation();
 		
+		// need to check total array size here and split it into smaller chunks if too big
+		
 		for (int y = 0; y < blockArray.length; ++y)
 		{
-			for (int x = 0; x < blockArray[0].length; ++x)
+			for (int x = 0; x < blockArray[y].length; ++x)
 			{
-				for (int z = 0; z < blockArray[0][0].length; ++z)
+				for (int z = 0; z < blockArray[y][x].length; ++z)
 				{
 					// Threw an NPE once, so...
-					if (blockArray[y][x][z].length == 0) continue;
+					if (blockArray[y][x][z].length == 0) {
+						if (z < blockArray[y][x].length) {
+							System.out.println("[GEN STRUCTURE][WARNING] No data set in blockArray[" + y + "][" + x + "][" + z + "]");
+							continue;
+						}
+						else {
+							System.out.println("[GEN STRUCTURE][WARNING] End of array reached with null data.");
+							return true;
+						}	
+					}
 					// If user decides not to set this block, so be it...
 					if (blockArray[y][x][z][0] == SET_NO_BLOCK) continue;
 					
