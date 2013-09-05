@@ -1,3 +1,9 @@
+/**
+ * @author coolAlias
+ * @license This work is licensed under the Creative Commons Attribution-ShareAlike 3.0 Unported
+ * License. To view a copy of this license, visit http://creativecommons.org/licenses/by-sa/3.0/.
+ */
+
 package coolalias.structuregen;
 
 import java.util.HashMap;
@@ -5,36 +11,6 @@ import java.util.Map;
 import java.util.Random;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockAnvil;
-import net.minecraft.block.BlockBed;
-import net.minecraft.block.BlockButton;
-import net.minecraft.block.BlockChest;
-import net.minecraft.block.BlockCocoa;
-import net.minecraft.block.BlockDispenser;
-import net.minecraft.block.BlockDoor;
-import net.minecraft.block.BlockDropper;
-import net.minecraft.block.BlockEndPortalFrame;
-import net.minecraft.block.BlockFenceGate;
-import net.minecraft.block.BlockFurnace;
-import net.minecraft.block.BlockHopper;
-import net.minecraft.block.BlockLadder;
-import net.minecraft.block.BlockLever;
-import net.minecraft.block.BlockPistonBase;
-import net.minecraft.block.BlockPistonExtension;
-import net.minecraft.block.BlockPumpkin;
-import net.minecraft.block.BlockRail;
-import net.minecraft.block.BlockRailBase;
-import net.minecraft.block.BlockRailPowered;
-import net.minecraft.block.BlockRedstoneRepeater;
-import net.minecraft.block.BlockRedstoneTorch;
-import net.minecraft.block.BlockSign;
-import net.minecraft.block.BlockSkull;
-import net.minecraft.block.BlockStairs;
-import net.minecraft.block.BlockTorch;
-import net.minecraft.block.BlockTrapDoor;
-import net.minecraft.block.BlockTripWireSource;
-import net.minecraft.block.BlockVine;
-import net.minecraft.block.BlockWood;
 import net.minecraft.world.World;
 import net.minecraft.world.gen.feature.WorldGenerator;
 

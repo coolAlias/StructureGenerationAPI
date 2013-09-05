@@ -1,3 +1,9 @@
+/**
+ * @author coolAlias
+ * @license This work is licensed under the Creative Commons Attribution-ShareAlike 3.0 Unported
+ * License. To view a copy of this license, visit http://creativecommons.org/licenses/by-sa/3.0/.
+ */
+
 package coolalias.structuregen;
 
 import net.minecraft.block.Block;
@@ -70,6 +76,7 @@ public class WorldGenStructure extends StructureGeneratorBase
 			EntityVillager bob = new EntityVillager(world, customData);
 			bob.setLocationAndAngles(x, y, z, MathHelper.wrapAngleTo180_float(world.rand.nextFloat() * 360.0F), 0.0F);
 			world.spawnEntityInWorld(bob);
+			System.out.println("[GEN STRUCTURE] Spawned villager at " + x + "/" + y + "/" + z);
 			break;
 		default:
 			System.out.println("[GEN STRUCTURE] No custom method defined for this id.");
