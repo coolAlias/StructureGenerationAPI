@@ -14,7 +14,6 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
 
 public class ItemStructureSpawner extends BaseModItem
@@ -87,15 +86,14 @@ public class ItemStructureSpawner extends BaseModItem
 	@Override
 	public boolean onItemUse(ItemStack itemstack, EntityPlayer player, World world, int x, int y, int z, int par7, float par8, float par9, float par10)
     {
-		int playerfacing = MathHelper.floor_double((double)((player.rotationYaw * 4F) / 360f) + 0.5D) &3;
-		
-		gen.setFacing(playerfacing);
-		gen.setBlockArray(StructureArrays.blockArrayNPCHut);
-		
-		// adjust for structure generating centered on player's position (including height)
-		gen.setOffset(this.offsetX, this.offsetY, this.offsetZ);
-		gen.generate(world, world.rand, x, y, z);
-		
+		if (!world.isRemote) {
+			gen.setFacing(player);
+			gen.addBlockArray(StructureArrays.blockArrayNPCHut);
+
+			// adjust for structure generating centered on player's position (including height)
+			gen.setOffset(this.offsetX, this.offsetY, this.offsetZ);
+			gen.generate(world, world.rand, x, y, z);
+		}
         return true;
     }
 	

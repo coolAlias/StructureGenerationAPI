@@ -17,7 +17,28 @@ public class StructureArrays
 	 * test out your creation before adding it to your own mod.
 	 * 
 	 * =====================================================================================
-	 * 					INSTRUCTIONS FOR SETTING UP A STRUCTURE'S BLOCK ARRAY
+	 * 						HOW TO GENERATE YOUR CUSTOM STRUCTURES
+	 * =====================================================================================
+	 * Once you have your blockArray(s) set up correctly (see below), you will need to add
+	 * them to the WorldGenStructure generator's list of arrays to generate.
+	 * 
+	 * This is done with the method "addBlockArray(int[][][][])".
+	 * 
+	 * If you have more than one layer, they should be added from the bottom up, so first
+	 * the base, then the layer on top of the base, and so on until the final topmost layer
+	 * is added.
+	 * 
+	 * Next, set your structure's facing and possibly offset with the following methods:
+	 * 
+	 * "setStructureFacing(StructureGeneratorBase.DIRECTION)"
+	 *  where DIRECTION is NORTH, SOUTH, EAST, WEST
+	 * 
+	 * "setOffset(int offX, int offY, int offZ)"
+	 * -offX places the structure further away from the player, +offX will move toward the
+	 * player. Thinking about inverting this.
+	 * 
+	 * =====================================================================================
+	 * 						SETTING UP A STRUCTURE'S BLOCK ARRAY
 	 * =====================================================================================
 	 * You can choose any direction to be the default facing of your structure. It is the
 	 * side that will always face the player when generated, which doesn't necessarily have
@@ -76,6 +97,28 @@ public class StructureArrays
 	 * ID, such as CUSTOM_CHEST with subtypes VILLAGE_BLACKSMITH, VILLAGE_LIBRARY, etc., to
 	 * set the number of random items to generate, to set villager type to spawn... you get
 	 * the idea.
+	 * 
+	 * =====================================================================================
+	 * 					GENERATING LARGE STRUCTURES: USING MULTIPLE ARRAYS
+	 * =====================================================================================
+	 * If you receive the error message "The code for the static initializer is exceeding
+	 * the 65535 bytes limit", then you will need to break your structure up into multiple
+	 * array 'layers'.
+	 * 
+	 * A 'layer' is defined here as a set of one or more complete 'y' arrays, such that all
+	 * blocks contained in the horizontal plane to be generated are defined. In other words,
+	 * you cannot end a 'layer' partway through generating blocks for a given 'y' without
+	 * achieving undesirable results.
+	 * 
+	 * Thus, if your structure is 40x40 blocks wide, its total planar area is 1600 blocks.
+	 * An array containing this 40x40 block area to a height of 3 would contain 4800 blocks;
+	 * trying to add another 'y' element at this point would exceed the static initializer
+	 * limit, and you wouldn't want to add 200 more blocks to fit under the limit as these
+	 * blocks do not form a complete 'y' layer.
+	 * 
+	 * If you wanted to generate a structure using this base that is 20 blocks tall, you'd
+	 * need to make 7 'layers' of height 3 each, except for the final layer which would only
+	 * have a height of 2.
 	 * =====================================================================================
 	 * 							IMPORTANT: NOTES ON SETTING METADATA
 	 * =====================================================================================

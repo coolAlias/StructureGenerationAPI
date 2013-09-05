@@ -7,6 +7,7 @@
 package coolalias.structuregen;
 
 import net.minecraft.block.Block;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.passive.EntityVillager;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -17,18 +18,17 @@ import net.minecraft.world.World;
 
 public class WorldGenStructure extends StructureGeneratorBase
 {
-
-	public WorldGenStructure(int facing, int[][][][] blocks){
-		super(facing, blocks);
+	public WorldGenStructure(Entity entity, int[][][][] blocks){
+		super(entity, blocks);
 	}
 
-	public WorldGenStructure(int facing, int[][][][] blocks, int structureFacing) {
-		super(facing, blocks, structureFacing);
+	public WorldGenStructure(Entity entity, int[][][][] blocks, int structureFacing) {
+		super(entity, blocks, structureFacing);
 	}
 
-	public WorldGenStructure(int facing, int[][][][] blocks,
+	public WorldGenStructure(Entity entity, int[][][][] blocks,
 			int structureFacing, int offX, int offY, int offZ) {
-		super(facing, blocks, structureFacing, offX, offY, offZ);
+		super(entity, blocks, structureFacing, offX, offY, offZ);
 	}
 
 	public WorldGenStructure(boolean par1) {
