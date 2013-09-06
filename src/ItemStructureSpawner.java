@@ -86,14 +86,20 @@ public class ItemStructureSpawner extends BaseModItem
 	@Override
 	public boolean onItemUse(ItemStack itemstack, EntityPlayer player, World world, int x, int y, int z, int par7, float par8, float par9, float par10)
     {
-		if (!world.isRemote) {
-			gen.setFacing(player);
+		// NOTE: It isn't absolutely necessary to check if the world is not remote here,
+		// but I recommend it as the client will be notified automatically anyway.
+		
+		if (!world.isRemote)
+		{
+			gen.setPlayerFacing(player);
 			gen.addBlockArray(StructureArrays.blockArrayNPCHut);
 
 			// adjust for structure generating centered on player's position (including height)
-			gen.setOffset(this.offsetX, this.offsetY, this.offsetZ);
+			//gen.setOffset(this.offsetX, this.offsetY, this.offsetZ);
+			gen.setDefaultOffset(0, -1, 0); // adjust down one for the buffer layer
 			gen.generate(world, world.rand, x, y, z);
 		}
+		
         return true;
     }
 	
