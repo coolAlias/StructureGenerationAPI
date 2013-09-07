@@ -642,7 +642,7 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 					&& !Block.blocksList[world.getBlockId(block.getPosX(), block.getPosY(), block.getPosZ())].blockMaterial.blocksMovement()))
 			{
 				// occasionally doesn't set metadata correctly, such as for certain ItemFrames
-				world.setBlock(block.getPosX(), block.getPosY(), block.getPosZ(), Math.abs(realID), block.getMetaData(), 2);
+				world.setBlock(block.getPosX(), block.getPosY(), block.getPosZ(), Math.abs(realID), block.getMetaData(), 3);
 				// print warning for mismatched metadata
 				if (world.getBlockMetadata(block.getPosX(), block.getPosY(), block.getPosZ()) != block.getMetaData()) {
 					System.out.println("[GEN STRUCTURE][WARNING] Mismatched metadata. Meta from world: " + world.getBlockMetadata(block.getPosX(), block.getPosY(), block.getPosZ()) + ", original: " + block.getMetaData());
