@@ -1,11 +1,8 @@
-StructureGenerationTool
-=======================
+STRUCTURE GENERATION TOOL
+=========================
+This is a tool I created for those of you who don't want to use schematics, for whatever reason, to generate structures in your world. It allows you to design and generate custom structures as well as rotate and offset your custom structures as they are generated in the world. Additionally, there are methods that allow you to set custom tile entity data, spawn entities or whatever else you can imagine.
 
-This is a tool I created to allow you to generate custom structures as well as rotate and offset your custom structures
-as they are generated in the world. Additionally, there are methods that allow you to set custom tile entity data, spawn
-entities or whatever else you can imagine.
-
-Features
+FEATURES
 ========
 - Generate custom structures in the world with the click of a button
 - Auto-rotation of structures ensures it will always face the player
@@ -16,20 +13,36 @@ Features
 - Set any block as a 'buffer' so your structure spawns more naturally in the environment
 - Custom 'hooks' allow you to define specific behavior for any block set, such as setting tile entity data
   or spawning entities at that location
+- Easy method of adding hanging entities such as item frames or paintings
+- Easy method to auto-set items in placed item frames
+- Easy method for adding items to any tile entity inventory
+ 
+POSSIBLE FUTURE FEATURES
+========================
+- Easy method to ensure your spawned entity doesn't spawn in a wall
+- Ability to set default x/y/z offsets for your structure
+- Reading structures from a file to avoid compile-time size limitations (big maybe)
+ 
+KNOWN BUGS
+==========
+- Default offset isn't perfect... working on this
 
-Limitations
+LIMITATIONS
 ===========
-Due to the maximum byte limit of static initializers, the structure array size cannot exceed 65535 bytes. I spawned
-a structure containing 4800 blocks without reaching this limit; however, many of those blocks were air, so if you can
-cut down on those, it will help somewhat.
+Due to the maximum byte limit of static initializers, the structure array size cannot exceed 65535 bytes. What this means for you is that a single horizontal layer of your structure cannot exceed roughly 3400 blocks in area, so about a 68x50 rectangular base, judging by my tests so far.
 
-Otherwise, if your structure is really that big, consider building it in separate sections.
+You would then build your structure by adding layers to the generator list. See StructureArrays.java for complete details on how to go about this.
 
+If your structure is very large (more than 3 or so maxed static arrays), you will probably need to store them in separate files or you will get a compile time error.
 
-Demo Mod Included
+DEMO MOD INCLUDED
 =================
 A ready-to-go mod that will help familiarize you with the capabilities and functionality of the Structure Generation
 Tool. There is currently no recipe for the item that spawns structures, so try it in Creative.
+
+Two structures are included:
+- blockArrayNPCBlackSmith - Vanilla blacksmith shop. Thanks to Microjunk for this one!
+- blockArrayNPCHut - A highly modified village hut. Enter at your own risk.
 
 These are the controls:
 
@@ -71,10 +84,6 @@ I still set metadata blocks backwards half the time.
 
 Anyways, hope this is useful!
 
-Possible Future Features:
-
-- Ability to set default x/y/z offsets for your structure in the StructureArrays file
-
-Known Bugs:
-
-- Currently none
+SCREEN SHOTS
+============
+Check them out on the forums: http://www.minecraftforum.net/topic/1963371-structure-generation-and-rotation-tool/
