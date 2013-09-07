@@ -253,28 +253,24 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 		int[] metaToFacing = {5, 4, 3, 2};
 		int direction = metaToFacing[world.getBlockMetadata(x, y, z) - 1];
 		FakePlayer player = new FakePlayer(world,"fake");
+		
 		// remove placeholder block:
 		world.setBlockToAir(x, y, z);
-		//System.out.println("[GEN STRUCTURE] Hanging entity initial position: " + x + "/" + y + "/" + z);
+		
 		switch(direction) {
-		case 2: // facing SOUTH
-			//++x;
+		case 2: // frame facing NORTH
 			++z;
 			break;
-		case 3: // facing NORTH
-			//--x;
+		case 3: // frame facing SOUTH
 			--z;
 			break;
-		case 4: // facing EAST
+		case 4: // frame facing WEST
 			++x;
-			//--z;
 			break;
-		case 5: // facing WEST (default)
+		case 5: // frame facing EAST
 			--x;
-			//++z;
 			break;
 		}
-		System.out.println("[GEN STRUCTURE] Hanging entity adjusted position: " + x + "/" + y + "/" + z);
 		
 		((ItemHangingEntity) hanging.getItem()).onItemUse(hanging, player, world, x, y, z, direction, 0, 0, 0);
 		
@@ -298,42 +294,34 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 	public final void setItemFrameStack(World world, int x, int y, int z, int direction, ItemStack itemstack, int itemRotation)
 	{
 		double minX = (double) x, minZ = (double) z, maxX = minX, maxZ =  minZ;
+		
 		switch(direction) {
-		case 2: // facing SOUTH
-			//++x;
-			++z;
+		case 2: // frame facing NORTH
 			minX += 0.25D;
 			maxX += 0.75D;
 			minZ += 0.5D;
 			maxZ += 1.5D;
 			break;
-		case 3: // facing NORTH
-			//--x;
-			--z;
+		case 3: // frame facing SOUTH
 			minX += 0.25D;
 			maxX += 0.75D;
-			minZ += 0.5D;
-			maxZ += 1.5D;
+			minZ -= 0.5D;
+			maxZ += 0.5D;
 			break;
-		case 4: // facing EAST
-			++x;
+		case 4: // frame facing WEST
 			minX += 0.5D;
 			maxX += 1.5D;
 			minZ += 0.25D;
 			maxZ += 0.75D;
-			//--z;
 			break;
-		case 5: // facing WEST
-			--x;
-			minX += 0.5D;
-			maxX += 1.5D;
+		case 5: // frame facing EAST
+			minX -= 0.5D;
+			maxX += 0.5D;
 			minZ += 0.25D;
 			maxZ += 0.75D;
-			//++z;
 			break;
 		}
-		System.out.println("[GEN STRUCTURE] Checking for ItemFrame at " + x + "/" + y + "/" + z);
-		//List<EntityItemFrame> frames = world.getEntitiesWithinAABB(EntityItemFrame.class, AxisAlignedBB.getBoundingBox(((double) x) - 0.5, (double) y, ((double) z) - 0.5, ((double) x) + 0.5, ((double) y) + 1, ((double) z) + 0.5));
+		
 		List<EntityItemFrame> frames = world.getEntitiesWithinAABB(EntityItemFrame.class, AxisAlignedBB.getBoundingBox(minX, (double) y, minZ, maxX, (double) y + 1, maxZ));
 		if (frames != null && !frames.isEmpty())
 		{
@@ -341,11 +329,9 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 
 			while (iterator.hasNext())
 			{
-				System.out.println("[FRAME] has iterator");
 				EntityItemFrame frame1 = (EntityItemFrame) iterator.next();
 				frame1.setDisplayedItem(itemstack);
 				frame1.setItemRotation(itemRotation);
-				System.out.println("[FRAME] Itemstack: " + frame1.getDisplayedItem().toString());
 			}
 		}
 	}
@@ -474,18 +460,17 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 	@Override
 	public final boolean generate(World world, Random random, int posX, int posY, int posZ)
 	{
-		// We only want to generate server side and if blockArray has been set
 		if (world.isRemote || !canGenerate()) { return false; }
-		int rotation = (((this.structureFacing == NORTH || this.structureFacing == SOUTH) ? this.structureFacing + 2 : this.structureFacing) + this.facing) % 4;
-		setOffsetFromRotation();
 		
-		//System.out.println("[GEN STRUCTURE] Block Array List size = " + this.blockArrayList.size());
+		int rotations = (((this.structureFacing == NORTH || this.structureFacing == SOUTH) ? this.structureFacing + 2 : this.structureFacing) + this.facing) % 4;
+		
+		setOffsetFromRotation();
 		
 		Iterator iterator = blockArrayList.iterator();
 		while (iterator.hasNext())
 		{
 			this.blockArray = (int[][][][]) iterator.next();
-			generateLayer(world, random, posX, posY, posZ, rotation);
+			generateLayer(world, random, posX, posY, posZ, rotations);
 			this.offsetY += this.blockArray.length;
 		}
 		
@@ -500,7 +485,7 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 	/**
 	 * Custom 'generate' method that generates a single 'layer' from the list of blockArrays
 	 */
-	private final boolean generateLayer(World world, Random random, int posX, int posY, int posZ, int rotation)
+	private final boolean generateLayer(World world, Random random, int posX, int posY, int posZ, int rotations)
 	{
 		// already checked in 'generate' method
 		// if (blockArray == null) { System.out.println("[GEN STRUCTURE][WARNING] No structure array has been set."); return false; }
@@ -508,7 +493,7 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 		// does center need to be calculated each time? What if first index isn't true size of structure?
 		int centerX = blockArray[0].length / 2, centerZ = blockArray[0][0].length / 2;
 		// It seems to work both ways, so for now, use the one with fewest computations
-		//int centerX, centerZ;
+		// int centerX, centerZ;
 
 		for (int y = 0; y < blockArray.length; ++y)
 		{
@@ -516,28 +501,12 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 			{
 				for (int z = 0; z < blockArray[y][x].length; ++z)
 				{
-					//centerX = blockArray[y].length / 2;
-					//centerZ = blockArray[y][x].length / 2;
-					/*
-					// Threw an NPE once, so...
-					if (blockArray[y][x][z].length == 0) {
-						if (z < blockArray[y][x].length) {
-							System.out.println("[GEN STRUCTURE][WARNING] No data set in blockArray[" + y + "][" + x + "][" + z + "]");
-							continue;
-						}
-						else {
-							System.out.println("[GEN STRUCTURE][WARNING] End of array reached with null data.");
-							return true;
-						}	
-					}
-					 */
-					// If no block data or user decides not to set this block, so be it...
 					if ((blockArray[y][x][z].length == 0 || blockArray[y][x][z][0] == SET_NO_BLOCK)
 							&& !this.removeStructure) continue;
 
 					int rotX = posX, rotZ = posZ, rotY = posY + y + offsetY;
 					
-					switch(rotation) {
+					switch(rotations) {
 					case 0: // Player is looking at the front of the default structure
 						rotX += x - centerX + offsetX;
 						rotZ += z - centerZ + offsetZ;
@@ -641,7 +610,7 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 					(Block.blocksList[world.getBlockId(block.getPosX(), block.getPosY(), block.getPosZ())] != null
 					&& !Block.blocksList[world.getBlockId(block.getPosX(), block.getPosY(), block.getPosZ())].blockMaterial.blocksMovement()))
 			{
-				// occasionally doesn't set metadata correctly, such as for certain ItemFrames
+				// occasionally doesn't set metadata correctly, such as for certain ItemFrames - notification flag 3 allows redstone torches to update circuits when placed
 				world.setBlock(block.getPosX(), block.getPosY(), block.getPosZ(), Math.abs(realID), block.getMetaData(), 3);
 				// print warning for mismatched metadata
 				if (world.getBlockMetadata(block.getPosX(), block.getPosY(), block.getPosZ()) != block.getMetaData()) {
@@ -768,7 +737,6 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 	/**
 	 * Adjusts offsetX and offsetZ amounts to compensate for manual rotation
 	 */
-	// don't think this is working as expected
 	private final void setOffsetFromRotation()
 	{
 		int x, z;
