@@ -17,9 +17,19 @@ import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.relauncher.Side;
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.item.EntityItemFrame;
+import net.minecraft.inventory.IInventory;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemHangingEntity;
+import net.minecraft.item.ItemStack;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.tileentity.TileEntityChest;
+import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.Direction;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
 import net.minecraft.world.gen.feature.WorldGenerator;
+import net.minecraftforge.common.FakePlayer;
 
 public abstract class StructureGeneratorBase extends WorldGenerator
 {
@@ -58,10 +68,17 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 	private int[][][][] blockArray;
 	
 	/** Stores a list of the structure to build, in 'layers' of up to the limit set by static array initialization. */
-	private final List blockArrayList = new LinkedList();
+	private final List<int[][][][]> blockArrayList = new LinkedList();
 	
 	/** Stores blocks that need to be set post-generation, such as torches */
-	private final List postGenBlocks = new LinkedList();
+	private final List<BlockData> postGenBlocks = new LinkedList();
+	
+	/**
+	 * Basic constructor. Sets generator to notify other blocks of blocks it changes.
+     */
+	public StructureGeneratorBase() {
+		super(true);
+	}
 	
 	/**
 	 * Constructs the generator based on the player's facing and blockArray for the structure
@@ -75,8 +92,8 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 	}
 
 	/**
-	 * Constructs the generator with the player's facing, the structure's front facing
-	 * and blockArray for the structure
+	 * Constructs the generator with the player's facing, the blockArray for the structure
+	 * and the structure's facing
 	 */
 	public StructureGeneratorBase(Entity entity, int[][][][] blocks, int structureFacing)
 	{
@@ -107,13 +124,230 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 		this.offsetY = offY;
 		this.offsetZ = offZ;
 	}
-
+	
 	/**
-	 * Super constructor. par1 sets whether or not the generator should notify blocks of blocks it
-	 * changes. When the world is first generated, this is false, when saplings grow, this is true.
-     */
-	public StructureGeneratorBase(boolean par1) {
-		super(par1);
+	 * Allows the use of block ids greater than 4096 as custom 'hooks' to trigger onCustomBlockAdded
+	 * @param fakeID ID you use to identify your 'event'. Absolute value must be greater than 4096
+	 * @param customData Custom data may be used to subtype events for given fakeID
+	 * Returns the real id of the block to spawn in the world; must be <= 4096
+	 */
+	public abstract int getRealBlockID(int fakeID, int customData);
+	
+	/**
+	 * A custom 'hook' to allow setting of tile entities, spawning entities, etc.
+	 * @param fakeID The custom identifier used to distinguish between types
+	 * @param customData Custom data may be used to subtype events for given fakeID
+	 */
+	public abstract void onCustomBlockAdded(World world, int x, int y, int z, int fakeID, int customData);
+	
+	/**
+	 * Maps a block id to a specified rotation type. Allows custom blocks to rotate with structure.
+	 * @param blockID a valid block id, 0 to 4096
+	 * @param rotationType types predefined by enumerated type ROTATION
+	 * @return false if a rotation type has already been specified for the given blockID
+	 */
+	public static final boolean registerCustomBlockRotation(int blockID, ROTATION rotationType)
+	{
+		return registerCustomBlockRotation(blockID, rotationType, false);
+	}
+	
+	/**
+	 * Maps a block id to a specified rotation type. Allows custom blocks to rotate with structure.
+	 * @param blockID a valid block id, 0 to 4096
+	 * @param rotationType types predefined by enumerated type ROTATION
+	 * @param override if true, will override the previously set rotation data for specified blockID
+	 * @return false if a rotation type has already been specified for the given blockID
+	 */
+	public static final boolean registerCustomBlockRotation(int blockID, ROTATION rotationType, boolean override)
+	{
+		if (blockID < 0 || blockID > 4096) {
+			throw new IllegalArgumentException("[GEN STRUCTURE] Error setting custom block rotation. Provided id: " + blockID + ". Valid ids are (0-4095)");
+		}
+		if (blockRotationData.containsKey(blockID)) {
+			System.out.println("[GEN STRUCTURE][WARNING] Block " + blockID + " already has a rotation type." + (override ? " Overriding previous data." : ""));
+			if (override) blockRotationData.put(blockID, rotationType);
+			else return false;
+		}
+		blockRotationData.put(blockID, rotationType);
+		return true;
+	}
+	
+	/**
+	 * Use this method to add an ItemStack to the first available slot in a TileEntity that
+	 * implements IInventory (and thus, by extension, ISidedInventory)
+	 * @return true if entire itemstack was added
+	 */
+	public final boolean addItemToTileInventory(World world, int x, int y, int z, ItemStack itemstack)
+	{
+		TileEntity tile = world.getBlockTileEntity(x, y, z);
+		
+		if (tile == null || !(tile instanceof IInventory)) {
+			System.out.println("[GEN STRUCTURE][WARNING] Tile Entity at " + x + "/" + y + "/" + z + " is " + (tile != null ? "not an IInventory" : "null"));
+			return false;
+		}
+		if (itemstack.stackSize < 1) {
+			System.out.println("[GEN STRUCTURE][WARNING] Trying to add ItemStack of size 0 to Tile Inventory");
+			return false;
+		}
+		
+		IInventory inventory = (IInventory) tile;
+		int remaining = itemstack.stackSize;
+		
+		for (int i = 0; i < inventory.getSizeInventory() && remaining > 0; ++i)
+		{
+			ItemStack slotstack = inventory.getStackInSlot(i);
+			
+			if (slotstack == null && inventory.isItemValidForSlot(i, itemstack))
+			{
+				remaining -= inventory.getInventoryStackLimit();
+				itemstack.stackSize = (remaining > 0 ? inventory.getInventoryStackLimit() : itemstack.stackSize);
+				inventory.setInventorySlotContents(i, itemstack);
+				inventory.onInventoryChanged();
+			}
+			else if (slotstack != null && itemstack.isStackable() && inventory.isItemValidForSlot(i, itemstack))
+			{
+				if (slotstack.itemID == itemstack.itemID  && (!itemstack.getHasSubtypes() || 
+					itemstack.getItemDamage() == slotstack.getItemDamage()) && ItemStack.areItemStackTagsEqual(itemstack, slotstack))
+				{
+					int l = slotstack.stackSize + remaining;
+
+                    if (l <= itemstack.getMaxStackSize() && l <= inventory.getInventoryStackLimit())
+                    {
+                    	remaining = 0;
+                        slotstack.stackSize = l;
+                        inventory.onInventoryChanged();
+                    }
+                    else if (slotstack.stackSize < itemstack.getMaxStackSize() && itemstack.getMaxStackSize() <= inventory.getInventoryStackLimit())
+                    {
+                        remaining -= itemstack.getMaxStackSize() - slotstack.stackSize;
+                        slotstack.stackSize = itemstack.getMaxStackSize();
+                        inventory.onInventoryChanged();
+                    }
+				}
+			}
+		}
+		
+		return remaining < 1;
+	}
+	
+	/**
+	 * Places a hanging item entity in the world at the correct location and facing.
+	 * Note that you MUST use a WALL_MOUNTED type block id (such as torch) for your custom
+	 * block id's getRealBlockID return value in order for orienation to be correct.
+	 * Coordinates x,y,z are the location of the block used to spawn the entity
+	 * Automatically removes the dummy block at x/y/z before placing the entity, so the
+	 * metadata stored in the block will no longer be available.
+	 * @param hanging Must be an instance of ItemHangingEntity, such as Item.painting
+	 * @return Returns direction for further processing such as for ItemFrames, or -1 if no entity set
+	 */
+	public final int setHangingEntity(World world, ItemStack hanging, int x, int y, int z)
+	{
+		if (hanging.getItem() == null || !(hanging.getItem() instanceof ItemHangingEntity)) {
+			return -1;
+		}
+		if (world.getBlockMetadata(x, y, z) < 1 || world.getBlockMetadata(x, y, z) > 5) {
+			System.out.println("[GEN STRUCTURE][WARNING] Hanging entity has invalid metadata of " + world.getBlockMetadata(x, y, z) + ". Valid values are 1,2,3,4");
+			return - 1;
+		}
+		
+		int[] metaToFacing = {5, 4, 3, 2};
+		int direction = metaToFacing[world.getBlockMetadata(x, y, z) - 1];
+		FakePlayer player = new FakePlayer(world,"fake");
+		// remove placeholder block:
+		world.setBlockToAir(x, y, z);
+		//System.out.println("[GEN STRUCTURE] Hanging entity initial position: " + x + "/" + y + "/" + z);
+		switch(direction) {
+		case 2: // facing SOUTH
+			//++x;
+			++z;
+			break;
+		case 3: // facing NORTH
+			//--x;
+			--z;
+			break;
+		case 4: // facing EAST
+			++x;
+			//--z;
+			break;
+		case 5: // facing WEST (default)
+			--x;
+			//++z;
+			break;
+		}
+		System.out.println("[GEN STRUCTURE] Hanging entity adjusted position: " + x + "/" + y + "/" + z);
+		
+		((ItemHangingEntity) hanging.getItem()).onItemUse(hanging, player, world, x, y, z, direction, 0, 0, 0);
+		
+		return direction;
+	}
+	
+	/**
+	 * Set's the itemstack contained in ItemFrame at x/y/z with default rotation.
+	 * @param direction Use the value returned from the setHangingEntity method
+	 */
+	public final void setItemFrameStack(World world, int x, int y, int z, int direction, ItemStack itemstack)
+	{
+		setItemFrameStack(world, x, y, z, direction, itemstack, 0);
+	}
+	
+	/**
+	 * Set's the itemstack contained in ItemFrame at x/y/z with specified rotation.
+	 * @param direction Use the value returned from the setHangingEntity method
+	 * @param itemRotation 0,1,2,3 starting at default and rotating 90 degrees clockwise
+	 */
+	public final void setItemFrameStack(World world, int x, int y, int z, int direction, ItemStack itemstack, int itemRotation)
+	{
+		double minX = (double) x, minZ = (double) z, maxX = minX, maxZ =  minZ;
+		switch(direction) {
+		case 2: // facing SOUTH
+			//++x;
+			++z;
+			minX += 0.25D;
+			maxX += 0.75D;
+			minZ += 0.5D;
+			maxZ += 1.5D;
+			break;
+		case 3: // facing NORTH
+			//--x;
+			--z;
+			minX += 0.25D;
+			maxX += 0.75D;
+			minZ += 0.5D;
+			maxZ += 1.5D;
+			break;
+		case 4: // facing EAST
+			++x;
+			minX += 0.5D;
+			maxX += 1.5D;
+			minZ += 0.25D;
+			maxZ += 0.75D;
+			//--z;
+			break;
+		case 5: // facing WEST
+			--x;
+			minX += 0.5D;
+			maxX += 1.5D;
+			minZ += 0.25D;
+			maxZ += 0.75D;
+			//++z;
+			break;
+		}
+		System.out.println("[GEN STRUCTURE] Checking for ItemFrame at " + x + "/" + y + "/" + z);
+		//List<EntityItemFrame> frames = world.getEntitiesWithinAABB(EntityItemFrame.class, AxisAlignedBB.getBoundingBox(((double) x) - 0.5, (double) y, ((double) z) - 0.5, ((double) x) + 0.5, ((double) y) + 1, ((double) z) + 0.5));
+		List<EntityItemFrame> frames = world.getEntitiesWithinAABB(EntityItemFrame.class, AxisAlignedBB.getBoundingBox(minX, (double) y, minZ, maxX, (double) y + 1, maxZ));
+		if (frames != null && !frames.isEmpty())
+		{
+			Iterator iterator = frames.iterator();
+
+			while (iterator.hasNext())
+			{
+				System.out.println("[FRAME] has iterator");
+				EntityItemFrame frame1 = (EntityItemFrame) iterator.next();
+				frame1.setDisplayedItem(itemstack);
+				frame1.setItemRotation(itemRotation);
+				System.out.println("[FRAME] Itemstack: " + frame1.getDisplayedItem().toString());
+			}
+		}
 	}
 	
 	/**
@@ -136,9 +370,6 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 	 * Adds a block array 'layer' to the list to be generated
 	 */
 	public final void addBlockArray(int blocks[][][][]) {
-		// checking here avoids forcing user to use 'if (!world.isRemote)' before adding or will be added twice
-		// prevents adding the same structure twice - not good if you have identical layers
-		//if (!blockArrayList.contains(blocks))
 		if (FMLCommonHandler.instance().getEffectiveSide() == Side.SERVER)
 			this.blockArrayList.add(blocks);
 	}
@@ -146,7 +377,6 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 	/**
 	 * Returns lowest structure layer's width along the x axis or 0 if no structure has been added
 	 */
-	// do we need this?
 	public final int getWidthX() {
 		return this.blockArray != null ? this.blockArray[0].length : 0;
 	}
@@ -154,13 +384,12 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 	/**
 	 * Returns lowest structure layer's width along the z axis or 0 if no structure has been set
 	 */
-	// do we need this?
 	public final int getWidthZ() {
 		return this.blockArray != null ? this.blockArray[0][0].length : 0;
 	}
 	
 	/**
-	 * Returns lowest structure layer's height or 0 if no structure has been set
+	 * Returns current structure layer's height or 0 if no structure has been set
 	 */
 	// do we need this?
 	public final int getHeight() {
@@ -202,7 +431,7 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 	}
 	
 	/**
-	 * This will rotate the structure's default facing 90 degrees clockwise.
+	 * This will manually rotate the structure's default facing 90 degrees clockwise.
 	 * Note that a different side will now face the player when generated.
 	 */
 	public final void rotateStructureFacing() {
@@ -231,7 +460,6 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 	/**
 	 * Returns true if the generator has enough information to generate a structure
 	 */
-	// Don't think we need this method...
 	public final boolean canGenerate()
 	{
 		return this.blockArrayList.size() > 0 || this.blockArray != null;
@@ -270,57 +498,12 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 	}
 	
 	/**
-	 * Maps a block id to a specified rotation type. Allows custom blocks to rotate with structure.
-	 * @param blockID a valid block id, 0 to 4096
-	 * @param rotationType types predefined by enumerated type ROTATION
-	 * @return false if a rotation type has already been specified for the given blockID
-	 */
-	public static final boolean addCustomBlockRotation(int blockID, ROTATION rotationType)
-	{
-		return addCustomBlockRotation(blockID, rotationType, false);
-	}
-	
-	/**
-	 * Maps a block id to a specified rotation type. Allows custom blocks to rotate with structure.
-	 * @param blockID a valid block id, 0 to 4096
-	 * @param rotationType types predefined by enumerated type ROTATION
-	 * @param override if true, will override the previously set rotation data for specified blockID
-	 * @return false if a rotation type has already been specified for the given blockID
-	 */
-	public static final boolean addCustomBlockRotation(int blockID, ROTATION rotationType, boolean override)
-	{
-		if (blockID < 0 || blockID > 4096) {
-			throw new IllegalArgumentException("[GEN STRUCTURE] Error setting custom block rotation. Provided id: " + blockID + ". Valid ids are (0-4095)");
-		}
-		if (blockRotationData.containsKey(blockID)) {
-			System.out.println("[GEN STRUCTURE][WARNING] Block " + blockID + " already has a rotation type." + (override ? " Overriding previous data." : ""));
-			if (override) blockRotationData.put(blockID, rotationType);
-			else return false;
-		}
-		blockRotationData.put(blockID, rotationType);
-		return true;
-	}
-	
-	/**
-	 * Allows the use of block ids greater than 4096 as custom 'hooks' to trigger onCustomBlockAdded
-	 * @param fakeID ID you use to identify your 'event'. Absolute value must be greater than 4096
-	 * @return Returns the id of the real block to spawn in the world. Absolute value must be greater than 4096
-	 */
-	public abstract int getRealBlockID(int fakeID);
-	
-	/**
-	 * A custom 'hook' to allow setting of tile entities, spawning entities, etc.
-	 * @param fakeID The custom identifier used to distinguish between types
-	 * @param customData Custom data may be used to subtype events for given fakeID
-	 */
-	public abstract void onCustomBlockAdded(World world, int x, int y, int z, int fakeID, int customData);
-	
-	/**
 	 * Custom 'generate' method that generates a single 'layer' from the list of blockArrays
 	 */
 	private final boolean generateLayer(World world, Random random, int posX, int posY, int posZ, int rotation)
 	{
-		if (blockArray == null) { System.out.println("[GEN STRUCTURE][WARNING] No structure array has been set."); return false; }
+		// already checked in 'generate' method
+		// if (blockArray == null) { System.out.println("[GEN STRUCTURE][WARNING] No structure array has been set."); return false; }
 
 		// does center need to be calculated each time? What if first index isn't true size of structure?
 		int centerX = blockArray[0].length / 2, centerZ = blockArray[0][0].length / 2;
@@ -382,16 +565,16 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 					else
 					{
 						int fakeID = blockArray[y][x][z][0];
-						int realID = (Math.abs(fakeID) > 4096 ? getRealBlockID(fakeID) : fakeID);
+						int meta = (blockArray[y][x][z].length > 1 ? blockArray[y][x][z][1] : NO_METADATA);
+						int flag = (blockArray[y][x][z].length > 2 ? blockArray[y][x][z][2] : 2);
+						int customData = (blockArray[y][x][z].length > 3 ? blockArray[y][x][z][3] : 0);
+						
+						int realID = (Math.abs(fakeID) > 4096 ? getRealBlockID(fakeID, customData) : fakeID);
 
 						if (Math.abs(realID) > 4096) {
 							System.out.println("[GEN STRUCTURE][WARNING] Invalid block ID. Initial ID: " + fakeID + ", returned id from getRealID: " + realID);
 							continue;
 						}
-						
-						int meta = (blockArray[y][x][z].length > 1 ? blockArray[y][x][z][1] : NO_METADATA);
-						int flag = (blockArray[y][x][z].length > 2 ? blockArray[y][x][z][2] : 2);
-						int customData = (blockArray[y][x][z].length > 3 ? blockArray[y][x][z][3] : 0);
 						
 						// Allows 'soft-spawning' blocks to be spawned only in air or on blocks that allow movement, such as air or grass
 						if (realID >= 0 || world.isAirBlock(rotX, rotY, rotZ) || 
@@ -402,23 +585,27 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 								meta = 0;
 							else if (blockRotationData.containsKey(realID))
 								meta = getMetadata(Math.abs(realID), meta, facing);
-							//else {}
+							//else {} // leave metadata alone
 
+							// must notify client of block change
 							flag = flag == 0 ? 2 : flag;
 							
 							// add torches and such to a list for after-generation setBlock calls
 							if (blockRotationData.get(realID) != null && blockRotationData.get(realID) == ROTATION.WALL_MOUNTED)
 							{
-								System.out.println("[GEN STRUCTURE] Block " + realID + " requires post-processing. Adding to list.");
+								System.out.println("[GEN STRUCTURE] Block " + realID + " requires post-processing. Adding to list. Meta = " + meta);
 								this.postGenBlocks.add(new BlockData(rotX, rotY, rotZ, fakeID, meta, customData));
 							}
+							// set all other blocks here
 							else
 							{
 								world.setBlock(rotX, rotY, rotZ, Math.abs(realID), meta, flag);
-								// Fixes things like rails that automatically update onBlockAdded from world.setBlock
+								
+								// Fix things like rails that automatically update onBlockAdded from world.setBlock
 								if (blockRotationData.containsKey(realID))
 									setMetadata(world, rotX, rotY, rotZ, meta, facing);
 
+								// Call to custom block hooks
 								if (Math.abs(fakeID) > 4096) {
 									onCustomBlockAdded(world, rotX, rotY, rotZ, fakeID, customData);
 								}
@@ -442,7 +629,7 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 		{
 			block = (BlockData) iterator.next();
 			fakeID = block.getBlockID();
-			realID = (Math.abs(fakeID) > 4096 ? getRealBlockID(fakeID) : fakeID);
+			realID = (Math.abs(fakeID) > 4096 ? getRealBlockID(fakeID, block.getCustomData()) : fakeID);
 
 			if (Math.abs(realID) > 4096) {
 				System.out.println("[GEN STRUCTURE][WARNING] Invalid block ID. Initial ID: " + fakeID + ", returned id from getRealID: " + realID);
@@ -454,8 +641,13 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 					(Block.blocksList[world.getBlockId(block.getPosX(), block.getPosY(), block.getPosZ())] != null
 					&& !Block.blocksList[world.getBlockId(block.getPosX(), block.getPosY(), block.getPosZ())].blockMaterial.blocksMovement()))
 			{
+				// occasionally doesn't set metadata correctly, such as for certain ItemFrames
 				world.setBlock(block.getPosX(), block.getPosY(), block.getPosZ(), Math.abs(realID), block.getMetaData(), 2);
-
+				// print warning for mismatched metadata
+				if (world.getBlockMetadata(block.getPosX(), block.getPosY(), block.getPosZ()) != block.getMetaData()) {
+					System.out.println("[GEN STRUCTURE][WARNING] Mismatched metadata. Meta from world: " + world.getBlockMetadata(block.getPosX(), block.getPosY(), block.getPosZ()) + ", original: " + block.getMetaData());
+				}
+				
 				if (Math.abs(fakeID) > 4096) {
 					onCustomBlockAdded(world, block.getPosX(), block.getPosY(), block.getPosZ(), fakeID, block.getCustomData());
 				}

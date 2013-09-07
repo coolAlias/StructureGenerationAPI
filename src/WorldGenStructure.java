@@ -8,18 +8,11 @@ package coolalias.structuregen;
 
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.item.EntityPainting;
 import net.minecraft.entity.passive.EntityVillager;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemHangingEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.tileentity.TileEntityChest;
-import net.minecraft.tileentity.TileEntityDispenser;
-import net.minecraft.util.Direction;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
-import net.minecraftforge.common.FakePlayer;
 
 public class WorldGenStructure extends StructureGeneratorBase
 {
@@ -36,23 +29,28 @@ public class WorldGenStructure extends StructureGeneratorBase
 		super(entity, blocks, structureFacing, offX, offY, offZ);
 	}
 
-	public WorldGenStructure(boolean par1) {
-		super(par1);
+	public WorldGenStructure() {
+		super();
 	}
 
 	/**
-	 * A custom 'hook' to allow setting of tile entities, spawning entities, etc.
-	 * @param fakeID The custom identifier used to distinguish between types
+	 * Allows the use of block ids greater than 4096 as custom 'hooks' to trigger onCustomBlockAdded
+	 * @param fakeID Identifier for your 'event'. Absolute value must be greater than 4096
 	 * @param customData Custom data may be used to subtype events for given fakeID
+	 * @return Returns the real id of the block to spawn in the world; must be <= 4096
 	 */
 	@Override
-	public int getRealBlockID(int fakeID) {
+	public int getRealBlockID(int fakeID, int customData) {
 		System.out.println("[GEN STRUCTURE] Getting real id from fake id: " + fakeID);
 		switch(fakeID) {
 		case StructureArrays.CUSTOM_CHEST:
 			return Block.chest.blockID;
 		case StructureArrays.CUSTOM_DISPENSER:
 			return Block.dispenser.blockID;
+		case StructureArrays.ITEM_FRAME: // same as PAINTING
+			return Block.torchWood.blockID;
+		case StructureArrays.PAINTING:
+			return Block.torchWood.blockID; // need to do post-generation setting of this entity
 		case StructureArrays.SPAWN_VILLAGER:
 			return Block.torchWood.blockID; // using this, the villager will be spawned post-generation
 		default:
@@ -70,22 +68,68 @@ public class WorldGenStructure extends StructureGeneratorBase
 	@Override
 	public void onCustomBlockAdded(World world, int x, int y, int z, int fakeID, int customData)
 	{
-		TileEntity T;
+		int meta = world.getBlockMetadata(x, y, z);
+		System.out.println("[CUSTOM BLOCK ADDED] metadata = " + meta);
 		System.out.println("[GEN STRUCTURE] Setting custom block info for fake id " + fakeID + " and customData " + customData);
 		switch(fakeID) {
 		case StructureArrays.CUSTOM_CHEST:
-			// just for demonstration; better to call a custom method
-			T = (TileEntityChest) world.getBlockTileEntity(x, y, z);
+			// Using the pre-made method addItemToTileInventory adds items to the first slot available
+
+			// Here we're using customData for stack size to add
+			addItemToTileInventory(world, x, y, z, new ItemStack(Item.diamond, customData));
 			
-			// here I'm using customData as the size of the stack, but it could also be used as the
-			// item id to spawn, number of random items to place inside or to distinguish between
-			// custom chest types such as CHEST_BLACKSMITH, CHEST_LIBRARY, etc.
-			((TileEntityChest) T).setInventorySlotContents(0, new ItemStack(Item.diamond, customData));
+			// Here we use customData to add a metadata block to the chest
+			addItemToTileInventory(world, x, y, z, new ItemStack(Block.cloth.blockID, 1, customData));
 			break;
 		case StructureArrays.CUSTOM_DISPENSER:
-			T = (TileEntityDispenser) world.getBlockTileEntity(x, y, z);
-			// here we use the customData as the itemID to add to the inventory
-			((TileEntityDispenser) T).setInventorySlotContents(0, new ItemStack(customData, 64, 0));
+			// We're going to take advantage of addItemToTileInventory's return value to fill
+			// the container to the brim
+			boolean addmore = true;
+			while (addmore)
+			{
+				// Here we use customData as the itemID to place
+				addmore = addItemToTileInventory(world, x, y, z, new ItemStack(customData, 64, 0));
+			}
+			break;
+		case StructureArrays.ITEM_FRAME:
+			ItemStack frame = new ItemStack(Item.itemFrame);
+			// To save you lots of trouble, there are ready-made methods to handle placing
+			// hanging entities and set ItemFrame items (with or without rotation)
+			
+			// You need to store the returned facing from setHangingEntity to use later methods
+			int facing = setHangingEntity(world, frame, x, y, z);
+			
+			// Use this method for default rotation:
+			setItemFrameStack(world, x, y, z, facing, new ItemStack(customData,1,0));
+
+			// or this one if you want to specify rotation:
+			// setItemFrameStack(world, x, y, z, facing, new ItemStack(customData,1,0),2);
+			break;
+		case StructureArrays.PAINTING:
+			ItemStack painting = new ItemStack(Item.painting);
+			setHangingEntity(world, painting, x, y, z);
+			// choose painting you want based on custom data; look at EnumArt for painting names
+			/*
+			String custom = (customData == 1 ? "Aztec" : "Bomb");
+			
+			List paintings = world.getEntitiesWithinAABB(EntityPainting.class, AxisAlignedBB.getBoundingBox((double) x - 1, (double) y - 1, (double) z - 1, (double) x + 1, (double) y + 1, (double) z + 1));
+			
+			if (paintings != null && !paintings.isEmpty())
+			{
+				Iterator iterator = paintings.iterator();
+
+				while (iterator.hasNext())
+				{
+					EntityPainting toEdit = (EntityPainting) iterator.next();
+					System.out.println("[PAINTING] setting custom painting for " + toEdit.getEntityData().getString("Motive"));
+					toEdit.getEntityData().setString("Motive", custom);
+					System.out.println("[PAINTING] new painting is " + toEdit.getEntityData().getString("Motive"));
+					//EntityPainting newPainting = new EntityPainting(world, (int) toEdit.posX, (int) toEdit.posY, (int) toEdit.posZ, 2, custom);
+					//toEdit.setDead();
+					//world.spawnEntityInWorld(newPainting);
+				}
+			}
+			*/
 			break;
 		case StructureArrays.SPAWN_VILLAGER:
 			// Again, it would be cleaner to call a custom method from this point
