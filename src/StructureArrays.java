@@ -347,7 +347,7 @@ public class StructureArrays
 	SOME USEFUL METHODS
 	The following are methods designed to make handling onCustomBlockAdded cases easier:
 	
-	1. addItemToTileInventory(World world, int x, int y, int z, ItemStack itemstack)
+	1. addItemToTileInventory(World world, ItemStack itemstack, int x, int y, int z)
 	
 		Use this method to conveniently add items to any TileEntity that has an inventory
 		(i.e. implements either IInventory or ISidedInventory).
@@ -355,7 +355,7 @@ public class StructureArrays
 		Items are added to the first slot available and the method returns false if the
 		stack was not able to be added entirely or if there was an error.
 	
-	2. spawnEntityInStructure(World world, int x, int y, int z, Entity entity)
+	2. spawnEntityInStructure(World world, Entity entity, int x, int y, int z)
 	
 		Will handle setting the entity's location more precisely to prevent spawning partially
 		inside of walls. The entity's other characteristics will still need to be set manually
@@ -369,7 +369,7 @@ public class StructureArrays
 		
 		This method returns the direction in which the entity faces for use with the following.
 	
-	4. setItemFrameStack(World world, int x, int y, int z, int direction, ItemStack itemstack,
+	4. setItemFrameStack(World world, ItemStack itemstack, int x, int y, int z, int direction,
 		int itemRotation)
 	
 		Finds the correct ItemFrame in the world for the coordinates and direction given and

@@ -177,7 +177,7 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 	 * implements IInventory (and thus, by extension, ISidedInventory)
 	 * @return true if entire itemstack was added
 	 */
-	public final boolean addItemToTileInventory(World world, int x, int y, int z, ItemStack itemstack)
+	public final boolean addItemToTileInventory(World world, ItemStack itemstack, int x, int y, int z)
 	{
 		TileEntity tile = world.getBlockTileEntity(x, y, z);
 		
@@ -228,6 +228,11 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 		}
 		
 		return remaining < 1;
+	}
+	
+	public final void spawnEntityInStructure(World world, Entity entity, int x, int y, int z)
+	{
+		
 	}
 	
 	/**
@@ -281,9 +286,9 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 	 * Set's the itemstack contained in ItemFrame at x/y/z with default rotation.
 	 * @param direction Use the value returned from the setHangingEntity method
 	 */
-	public final void setItemFrameStack(World world, int x, int y, int z, int direction, ItemStack itemstack)
+	public final void setItemFrameStack(World world, ItemStack itemstack, int x, int y, int z, int direction)
 	{
-		setItemFrameStack(world, x, y, z, direction, itemstack, 0);
+		setItemFrameStack(world, itemstack, x, y, z, direction, 0);
 	}
 	
 	/**
@@ -291,7 +296,7 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 	 * @param direction Use the value returned from the setHangingEntity method
 	 * @param itemRotation 0,1,2,3 starting at default and rotating 90 degrees clockwise
 	 */
-	public final void setItemFrameStack(World world, int x, int y, int z, int direction, ItemStack itemstack, int itemRotation)
+	public final void setItemFrameStack(World world, ItemStack itemstack, int x, int y, int z, int direction, int itemRotation)
 	{
 		double minX = (double) x, minZ = (double) z, maxX = minX, maxZ =  minZ;
 		

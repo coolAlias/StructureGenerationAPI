@@ -76,10 +76,10 @@ public class WorldGenStructure extends StructureGeneratorBase
 			// Using the pre-made method addItemToTileInventory adds items to the first slot available
 
 			// Here we're using customData for stack size to add
-			addItemToTileInventory(world, x, y, z, new ItemStack(Item.diamond, customData));
+			addItemToTileInventory(world, new ItemStack(Item.diamond, customData), x, y, z);
 			
 			// Here we use customData to add a metadata block to the chest
-			addItemToTileInventory(world, x, y, z, new ItemStack(Block.cloth.blockID, 1, customData));
+			addItemToTileInventory(world, new ItemStack(Block.cloth.blockID, 1, customData), x, y, z);
 			break;
 		case StructureArrays.CUSTOM_DISPENSER:
 			// We're going to take advantage of addItemToTileInventory's return value to fill
@@ -88,7 +88,7 @@ public class WorldGenStructure extends StructureGeneratorBase
 			while (addmore)
 			{
 				// Here we use customData as the itemID to place
-				addmore = addItemToTileInventory(world, x, y, z, new ItemStack(customData, 64, 0));
+				addmore = addItemToTileInventory(world, new ItemStack(customData, 64, 0), x, y, z);
 			}
 			break;
 		case StructureArrays.ITEM_FRAME:
@@ -100,7 +100,7 @@ public class WorldGenStructure extends StructureGeneratorBase
 			int facing = setHangingEntity(world, frame, x, y, z);
 			
 			// Use this method for default rotation:
-			setItemFrameStack(world, x, y, z, facing, new ItemStack(customData,1,0));
+			setItemFrameStack(world, new ItemStack(customData,1,0), x, y, z, facing);
 
 			// or this one if you want to specify rotation:
 			// setItemFrameStack(world, x, y, z, facing, new ItemStack(customData,1,0),2);
