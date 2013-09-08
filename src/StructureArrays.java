@@ -198,12 +198,25 @@ public class StructureArrays
 		 					IMPORTANT: NOTES ON SETTING METADATA
 				Read this or your directional blocks WILL face the wrong direction!
 	=====================================================================================
+	
+	!!!VERY IMPORTANT!!! If the block uses metadata to determine direction, you MUST include
+	a metadata value in the array, EVEN if the value for that block happens to be 0 (zero).
+	
+	{Block.cobblestoneStairs.blockID} will NOT get rotated, but
+	{Block.cobblestoneStairs.blockID,0} will.
+	
+	That goes for all blocks that have direction, not just stairs.
+	
 	Set metadata value in relation to player facing opposite your structure's facing.
 	Default structure facing is EAST, so I set all my metadata based on a player looking
 	WEST, e.g. if I want stairs leading away from the player, I set the metadata to 1.
 	
-	The ROTATION type is in parentheses ( ), followed by metadata explanations for all blocks
+	(ROTATION) type is in parentheses, followed by metadata explanations for all blocks
 	that use that type. Use this as a guide for setting custom block rotation type.
+	
+	[POST] Indicates that these block types are set post-generation, so can be used for custom
+	events you want to do after the structure has finished generating. Currently only the
+	type WALL_MOUNTED uses this.
 	
 	TIP: It's worth stating one more time: using MCEdit will vastly reduce the headache of
 	trying to figure out metadata information for directional blocks. Please use it first,
@@ -275,18 +288,22 @@ public class StructureArrays
 	I know I set mine backwards a few times.
 	See http://www.minecraftwiki.net/wiki/Data_values#Sign_Posts for exact details
 	
-	(TRAPDOOR) Trapdoors:
+	(TRAPDOOR)
+	Trapdoors:
 	0,1,2,3 attached to the wall on the south, north, east or west. For example, if you
 	are facing west and want the trapdoor to open away from you, attach it to the wall
 	to the west (3), NOT east.
 	Add 4 if you want the trapdoor opened, add 8 if you want it attached to the top
 	half of the block (these are additive, so east wall open on upper half is 2+4+8 = 14)
 	
+	Note that placing active redstone signals near trapdoors will cause them to detach IF
+	in a location not otherwise allowed (e.g. attached to glass panes instead of blocks)
+	
 	(VINE) Vines:
 	1,2,4,8 anchored to the south, west, north or east side of the vine block, NOT
 	neighboring block (so the position may be opposite what you think)
 	
-	(WALL_MOUNTED)
+	(WALL_MOUNTED) [POST]
 	Buttons and Torches (normal and redstone):
 	1,2,3,4 pointing east, west, south, north.
 	Torches (both) only: 5,6 standing on floor / in ground (what's the difference?)
@@ -295,9 +312,6 @@ public class StructureArrays
 	As buttons with the following: 5,6 ground lever south or east when off;
 	7,0 ceiling lever, south or east when off, +8 for switched on (might want
 	to set the flag value to 3 if switched on to notify neighboring blocks)
-	
-	Note that these blocks are set post-generation, so can be used for custom events
-	you want to do after the structure has finished generating.
 	
 	(WOOD) Wood:
 	0,1,2,3 Oak/Spruce/Birch/Jungle placed vertically
@@ -355,11 +369,17 @@ public class StructureArrays
 		Items are added to the first slot available and the method returns false if the
 		stack was not able to be added entirely or if there was an error.
 	
-	2. spawnEntityInStructure(World world, Entity entity, int x, int y, int z)
+	2.1 spawnEntityInStructure(World world, Entity entity, int x, int y, int z)
 	
-		Will handle setting the entity's location more precisely to prevent spawning partially
-		inside of walls. The entity's other characteristics will still need to be set manually
-		by the user, however.
+		Spawns the passed in entity within the structure such that it doesn't spawn inside of
+		walls. If no valid location was found, the entity will still spawn but the method will
+		return false.
+		
+	2.2. setEntityInStructure(World world, Entity entity, int x, int y, int z)
+	
+		 Sets an entity's location so that it doesn't spawn inside of walls, but doesn't spawn
+		 the entity. Automatically removes placeholder block at coordinates x/y/z.
+		 Returns false if no suitable location found so user can decide whether to spawn or not.
 	
 	3. setHangingEntity(World world, ItemStack hanging, int x, int y, int z)
 	
@@ -584,7 +604,7 @@ public class StructureArrays
 				{Block.fence.blockID},
 				{Block.fence.blockID},
 				{Block.fence.blockID},
-				{Block.fenceGate.blockID,1},
+				{Block.fenceGate.blockID,1}, // could also be 3
 				{Block.fence.blockID},
 				{Block.fence.blockID},
 			}
@@ -602,8 +622,9 @@ public class StructureArrays
 				{PAINTING,4}, // facing north (since default structure faces EAST, this is the right-hand side)
 				// if you change the above block to wood, the painting at y=2,x=0,z=0 will work fine
 				{Block.planks.blockID},
-				{Block.bed.blockID,10}, // head
-				{Block.bed.blockID,2}, // base
+				{Block.bed.blockID,10},
+				// head, facing west (i.e. to the right), so we must place the head to the north of the base (i.e. z - 1)
+				{Block.bed.blockID,2}, // base, facing west, at z=3, so head is at z=2
 				{Block.planks.blockID},
 				{0}
 			},
@@ -635,6 +656,7 @@ public class StructureArrays
 				{0},{PAINTING,1},{0},{0},{Block.signWall.blockID,5},{0}
 			}
 			// note that since we don't spawn anything at x = 6 from here on, we don't need to include it
+			// excluding x=0, however, would cause this entire layer to be out of place
 		},
 		{ // y = 3
 			{ // x = 0 z values:
@@ -652,12 +674,12 @@ public class StructureArrays
 				{0}
 			},
 			{ // x = 2 z values:
-				{Block.trapdoor.blockID,4},
-				{Block.thinGlass.blockID},
-				{Block.redstoneWire.blockID},
+				{Block.trapdoor.blockID,4}, // placing a trapdoor on glass is normally not possible
+				{Block.thinGlass.blockID}, // changing this to a non-glass block would prevent the trapdoor from falling off
+				{Block.redstoneWire.blockID}, // so this wire here will cause the above trapdoor to detach
 				{0},
 				{Block.thinGlass.blockID},
-				{Block.trapdoor.blockID,5}
+				{Block.trapdoor.blockID,5} // this one, however, will stay (unless you connect redstone wire to it and activate it)
 			},
 			{ // x = 3 z values:
 				{0},
@@ -1397,4 +1419,671 @@ public class StructureArrays
 			}
 		};
 		*/
+	/*
+	public static final int[][][][] blockArrayShop =
+	{
+		{//y = 0
+			{//x = 0
+				{Block.grass.blockID},
+				{Block.grass.blockID},
+				{Block.grass.blockID},
+				{Block.grass.blockID},
+				{Block.grass.blockID},
+				{Block.grass.blockID},
+				{Block.grass.blockID},
+				{Block.wood.blockID},
+				{Block.grass.blockID},
+				{Block.grass.blockID},
+				{Block.grass.blockID}
+			},
+			{//x = 1
+				{Block.grass.blockID},
+				{Block.dirt.blockID},
+				{Block.dirt.blockID},
+				{Block.dirt.blockID},
+				{Block.dirt.blockID},
+				{Block.dirt.blockID},
+				{Block.dirt.blockID},
+				{Block.wood.blockID},
+				{Block.dirt.blockID},
+				{Block.dirt.blockID},
+				{Block.grass.blockID}
+			},
+			{//x = 2
+				{Block.dirt.blockID},
+				{Block.dirt.blockID},
+				{Block.wood.blockID, 1},
+				{Block.wood.blockID, 1},
+				{Block.wood.blockID, 1},
+				{Block.wood.blockID, 1},
+				{Block.wood.blockID, 1},
+				{Block.wood.blockID, 1},
+				{Block.wood.blockID, 1},
+				{Block.dirt.blockID},
+				{Block.dirt.blockID}
+			},
+			{//x = 3
+				{Block.wood.blockID},
+				{Block.dirt.blockID},
+				{Block.wood.blockID, 1},
+				{Block.planks.blockID},
+				{Block.planks.blockID},
+				{Block.planks.blockID},
+				{Block.planks.blockID},
+				{Block.planks.blockID},
+				{Block.wood.blockID, 1},
+				{Block.dirt.blockID},
+				{Block.wood.blockID}
+			},
+			{//x = 4
+				{Block.wood.blockID},
+				{Block.dirt.blockID},
+				{Block.wood.blockID, 1},
+				{Block.planks.blockID},
+				{Block.planks.blockID},
+				{Block.planks.blockID},
+				{Block.planks.blockID},
+				{Block.planks.blockID},
+				{Block.wood.blockID, 1},
+				{Block.cobblestone.blockID},
+				{Block.wood.blockID}
+			},
+			{//x = 5
+				{Block.wood.blockID},
+				{Block.dirt.blockID},
+				{Block.wood.blockID, 1},
+				{Block.planks.blockID},
+				{Block.planks.blockID},
+				{Block.planks.blockID},
+				{Block.planks.blockID},
+				{Block.planks.blockID},
+				{Block.wood.blockID, 1},
+				{Block.dirt.blockID},
+				{Block.wood.blockID}
+			},
+			{//x = 6
+				{Block.dirt.blockID},
+				{Block.dirt.blockID},
+				{Block.wood.blockID, 1},
+				{Block.wood.blockID, 1},
+				{Block.wood.blockID, 1},
+				{Block.wood.blockID, 1},
+				{Block.wood.blockID, 1},
+				{Block.wood.blockID, 1},
+				{Block.wood.blockID, 1},
+				{Block.dirt.blockID},
+				{Block.dirt.blockID}
+			},
+			{//x = 7
+				{Block.grass.blockID},
+				{Block.dirt.blockID},
+				{Block.dirt.blockID},
+				{Block.dirt.blockID},
+				{Block.dirt.blockID},
+				{Block.dirt.blockID},
+				{Block.dirt.blockID},
+				{Block.dirt.blockID},
+				{Block.dirt.blockID},
+				{Block.dirt.blockID},
+				{Block.grass.blockID}
+			},
+			{//x = 8
+				{Block.grass.blockID},
+				{Block.grass.blockID},
+				{Block.grass.blockID},
+				{Block.grass.blockID},
+				{Block.grass.blockID},
+				{Block.grass.blockID},
+				{Block.grass.blockID},
+				{Block.grass.blockID},
+				{Block.grass.blockID},
+				{Block.grass.blockID},
+				{Block.grass.blockID}
+			}
+		},
+		{//y = 1
+			{//x = 0
+				{0},
+				{Block.stairsWoodSpruce.blockID,0},
+				{Block.stairsWoodSpruce.blockID,0},
+				{Block.stairsWoodSpruce.blockID,0},
+				{Block.stairsWoodSpruce.blockID,0},
+				{Block.stairsWoodSpruce.blockID,0},
+				{Block.stairsWoodSpruce.blockID,0},
+				{0},
+				{Block.stairsWoodSpruce.blockID,0},
+				{Block.stairsWoodSpruce.blockID,0},
+				{0}
+			},
+			{//x = 1
+				{Block.stairsWoodSpruce.blockID,0},
+				{Block.stoneBrick.blockID},
+				{Block.stoneBrick.blockID},
+				{Block.stoneBrick.blockID},
+				{Block.stoneBrick.blockID},
+				{Block.stoneBrick.blockID},
+				{Block.stoneBrick.blockID},
+				{Block.doorWood.blockID, 2},
+				{Block.stoneBrick.blockID},
+				{Block.stoneBrick.blockID},
+				{Block.stairsWoodSpruce.blockID,0}
+			},
+			{//x = 2
+				{Block.wood.blockID},
+				{Block.planks.blockID},
+				{0},
+				{0},
+				{0},
+				{0},
+				{0},
+				{0},
+				{0},
+				{Block.planks.blockID},
+				{Block.wood.blockID}
+			},
+			{//x = 3
+				{0},
+				{Block.wood.blockID, 1},
+				{0},
+				{0},
+				{0},
+				{0},
+				{0},
+				{0},
+				{0},
+				{Block.wood.blockID, 1},
+				{0}
+			},
+			{//x = 4
+				{0},
+				{Block.cobblestone.blockID},
+				{0},
+				{0},
+				{0},
+				{0},
+				{0},
+				{0},
+				{0},
+				{Block.cobblestone.blockID},
+				{0}
+			},
+			{//x = 5
+				{0},
+				{Block.wood.blockID, 1},
+				{0},
+				{0},
+				{0},
+				{0},
+				{0},
+				{0},
+				{0},
+				{Block.wood.blockID, 1},
+				{0}
+			},
+			{//x = 6
+				{Block.wood.blockID},
+				{Block.planks.blockID},
+				{0},
+				{0},
+				{0},
+				{0},
+				{0},
+				{0},
+				{0},
+				{Block.planks.blockID},
+				{Block.wood.blockID}
+			},
+			{//x = 7
+				{Block.stairsWoodSpruce.blockID, 1},
+				{Block.stoneBrick.blockID},
+				{Block.stoneBrick.blockID},
+				{Block.stoneBrick.blockID},
+				{Block.stoneBrick.blockID},
+				{Block.stoneBrick.blockID},
+				{Block.stoneBrick.blockID},
+				{Block.stoneBrick.blockID},
+				{Block.stoneBrick.blockID},
+				{Block.stoneBrick.blockID},
+				{Block.stairsWoodSpruce.blockID, 1}
+			},
+			{//x = 8
+				{0},
+				{Block.stairsWoodSpruce.blockID, 1},
+				{Block.stairsWoodSpruce.blockID, 1},
+				{Block.stairsWoodSpruce.blockID, 1},
+				{Block.stairsWoodSpruce.blockID, 1},
+				{Block.stairsWoodSpruce.blockID, 1},
+				{Block.stairsWoodSpruce.blockID, 1},
+				{Block.stairsWoodSpruce.blockID, 1},
+				{Block.stairsWoodSpruce.blockID, 1},
+				{Block.stairsWoodSpruce.blockID, 1},
+				{0}
+			}
+		},
+		{//y = 2
+			{//x = 0
+				{0},
+				{0},
+				{0},
+				{0},
+				{0},
+				{0},
+				{0},
+				{0},
+				{0},
+				{0},
+				{0}
+			},
+			{//x = 1
+				{0},
+				{Block.stairsWoodSpruce.blockID},
+				{Block.fence.blockID},
+				{0},
+				{Block.fence.blockID},
+				{Block.stairsWoodSpruce.blockID},
+				{Block.stairsWoodSpruce.blockID},
+				{Block.doorWood.blockID, 10},
+				{Block.stairsWoodSpruce.blockID},
+				{Block.stairsWoodSpruce.blockID},
+				{0}
+			},
+			{//x = 2
+				{Block.stairsWoodSpruce.blockID},
+				{Block.wood.blockID, 1},
+				{0},
+				{0},
+				{0},
+				{0},
+				{0},
+				{0},
+				{0},
+				{Block.wood.blockID, 1},
+				{Block.stairsWoodSpruce.blockID}
+			},
+			{//x = 3
+				{Block.wood.blockID},
+				{Block.torchWood.blockID, 3},
+				{0},
+				{0},
+				{0},
+				{0},
+				{0},
+				{0},
+				{0},
+				{Block.torchWood.blockID, 4},
+				{Block.wood.blockID}
+			},
+			{//x = 4
+				{0},
+				{Block.wood.blockID, 1},
+				{0},
+				{0},
+				{0},
+				{0},
+				{0},
+				{0},
+				{0},
+				{Block.wood.blockID, 1},
+				{0}
+			},
+			{//x = 5
+				{Block.wood.blockID},
+				{Block.torchWood.blockID, 3},
+				{0},
+				{0},
+				{0},
+				{0},
+				{0},
+				{0},
+				{0},
+				{Block.torchWood.blockID, 4},
+				{Block.wood.blockID}
+			},
+			{//x = 6
+				{Block.stairsWoodSpruce.blockID, 1},
+				{Block.wood.blockID, 1},
+				{0},
+				{0},
+				{0},
+				{0},
+				{0},
+				{0},
+				{0},
+				{Block.wood.blockID, 1},
+				{Block.stairsWoodSpruce.blockID, 1},
+			},
+			{//x = 7
+				{0},
+				{Block.stairsWoodSpruce.blockID, 1},
+				{Block.stairsWoodSpruce.blockID, 1},
+				{Block.wood.blockID, 1},
+				{Block.stairsWoodSpruce.blockID, 1},
+				{Block.stairsWoodSpruce.blockID, 1},
+				{Block.stairsWoodSpruce.blockID, 1},
+				{Block.wood.blockID, 1},
+				{Block.stairsWoodSpruce.blockID, 1},
+				{Block.stairsWoodSpruce.blockID, 1},
+				{0}
+			},
+			{//x = 8
+				{0},
+				{0},
+				{0},
+				{Block.torchWood.blockID, 1},
+				{0},
+				{0},
+				{0},
+				{Block.torchWood.blockID, 1},
+				{0},
+				{0},
+				{0}
+			}
+		},
+		{//y = 3
+			{//x = 0
+				{0},
+				{0},
+				{0},
+				{0},
+				{0},
+				{0},
+				{0},
+				{0},
+				{0},
+				{0},
+				{0}
+			},
+			{//x = 1
+				{0},
+				{0},
+				{Block.stoneSingleSlab.blockID, 3},
+				{Block.stoneSingleSlab.blockID, 3},
+				{Block.stoneSingleSlab.blockID, 3},
+				{0},
+				{0},
+				{Block.stoneSingleSlab.blockID, 3},
+				{0},
+				{0},
+				{0}
+			},
+			{//x = 2
+				{0},
+				{Block.stairsWoodSpruce.blockID},
+				{Block.cobblestone.blockID},
+				{Block.cobblestone.blockID},
+				{Block.cobblestone.blockID},
+				{Block.stairsWoodSpruce.blockID},
+				{Block.stairsWoodSpruce.blockID},
+				{Block.stairsCobblestone.blockID},
+				{Block.stairsWoodSpruce.blockID},
+				{Block.stairsWoodSpruce.blockID},
+				{0}
+			},
+			{//x = 3
+				{Block.stairsWoodSpruce.blockID},
+				{Block.wood.blockID, 1},
+				{0},
+				{0},
+				{0},
+				{0},
+				{0},
+				{0},
+				{0},
+				{Block.wood.blockID, 1},
+				{Block.stairsWoodSpruce.blockID}
+			},
+			{//x = 4
+				{Block.wood.blockID},
+				{Block.planks.blockID},
+				{0},
+				{0},
+				{0},
+				{0},
+				{0},
+				{0},
+				{0},
+				{Block.planks.blockID},
+				{Block.wood.blockID}
+			},
+			{//x = 5
+				{Block.stairsWoodSpruce.blockID, 1},
+				{Block.wood.blockID, 1},
+				{0},
+				{0},
+				{0},
+				{0},
+				{0},
+				{0},
+				{0},
+				{Block.wood.blockID, 1},
+				{Block.stairsWoodSpruce.blockID, 1},
+			},
+			{//x = 6
+				{0},
+				{Block.stairsWoodSpruce.blockID, 1},
+				{Block.stairsWoodSpruce.blockID, 1},
+				{Block.stairsCobblestone.blockID, 1},
+				{Block.stairsWoodSpruce.blockID, 1},
+				{Block.stairsWoodSpruce.blockID, 1},
+				{Block.stairsWoodSpruce.blockID, 1},
+				{Block.stairsCobblestone.blockID, 1},
+				{Block.stairsWoodSpruce.blockID, 1},
+				{Block.stairsWoodSpruce.blockID, 1},
+				{0}
+			},
+			{//x = 7
+				{0},
+				{0},
+				{0},
+				{Block.stoneSingleSlab.blockID, 3},
+				{0},
+				{0},
+				{0},
+				{Block.stoneSingleSlab.blockID, 3},
+				{0},
+				{0},
+				{0}
+			},
+			{//x = 8
+				{0},
+				{0},
+				{0},
+				{Block.stoneSingleSlab.blockID, 3},
+				{0},
+				{0},
+				{0},
+				{Block.stoneSingleSlab.blockID, 3},
+				{0},
+				{0},
+				{0}
+			}
+		},
+		{//y = 4
+			{//x = 0
+				{0},
+				{0},
+				{0},
+				{0},
+				{0},
+				{0},
+				{0},
+				{0},
+				{0},
+				{0},
+				{0}
+			},
+			{//x = 1
+				{0},
+				{0},
+				{0},
+				{0},
+				{0},
+				{0},
+				{0},
+				{0},
+				{0},
+				{0},
+				{0}
+			},
+			{//x = 2
+				{0},
+				{0},
+				{0},
+				{0},
+				{0},
+				{0},
+				{0},
+				{0},
+				{0},
+				{0},
+				{0}
+			},
+			{//x = 3
+				{0},
+				{Block.stairsWoodSpruce.blockID},
+				{Block.stairsCobblestone.blockID},
+				{Block.stairsCobblestone.blockID},
+				{Block.stairsCobblestone.blockID},
+				{Block.stairsWoodSpruce.blockID},
+				{Block.stairsWoodSpruce.blockID},
+				{Block.stairsCobblestone.blockID},
+				{Block.stairsWoodSpruce.blockID},
+				{Block.stairsWoodSpruce.blockID},
+				{0}
+			},
+			{//x = 4
+				{Block.stairsCobblestone.blockID, 2},
+				{Block.wood.blockID, 1},
+				{Block.wood.blockID, 1},
+				{Block.wood.blockID, 1},
+				{Block.wood.blockID, 1},
+				{Block.wood.blockID, 1},
+				{Block.wood.blockID, 1},
+				{Block.wood.blockID, 1},
+				{Block.wood.blockID, 1},
+				{Block.wood.blockID, 1},
+				{Block.stairsCobblestone.blockID, 3}
+			},
+			{//x = 5
+				{0},
+				{Block.stairsWoodSpruce.blockID, 1},
+				{Block.stairsWoodSpruce.blockID, 1},
+				{Block.stairsCobblestone.blockID, 1},
+				{Block.stairsWoodSpruce.blockID, 1},
+				{Block.stairsWoodSpruce.blockID, 1},
+				{Block.stairsWoodSpruce.blockID, 1},
+				{Block.stairsCobblestone.blockID, 1},
+				{Block.stairsWoodSpruce.blockID, 1},
+				{Block.stairsWoodSpruce.blockID, 1},
+				{0}
+			},
+			{//x = 6
+				{0},
+				{0},
+				{0},
+				{0},
+				{0},
+				{0},
+				{0},
+				{0},
+				{0},
+				{0},
+				{0}
+			},
+			{//x = 7
+				{0},
+				{0},
+				{0},
+				{0},
+				{0},
+				{0},
+				{0},
+				{0},
+				{0},
+				{0},
+				{0}
+			},
+			{//x = 8
+				{0},
+				{0},
+				{0},
+				{0},
+				{0},
+				{0},
+				{0},
+				{0},
+				{0},
+				{0},
+				{0}
+			}
+		},
+		{//y = 5
+			{//x = 0
+				{0},
+				{0},
+				{0},
+				{0},
+				{0},
+				{0},
+				{0},
+				{0},
+				{0},
+				{0},
+				{0}
+			},
+			{//x = 1
+				{0},
+				{0},
+				{0},
+				{0},
+				{0},
+				{0},
+				{0},
+				{0},
+				{0},
+				{0},
+				{0}
+			},
+			{//x = 2
+				{0},
+				{0},
+				{0},
+				{0},
+				{0},
+				{0},
+				{0},
+				{0},
+				{0},
+				{0},
+				{0}
+			},
+			{//x = 3
+				{0},
+				{0},
+				{0},
+				{0},
+				{0},
+				{0},
+				{0},
+				{0},
+				{0},
+				{0},
+				{0}
+			},
+			{//x = 4
+				{Block.stairsCobblestone.blockID, 2},
+				{Block.stoneSingleSlab.blockID, 3},
+				{Block.stoneSingleSlab.blockID, 3},
+				{Block.stoneSingleSlab.blockID, 3},
+				{Block.stoneSingleSlab.blockID, 3},
+				{Block.stoneSingleSlab.blockID, 3},
+				{Block.stoneSingleSlab.blockID, 3},
+				{Block.stoneSingleSlab.blockID, 3},
+				{Block.stoneSingleSlab.blockID, 3},
+				{Block.stoneSingleSlab.blockID, 3},
+				{Block.stairsCobblestone.blockID, 3}
+			}
+		}
+	};
+	*/
 }

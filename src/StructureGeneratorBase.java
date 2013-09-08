@@ -431,8 +431,11 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 	 * Adds a block array 'layer' to the list to be generated
 	 */
 	public final void addBlockArray(int blocks[][][][]) {
-		if (FMLCommonHandler.instance().getEffectiveSide() == Side.SERVER)
+		if (FMLCommonHandler.instance().getEffectiveSide() == Side.SERVER) {
 			this.blockArrayList.add(blocks);
+			if (this.blockArray == null)
+				this.blockArray = blocks;
+		}
 	}
 	
 	/**
@@ -486,9 +489,10 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 	 * provided as parameters
 	 */
 	public final void setDefaultOffset(int x, int y, int z) {
-		this.offsetX = -(getWidthX() / 2) - 2 + x;
+		this.offsetX = -(getWidthX()  / 2) + x;
 		this.offsetY = 1 + y;
 		this.offsetZ = 0 + z;
+		System.out.println("[GEN STRUCTURE] Default offsetX " + this.offsetX + " for width " + getWidthX());
 	}
 	
 	/**
@@ -740,7 +744,10 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 		// No rotational metadata value associated with this block, return
 		if (blockRotationData.get(id) == null) return 0;
 		
-		int rotation = (((this.structureFacing == NORTH || this.structureFacing == SOUTH) ? this.structureFacing + 2 : this.structureFacing) + this.facing) % 4;
+		// original:
+		// int rotation = (((this.structureFacing == NORTH || this.structureFacing == SOUTH) ? this.structureFacing + 2 : this.structureFacing) + this.facing) % 4;
+		// should use manualRotation
+		int rotation = (((this.manualRotations == 1 || this.manualRotations == 3) ? this.structureFacing + 2 : this.structureFacing) + this.facing) % 4;
 		
 		int meta = origMeta, bitface, tickDelay = meta >> 2, bit9 = meta >> 3,
 			bit4 = meta & 4, bit8 = meta & 8, extra = meta & ~3;
@@ -816,12 +823,12 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 	{
 		int x, z;
 		
-		// need to offset for player clicking in front of themselves
-		this.offsetX -= (this.getWidthZ() - this.getWidthX()) * this.manualRotations;
-		this.offsetX -= (this.manualRotations > 1 ? 2 : 1);
-		// above works perfectly for 0 or 2 rotations, still too close for 1 and 3 (by 2 blocks for blacksmith)
-		// works perfectly for Hut whose widthX and widthZ are equal
-		//this.offsetX -= ((this.manualRotations == 1 || this.manualRotations == 3) ? (this.getWidthZ() - this.getWidthX()) : 0);
+		// adjust for generating on opposite axis
+		if (this.manualRotations == 1 || this.manualRotations == 3)
+			this.offsetX -= (this.getWidthZ() - this.getWidthX());
+		
+		// adjust by one block for one and two rotations
+		this.offsetX -= (this.manualRotations == 2 || this.manualRotations == 3 ? 1 : 0);
 		
 		for (int i = 0; i < this.manualRotations; ++i)
 		{
