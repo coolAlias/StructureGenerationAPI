@@ -24,7 +24,7 @@ public class StructureArrays
 	test out your creation before adding it to your own mod.
 	
 	=====================================================================================
-							HOW TO GENERATE YOUR CUSTOM STRUCTURES
+					HOW TO GENERATE YOUR CUSTOM STRUCTURES
 	=====================================================================================
 	Here I explain in detail how to generate and manipulate the position for your custom
 	structure. Only steps 1 and 5 are absolutely required, and step 3 is pretty much also
@@ -81,7 +81,7 @@ public class StructureArrays
 	"generate(World world, Random random, int x, int y, int z)"
 	
 	=====================================================================================
-							SETTING UP A STRUCTURE'S BLOCK ARRAY
+					SETTING UP A STRUCTURE'S BLOCK ARRAY
 	=====================================================================================
 	TIP: You can use MCEdit first and convert the 'generate' methods from that to a block
 	array much more easily than building one from scratch. This has the added benefit of
@@ -168,7 +168,7 @@ public class StructureArrays
 	8; same goes for blockArray[n][1]-[n][maxWidth].
 	
 	=====================================================================================
-						GENERATING LARGE STRUCTURES: USING MULTIPLE ARRAYS
+				GENERATING LARGE STRUCTURES: USING MULTIPLE ARRAYS
 	=====================================================================================
 	If you receive the error message "The code for the static initializer is exceeding
 	the 65535 bytes limit", then you will need to break your structure up into multiple
@@ -195,8 +195,8 @@ public class StructureArrays
 	floor and then addBlockArray(floorWizardTower) 10 times.
 	
 	=====================================================================================
-		 					IMPORTANT: NOTES ON SETTING METADATA
-				Read this or your directional blocks WILL face the wrong direction!
+		 				IMPORTANT: NOTES ON SETTING METADATA
+			Read this or your directional blocks WILL face the wrong direction!
 	=====================================================================================
 	
 	!!!VERY IMPORTANT!!! If the block uses metadata to determine direction, you MUST include
@@ -326,8 +326,8 @@ public class StructureArrays
 	Associated tile entity will determine skull type, as well as rotation if on floor.
 	
 	=====================================================================================
-								HOW TO USE CUSTOM HOOK METHOD:
-		"onCustomBlockAdded(World world, int x, int y, int z, int fakeID, int customData)"
+						HOW TO USE CUSTOM HOOK METHOD:
+	"onCustomBlockAdded(World world, int x, int y, int z, int fakeID, int customData)"
 	=====================================================================================
 	Step 1: Choose a block ID
 	Custom block hooks require block ids greater than 4096. If you want to your block to
@@ -397,7 +397,7 @@ public class StructureArrays
 		value is given.
 	
 	=====================================================================================
-						CONGRATULATIONS! YOU'VE REACHED THE END!
+				CONGRATULATIONS! YOU'VE REACHED THE END!
 	=====================================================================================
 	*/
 	
