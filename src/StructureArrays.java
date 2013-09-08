@@ -417,6 +417,52 @@ public class StructureArrays
 		}
 	};
 	
+	public static final int[][][][] blockArraySpawnTest =
+		{
+			{ // y = 0
+				{ // x = 0
+					{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
+				},
+				{ // x = 1
+					{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
+				},
+				{ // x = 2
+					{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
+				},
+				{ // x = 3
+					{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
+				}
+			},
+			{ // y = 1
+				{ // x = 0
+					{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
+				},
+				{ // x = 1
+					{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
+				},
+				{ // x = 2
+					{Block.cobblestone.blockID},{SPAWN_VILLAGER},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
+				},
+				{ // x = 3
+					{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
+				}
+			},
+			{ // y = 2
+				{ // x = 0
+					{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
+				},
+				{ // x = 1
+					{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
+				},
+				{ // x = 2
+					{Block.cobblestone.blockID},{0},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
+				},
+				{ // x = 3
+					{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
+				}
+			}
+		};
+	
 	/**
 	 * Here is my demo structure, a showcase NPC Hut. Dimensions: 7x6 base, 8 blocks high.
 	 * Uses lots of different kinds of blocks and metadata to demonstrate them in use.
@@ -661,19 +707,19 @@ public class StructureArrays
 		},
 		{ // y = 5
 			{ // x = 0 z values:
-				{0},{ITEM_FRAME,4,0,Item.diamond.itemID},{Block.wood.blockID},{Block.wood.blockID},{0},{0}
+				{0},{ITEM_FRAME,4,0,Item.diamond.itemID},{Block.wood.blockID},{Block.wood.blockID},{ITEM_FRAME,3,0,Item.diamond.itemID},{0}
 			},
 			{ // x = 1 z values:
-				{ITEM_FRAME,4,0,Item.diamond.itemID},{Block.wood.blockID},{Block.wood.blockID},{Block.wood.blockID},{Block.wood.blockID},{0}
+				{ITEM_FRAME,4,0,Item.emerald.itemID},{Block.wood.blockID},{Block.wood.blockID},{Block.wood.blockID},{Block.wood.blockID},{ITEM_FRAME,3,0,Item.emerald.itemID}
 			},
 			{ // x = 2 z values:
-				{ITEM_FRAME,4,0,Item.diamond.itemID},{Block.wood.blockID},{Block.wood.blockID},{Block.wood.blockID},{Block.wood.blockID},{0}
+				{ITEM_FRAME,4,0,Item.diamond.itemID},{Block.wood.blockID},{Block.wood.blockID},{Block.wood.blockID},{Block.wood.blockID},{ITEM_FRAME,3,0,Item.diamond.itemID}
 			},
 			{ // x = 3 z values:
-				{ITEM_FRAME,4,0,Item.diamond.itemID},{Block.wood.blockID},{Block.wood.blockID},{Block.wood.blockID},{Block.wood.blockID},{0}
+				{ITEM_FRAME,4,0,Item.emerald.itemID},{Block.wood.blockID},{Block.wood.blockID},{Block.wood.blockID},{Block.wood.blockID},{ITEM_FRAME,3,0,Item.emerald.itemID}
 			},
 			{ // x = 4 z values:
-				{0},{ITEM_FRAME,4,0,Item.diamond.itemID},{Block.wood.blockID},{Block.wood.blockID},{0},{0}
+				{0},{ITEM_FRAME,4,0,Item.diamond.itemID},{Block.wood.blockID},{Block.wood.blockID},{ITEM_FRAME,3,0,Item.diamond.itemID},{0}
 			},
 			{ // x = 5 z values:
 				{0},{0},{ITEM_FRAME,1,0,Item.pickaxeDiamond.itemID},{ITEM_FRAME,1,0,Item.swordDiamond.itemID},{0},{0}

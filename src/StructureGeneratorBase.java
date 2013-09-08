@@ -230,9 +230,79 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 		return remaining < 1;
 	}
 	
-	public final void spawnEntityInStructure(World world, Entity entity, int x, int y, int z)
+	/**
+	 * Sets an entity's location so that it doesn't spawn inside of walls.
+	 * Automatically removes placeholder block at coordinates x/y/z.
+	 * @return false if no suitable location found
+	 */
+	public final boolean setEntityInStructure(World world, Entity entity, int x, int y, int z)
 	{
+		if (entity == null) { return false; }
+		int i = 0, iMax = (entity.width > 1.0F ? 16 : 4), factor = 1;
 		
+		// remove place-holder block
+		world.setBlockToAir(x, y, z);
+		
+		// entity.setLocationAndAngles(x, y, z, MathHelper.wrapAngleTo180_float(world.rand.nextFloat() * 360.0F), 0.0F);
+		entity.setLocationAndAngles(x, y, z, 0.0F, 0.0F);
+		
+		while (entity.isEntityInsideOpaqueBlock() && i < iMax)
+		{
+			if (i == 4 && entity.isEntityInsideOpaqueBlock() && entity.width > 1.0F) {
+				entity.setLocationAndAngles(x, y, z, 90.0F, 0.0F);
+				System.out.println("[GEN STRUCTURE][SPAWN] Large entity; rotating 90 degrees");
+			}
+			else if (i == 8 && entity.isEntityInsideOpaqueBlock() && entity.width > 1.0F) {
+				entity.setLocationAndAngles(x, y, z, 180.0F, 0.0F);
+				System.out.println("[GEN STRUCTURE][SPAWN] Large entity; rotating 180 degrees");
+			}
+			else if (i == 12 && entity.isEntityInsideOpaqueBlock() && entity.width > 1.0F) {
+				entity.setLocationAndAngles(x, y, z, 270.0F, 0.0F);
+				System.out.println("[GEN STRUCTURE][SPAWN] Large entity; rotating 270 degrees");
+			}
+			
+			System.out.println("[GEN STRUCTURE][SPAWN] Entity inside opaque block at " + entity.posX + "/" + entity.posY + "/" + entity.posZ);
+			
+			switch(i % 4) {
+			case 0: entity.setPosition(entity.posX + 0.5D, entity.posY, entity.posZ + 0.5D); break;
+			case 1: entity.setPosition(entity.posX, entity.posY, entity.posZ - 1.0D); break;
+			case 2: entity.setPosition(entity.posX - 1.0D, entity.posY, entity.posZ); break;
+			case 3: entity.setPosition(entity.posX, entity.posY, entity.posZ + 1.0D); break;
+			}
+			
+			++i;
+			/*
+			if (i == 12 && factor == 1 && entity.isEntityInsideOpaqueBlock() && entity.width > 1.0F) {
+				System.out.println("[GEN STRUCTURE][SPAWN] Large entity still inside opaque block; resetting with factor of 2");
+				factor = 2;
+				i = 0;
+			}
+			*/
+		}
+		if (entity.isEntityInsideOpaqueBlock()) {
+			System.out.println("[GEN STRUCTURE][SPAWN] Failed to set entity in open space. Returning to default position.");
+			entity.setPosition(entity.posX + 0.5D, entity.posY, entity.posZ + 0.5D);
+			return false;
+		}
+		
+		return true;
+	}
+	
+	/**
+	 * Spawns an entity in the structure by using setEntityInStructure.
+	 * @return true if entity spawned without collision (entity will still spawn if false, but may be in a wall)
+	 */
+	public final boolean spawnEntityInStructure(World world, Entity entity, int x, int y, int z)
+	{
+		if (world.isRemote || entity == null) { return false; }
+		
+		boolean collided = setEntityInStructure(world, entity, x, y, z);
+		
+		world.spawnEntityInWorld(entity);
+		
+		System.out.println("[GEN STRUCTURE] Spawned entity at " + entity.posX + "/" + entity.posY + "/" + entity.posZ);
+		
+		return collided;
 	}
 	
 	/**

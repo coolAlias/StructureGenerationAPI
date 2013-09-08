@@ -8,6 +8,9 @@ package coolalias.structuregen;
 
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.monster.EntityZombie;
+import net.minecraft.entity.passive.EntityCow;
+import net.minecraft.entity.passive.EntityHorse;
 import net.minecraft.entity.passive.EntityVillager;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -132,23 +135,12 @@ public class WorldGenStructure extends StructureGeneratorBase
 			*/
 			break;
 		case StructureArrays.SPAWN_VILLAGER:
-			// Again, it would be cleaner to call a custom method from this point
-			
-			// first remove the torch used as a place-marker
-			world.setBlockToAir(x, y, z);
-			
 			// here I'm using customData as the villagerID
-			EntityVillager bob = new EntityVillager(world, customData);
+			Entity bob = new EntityVillager(world, customData);
+			//Entity X = new EntityHorse(world);
 			
-			// set the entity's location; note that these are doubles so you could perform more
-			// sophisticated calculations to prevent spawning halfway in a wall
-			bob.setLocationAndAngles(x, y, z, MathHelper.wrapAngleTo180_float(world.rand.nextFloat() * 360.0F), 0.0F);
-			
-			// spawn the entity
-			world.spawnEntityInWorld(bob);
-			
-			// hooray! Bob is here :)
-			System.out.println("[GEN STRUCTURE] Spawned villager at " + x + "/" + y + "/" + z);
+			// Now use the preset method to avoid spawning in walls
+			spawnEntityInStructure(world, bob, x, y, z);
 			break;
 		default:
 			System.out.println("[GEN STRUCTURE] No custom method defined for this id.");
