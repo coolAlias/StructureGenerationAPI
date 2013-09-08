@@ -14,10 +14,15 @@ FEATURES
 - Custom 'hooks' allow you to define specific behavior for any block set, such as setting tile entity data
   or spawning entities at that location
 - Place blocks where they can't otherwise be placed, such as trapdoors on glass or torches in air
-- Easy method for adding items to any tile entity inventory
-- Easy method to ensure your spawned entity doesn't spawn in a wall
-- Easy method of adding hanging entities such as item frames or paintings
-- Easy method to auto-set items in placed item frames
+
+CUSTOM 'HOOKS'
+==============
+- Add items to any tile entity inventory with a single method
+- Spawn entities without fear of spawning in a wall
+- Add hanging entities such as item frames or paintings
+- Set items in placed item frames
+- Add text to signs, with color example
+- Place any kind of mob head
  
 POSSIBLE FUTURE FEATURES
 ========================
