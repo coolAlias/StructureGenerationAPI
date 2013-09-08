@@ -130,17 +130,18 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 	/**
 	 * Allows the use of block ids greater than 4096 as custom 'hooks' to trigger onCustomBlockAdded
 	 * @param fakeID ID you use to identify your 'event'. Absolute value must be greater than 4096
-	 * @param customData Custom data may be used to subtype events for given fakeID
+	 * @param customData1 Custom data may be used to subtype events for given fakeID
 	 * Returns the real id of the block to spawn in the world; must be <= 4096
 	 */
-	public abstract int getRealBlockID(int fakeID, int customData);
+	public abstract int getRealBlockID(int fakeID, int customData1);
 	
 	/**
 	 * A custom 'hook' to allow setting of tile entities, spawning entities, etc.
 	 * @param fakeID The custom identifier used to distinguish between types
-	 * @param customData Custom data may be used to subtype events for given fakeID
+	 * @param customData1 Custom data used to subtype events for given fakeID
+	 * @param customData2 Additional custom data
 	 */
-	public abstract void onCustomBlockAdded(World world, int x, int y, int z, int fakeID, int customData);
+	public abstract void onCustomBlockAdded(World world, int x, int y, int z, int fakeID, int customData1, int customData2);
 	
 	/**
 	 * Maps a block id to a specified rotation type. Allows custom blocks to rotate with structure.
@@ -414,12 +415,21 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 	}
 	
 	/**
+	 * Method to set skulls not requiring extra rotation data (i.e. wall-mounted skulls whose rotation is determined by metadata)
+	 */
+	public final boolean setSkullData(World world, String name, int type, int x, int y, int z)
+	{
+		return setSkullData(world, name, type, -1, x, y, z);
+	}
+	
+	/**
 	 * Sets skull type and name for a TileEntitySkull at x/y/z
 	 * @param name Must be a valid player username
 	 * @param type Type of skull: 0 Skeleton, 1 Wither Skeleton, 2 Zombie, 3 Human, 4 Creeper
+	 * @param rot Sets the rotation for the skull if positive value is used
 	 * @return false if errors were encountered (i.e. incorrect tile entity at x/y/z)
 	 */
-	public final boolean setSkullData(World world, String name, int type, int x, int y, int z)
+	public final boolean setSkullData(World world, String name, int type, int rot, int x, int y, int z)
 	{
 		TileEntitySkull skull = (world.getBlockTileEntity(x, y, z) instanceof TileEntitySkull ? (TileEntitySkull) world.getBlockTileEntity(x, y, z) : null);
 		if (skull != null)
@@ -430,9 +440,11 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 				type = 0;
 			}
 			skull.setSkullType(type, name);
-			// skull.setSkullRotation(0); // need 2nd customData parameter for this
+			if (rot > -1)
+				skull.setSkullRotation(rot);
 			return true;
 		}
+		
 		return false;
 	}
 	
@@ -664,10 +676,10 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 					{
 						int fakeID = blockArray[y][x][z][0];
 						int meta = (blockArray[y][x][z].length > 1 ? blockArray[y][x][z][1] : NO_METADATA);
-						int flag = (blockArray[y][x][z].length > 2 ? blockArray[y][x][z][2] : 2);
-						int customData = (blockArray[y][x][z].length > 3 ? blockArray[y][x][z][3] : 0);
+						int customData1 = (blockArray[y][x][z].length > 2 ? blockArray[y][x][z][2] : 0);
+						int customData2 = (blockArray[y][x][z].length > 3 ? blockArray[y][x][z][3] : 0);
 						
-						int realID = (Math.abs(fakeID) > 4096 ? getRealBlockID(fakeID, customData) : fakeID);
+						int realID = (Math.abs(fakeID) > 4096 ? getRealBlockID(fakeID, customData1) : fakeID);
 
 						if (Math.abs(realID) > 4096) {
 							System.out.println("[GEN STRUCTURE][WARNING] Invalid block ID. Initial ID: " + fakeID + ", returned id from getRealID: " + realID);
@@ -685,14 +697,14 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 								meta = getMetadata(Math.abs(realID), meta, facing);
 							//else {} // leave metadata alone
 
-							// must notify client of block change
-							flag = flag == 0 ? 2 : flag;
+							// Get color data for wool blocks
+							int flag = (Math.abs(realID) == Block.cloth.blockID ? customData1 : 2);
 							
 							// add torches and such to a list for after-generation setBlock calls
 							if (blockRotationData.get(realID) != null && blockRotationData.get(realID) == ROTATION.WALL_MOUNTED)
 							{
 								System.out.println("[GEN STRUCTURE] Block " + realID + " requires post-processing. Adding to list. Meta = " + meta);
-								this.postGenBlocks.add(new BlockData(rotX, rotY, rotZ, fakeID, meta, customData));
+								this.postGenBlocks.add(new BlockData(rotX, rotY, rotZ, fakeID, meta, customData1, customData2));
 							}
 							// set all other blocks here
 							else
@@ -705,7 +717,7 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 
 								// Call to custom block hooks
 								if (Math.abs(fakeID) > 4096) {
-									onCustomBlockAdded(world, rotX, rotY, rotZ, fakeID, customData);
+									onCustomBlockAdded(world, rotX, rotY, rotZ, fakeID, customData1, customData2);
 								}
 							}
 						}
@@ -727,7 +739,7 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 		{
 			block = (BlockData) iterator.next();
 			fakeID = block.getBlockID();
-			realID = (Math.abs(fakeID) > 4096 ? getRealBlockID(fakeID, block.getCustomData()) : fakeID);
+			realID = (Math.abs(fakeID) > 4096 ? getRealBlockID(fakeID, block.getCustomData1()) : fakeID);
 
 			if (Math.abs(realID) > 4096) {
 				System.out.println("[GEN STRUCTURE][WARNING] Invalid block ID. Initial ID: " + fakeID + ", returned id from getRealID: " + realID);
@@ -747,7 +759,7 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 				}
 				
 				if (Math.abs(fakeID) > 4096) {
-					onCustomBlockAdded(world, block.getPosX(), block.getPosY(), block.getPosZ(), fakeID, block.getCustomData());
+					onCustomBlockAdded(world, block.getPosX(), block.getPosY(), block.getPosZ(), fakeID, block.getCustomData1(), block.getCustomData2());
 				}
 			}
 		}
@@ -966,16 +978,17 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 
 class BlockData
 {
-	private final int x, y, z, id, meta, customData;
+	private final int x, y, z, id, meta, customData1, customData2;
 	
-	public BlockData(int x, int y, int z, int id, int meta, int customData)
+	public BlockData(int x, int y, int z, int id, int meta, int customData1, int customData2)
 	{
 		this.x = x;
 		this.y = y;
 		this.z = z;
 		this.id = id;
 		this.meta = meta;
-		this.customData = customData;
+		this.customData1 = customData1;
+		this.customData2 = customData2;
 	}
 	
 	public final int getPosX() {
@@ -998,7 +1011,11 @@ class BlockData
 		return this.meta;
 	}
 	
-	public final int getCustomData() {
-		return this.customData;
+	public final int getCustomData1() {
+		return this.customData1;
+	}
+	
+	public final int getCustomData2() {
+		return this.customData2;
 	}
 }

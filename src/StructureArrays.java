@@ -19,7 +19,10 @@ public class StructureArrays
 	public static final int CUSTOM_CHEST = 4097, CUSTOM_DISPENSER = 4098, ITEM_FRAME = 4099, PAINTING = 4100, SPAWN_VILLAGER = 4101, CUSTOM_SKULL = 4102, CUSTOM_SIGNWALL = 4103;
 	
 	/** Start of specific chests; I'll use negative values so as not to conflict with item types and such */
-	public static final int CUSTOM_CHEST_1 = -1, CUSTOM_SIGN_1 = 1;
+	public static final int CUSTOM_CHEST_1 = -1;
+	
+	/** Custom signs */
+	public static final int CUSTOM_SIGN_1 = 1;
 	
 	/**
 	This file contains a demo and a template structure to illustrate how to go about
@@ -34,9 +37,9 @@ public class StructureArrays
 	structure. Only steps 1 and 5 are absolutely required, and step 3 is pretty much also
 	absolutely required, but you could skip it. Steps 2 and 4 just give you further
 	control over exactly where and how the structure is generated.
-	
+	=======
 	Step 1: ABSOLUTELY REQUIRED! Add your blockArray to the generator's list
-	
+	=======
 	Once you have your blockArray(s) set up correctly (see below), you will need to add
 	them to the WorldGenStructure generator's list of arrays to generate.
 	
@@ -45,17 +48,17 @@ public class StructureArrays
 	If you have more than one layer, they should be added from the bottom up, so first
 	the base, then the layer on top of the base, and so on until the final topmost layer
 	is added.
-	
+	=======
 	Step 2: Set your structure's facing (defaults to EAST if not specifically set)
-	
+	=======
 	"setStructureFacing(StructureGeneratorBase.DIRECTION)"
 	 
 	Valid DIRECTION values are NORTH, SOUTH, EAST, WEST, enumerated in StructureGeneratorBase.
 	
 	See below for more information on choosing a default facing for your structure.
-	
+	=======
 	Step 3: REQUIRED! Set how much to offset the structure's position when generated
-	
+	=======
 	This can be done in one of three ways:
 	
 	- Automatically so structure always generates completely in front of player:
@@ -72,16 +75,16 @@ public class StructureArrays
 	
 	Negative offX values place the structure further away from the player, +offX will move
 	toward the player. Thinking about inverting this.
-	
+	=======
 	Step 4: Set the player's facing (optional but generally recommended)
-	
+	=======
 	"setPlayerFacing(Entity)"
 	
 	This will ensure the structure always orients itself toward the player; important if
 	you put the front door on the structureFacing side.
-	
+	=======
 	Step 5: ABSOLUTELY REQUIRED! Generate your structure
-	
+	=======
 	The final step is to call the generate method. This is a vanilla method signature used
 	by all classes extending WorldGenerator:
 	
@@ -118,7 +121,7 @@ public class StructureArrays
 	This makes it easy for me to visualize the structure by looking at the array.
 	
 	Cardinal directions are determined by x and z regardless of structure facing:
-	NORTH = Min Z, SOUTH = MAX Z, EAST = Max X, WEST = Min X
+	NORTH = Min Z, SOUTH = Max Z, EAST = Max X, WEST = Min X
 	
 	Left/right values given above are based on the player looking at the front face of the
 	structure in its default orientation.
@@ -134,7 +137,7 @@ public class StructureArrays
 	The second array [] stores x, the third stores z, and the fourth individual block data.
 	
 	Each block uses the following variables:
-	{blockID, metadata, flag, customData}
+	{blockID, metadata, customData1, customData2}
 	
 	Note that you only need to fill this array up to the point you need, so if your block does
 	not use metadata, you could simply use {blockID} for the array, instead of {blockID,0,0,0};
@@ -165,15 +168,16 @@ public class StructureArrays
 	Stores the block's metadata. If metadata determines orientation, see below for details on
 	setting the value correctly.
 	
-	{flag} - REMOVE and use as secondary custom data field, as flag always seems to be 2
-	Will automatically be set to 2 to notify the client if you don't set it yourself.
-	See 'World.setBlock' method for more information on setting your own flag.
+	{custom data 1}
+	This value is passed to getRealBlockID method where it can be used to subtype custom blocks, if desired.
+	Generally used just like {custom data 2}.
+	Also used to store color value for cloth blocks.
 	
-	{customData}
-	A value passed to the onCustomBlockAdded method. One could use this to subtype a block
+	{custom data 2}
+	Passed along with customData1 to the onCustomBlockAdded method. One could use this to subtype a block
 	ID, such as CUSTOM_CHEST with subtypes VILLAGE_BLACKSMITH, VILLAGE_LIBRARY, etc., to
 	set the number of random items to generate, to set villager type to spawn... you get
-	the idea. See below for more information.
+	the idea. See below for more information on how to use custom data.
 	
 	!!!IMPORTANT!!!
 	The first element [0] of each y / x array MUST contain an array that
@@ -341,8 +345,7 @@ public class StructureArrays
 	
 	Levers:
 	As buttons with the following: 5,6 ground lever south or east when off;
-	7,0 ceiling lever, south or east when off, +8 for switched on (might want
-	to set the flag value to 3 if switched on to notify neighboring blocks)
+	7,0 ceiling lever, south or east when off, +8 for switched on
 	
 	(WOOD)
 	Wood:
@@ -433,13 +436,13 @@ public class StructureArrays
 		places the itemstack inside with the rotation provided, or default if no itemRotation
 		value is given.
 	
-	5. public final boolean setSignText(World world, String[] text, int x, int y, int z)
+	5. setSignText(World world, String[] text, int x, int y, int z)
 	
 		Adds the provided text to a sign tile entity at the provided coordinates, or returns
 		false if no TileEntitySign was found. String[] must be manually set for each sign, as
 		there is currently no way to store this information within the block array.
 	
-	6. public final boolean setSkullData(World world, String name, int type, int x, int y, int z)
+	6. setSkullData(World world, String name, int type, int x, int y, int z)
 	
 		Sets the skull type and player username (if you can get one) for the tile entity at
 		the provided coordinates. Returns false if no TileEntitySkull was found.
@@ -471,7 +474,7 @@ public class StructureArrays
 				{}, // z = 1,
 				{}	// z = 2 etc. for as many z values as you need
 				// Each z bracket contains up to four integers:
-				// {blockID, metadata, flag, customData}
+				// {blockID, metadata, customData1, customData2}
 			}
 		}
 	};
@@ -603,7 +606,7 @@ public class StructureArrays
 				{Block.cobblestone.blockID}, // z = 2
 				{Block.cobblestone.blockID}, // z = 3
 				{Block.cobblestone.blockID}, // z = 4
-				{Block.lever.blockID,11,3} // z = 5
+				{Block.lever.blockID,11} // z = 5
 			},
 			{ // x = 1 z values:
 				{Block.tripWireSource.blockID,7},
@@ -642,7 +645,7 @@ public class StructureArrays
 				{Block.signPost.blockID,14},
 				{Block.railPowered.blockID,11},
 				{Block.stairsCobblestone.blockID, 1}, // ascending to west
-				{SPAWN_VILLAGER,1,0,2},
+				{SPAWN_VILLAGER,1,2},
 				// we'll spawn him outside just so there's more room inside for stuff
 				// however, this way the villager will not move inside at night
 				// you should ALWAYS spawn villagers inside a valid 'home' if possible
@@ -663,7 +666,7 @@ public class StructureArrays
 				{Block.wood.blockID},
 				{Block.planks.blockID},
 				{Block.planks.blockID},
-				{Block.cloth.blockID,1,14}, // cloth is odd in that the color value is stored in the flag
+				{Block.cloth.blockID,1,14}, // cloth is odd in that the color value is stored in the flag, which here we store as customData
 				{PAINTING,3} // facing south (since default structure faces EAST, this is the left-hand side)
 			},
 			{ // x = 1 z values:
@@ -680,14 +683,14 @@ public class StructureArrays
 				{0},
 				{Block.planks.blockID},
 				{Block.cobblestone.blockID},
-				{CUSTOM_DISPENSER,5,2,Item.arrow.itemID}, // Using custom data to define the item id
+				{CUSTOM_DISPENSER,5,Item.arrow.itemID}, // Using custom data to define item id
 				{Block.planks.blockID},
 				{0}
 			},
 			{ // x = 3 z values:
 				{0},
 				{Block.planks.blockID},
-				{CUSTOM_CHEST,3,2,4}, // a custom chest, facing south, with custom data of 4
+				{CUSTOM_CHEST,3,4}, // a custom chest, facing south, with custom data of 4
 				{0},
 				{Block.planks.blockID},
 				{0}
@@ -701,7 +704,7 @@ public class StructureArrays
 				{0}
 			},
 			{ // x = 5 z values:
-				{0},{PAINTING,1},{0},{0},{CUSTOM_SIGNWALL,5,0,CUSTOM_SIGN_1},{0}
+				{0},{PAINTING,1},{0},{0},{CUSTOM_SIGNWALL,5,CUSTOM_SIGN_1},{0}
 			}
 			// note that since we don't spawn anything at x = 6 from here on, we don't need to include it
 			// excluding x=0, however, would cause this entire layer to be out of place
@@ -772,27 +775,27 @@ public class StructureArrays
 				{Block.cocoaPlant.blockID,8},{Block.wood.blockID,3},{Block.planks.blockID},{Block.planks.blockID},{Block.wood.blockID},{0}
 			},
 			{ // x = 5 z values:
-				{0},{Block.torchWood.blockID,1},{0},{CUSTOM_SKULL,5,0,3},{Block.torchWood.blockID,1},{0}
+				{0},{Block.torchWood.blockID,1},{0},{CUSTOM_SKULL,5,3},{Block.torchWood.blockID,1},{0}
 			}
 		},
 		{ // y = 5
 			{ // x = 0 z values:
-				{0},{ITEM_FRAME,4,0,Item.diamond.itemID},{Block.wood.blockID},{Block.wood.blockID},{ITEM_FRAME,3,0,Item.diamond.itemID},{0}
+				{0},{ITEM_FRAME,4,Item.diamond.itemID},{Block.wood.blockID},{Block.wood.blockID},{ITEM_FRAME,3,Item.diamond.itemID},{0}
 			},
 			{ // x = 1 z values:
-				{ITEM_FRAME,4,0,Item.emerald.itemID},{Block.wood.blockID},{Block.wood.blockID},{Block.wood.blockID},{Block.wood.blockID},{ITEM_FRAME,3,0,Item.emerald.itemID}
+				{ITEM_FRAME,4,Item.emerald.itemID},{Block.wood.blockID},{Block.wood.blockID},{Block.wood.blockID},{Block.wood.blockID},{ITEM_FRAME,3,Item.emerald.itemID}
 			},
 			{ // x = 2 z values:
-				{ITEM_FRAME,4,0,Item.diamond.itemID},{Block.wood.blockID},{Block.wood.blockID},{Block.wood.blockID},{Block.wood.blockID},{ITEM_FRAME,3,0,Item.diamond.itemID}
+				{ITEM_FRAME,4,Item.diamond.itemID},{Block.wood.blockID},{Block.wood.blockID},{Block.wood.blockID},{Block.wood.blockID},{ITEM_FRAME,3,Item.diamond.itemID}
 			},
 			{ // x = 3 z values:
-				{ITEM_FRAME,4,0,Item.emerald.itemID},{Block.wood.blockID},{Block.wood.blockID},{Block.wood.blockID},{Block.wood.blockID},{ITEM_FRAME,3,0,Item.emerald.itemID}
+				{ITEM_FRAME,4,Item.emerald.itemID},{Block.wood.blockID},{Block.wood.blockID},{Block.wood.blockID},{Block.wood.blockID},{ITEM_FRAME,3,Item.emerald.itemID}
 			},
 			{ // x = 4 z values:
-				{0},{ITEM_FRAME,4,0,Item.diamond.itemID},{Block.wood.blockID},{Block.wood.blockID},{ITEM_FRAME,3,0,Item.diamond.itemID},{0}
+				{0},{ITEM_FRAME,4,Item.diamond.itemID},{Block.wood.blockID},{Block.wood.blockID},{ITEM_FRAME,3,Item.diamond.itemID},{0}
 			},
 			{ // x = 5 z values:
-				{0},{0},{ITEM_FRAME,1,0,Item.pickaxeDiamond.itemID},{ITEM_FRAME,1,0,Item.swordDiamond.itemID},{0},{0}
+				{0},{0},{ITEM_FRAME,1,Item.pickaxeDiamond.itemID},{ITEM_FRAME,1,Item.swordDiamond.itemID},{0},{0}
 			}
 		},
 		{ // y = 6
@@ -882,7 +885,7 @@ public class StructureArrays
 				{Block.thinGlass.blockID},{0},{Block.pressurePlatePlanks.blockID},{0},{0},{0},{Block.cobblestone.blockID},{0},{0},{Block.fenceIron.blockID}
 			},
 			{//x = 3
-				{Block.planks.blockID},{0},{0},{0},{Block.planks.blockID},{Block.planks.blockID},{Block.furnaceIdle.blockID, 5, 0},{0},{0},{0}
+				{Block.planks.blockID},{0},{0},{0},{Block.planks.blockID},{Block.planks.blockID},{Block.furnaceIdle.blockID, 5},{0},{0},{0}
 			},
 			{//x = 4
 				{Block.thinGlass.blockID},{0},{0},{Block.planks.blockID},{0},{0},{0},{0},{0},{0}
@@ -2219,7 +2222,7 @@ public class StructureArrays
 				},
 				{ // x = 7
 					{Block.redstoneWire.blockID},{Block.redstoneWire.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},
-					{0},{0},{CUSTOM_CHEST,2,0,CUSTOM_CHEST_1},{Block.cobblestone.blockID}
+					{0},{0},{CUSTOM_CHEST,2,CUSTOM_CHEST_1},{Block.cobblestone.blockID}
 				},
 				{ // x = 8
 					{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},

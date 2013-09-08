@@ -44,7 +44,7 @@ public class WorldGenStructure extends StructureGeneratorBase
 	 * @return Returns the real id of the block to spawn in the world; must be <= 4096
 	 */
 	@Override
-	public int getRealBlockID(int fakeID, int customData) {
+	public int getRealBlockID(int fakeID, int customData1) {
 		System.out.println("[GEN STRUCTURE] Getting real id from fake id: " + fakeID);
 		switch(fakeID) {
 		case StructureArrays.CUSTOM_CHEST:
@@ -71,20 +71,21 @@ public class WorldGenStructure extends StructureGeneratorBase
 	/**
 	 * A custom 'hook' to allow setting of tile entities, spawning entities, etc.
 	 * @param fakeID The custom identifier used to distinguish between types
-	 * @param customData Custom data may be used to subtype events for given fakeID
+	 * @param customData1 Custom data used to subtype events for given fakeID
+	 * @param customData2 Additional custom data
 	 */
 	@Override
-	public void onCustomBlockAdded(World world, int x, int y, int z, int fakeID, int customData)
+	public void onCustomBlockAdded(World world, int x, int y, int z, int fakeID, int customData1, int customData2)
 	{
 		int meta = world.getBlockMetadata(x, y, z);
 		System.out.println("[CUSTOM BLOCK ADDED] metadata = " + meta);
-		System.out.println("[GEN STRUCTURE] Setting custom block info for fake id " + fakeID + " and customData " + customData);
+		System.out.println("[GEN STRUCTURE] Setting custom block info for fake id " + fakeID + " and customData1 " + customData1);
 		switch(fakeID) {
 		case StructureArrays.CUSTOM_CHEST:
 			// Using the pre-made method addItemToTileInventory adds items to the first slot available
 
 			// Here we use customData to subtype custom_chest:
-			if (customData == StructureArrays.CUSTOM_CHEST_1)
+			if (customData1 == StructureArrays.CUSTOM_CHEST_1)
 			{
 				// Let's load it with goodies; don't worry about over-filling, the method will take care of it
 				for (int i = 0; i < 30; ++i) {
@@ -96,10 +97,10 @@ public class WorldGenStructure extends StructureGeneratorBase
 			else
 			{
 				// Here we're using customData for stack size to add
-				addItemToTileInventory(world, new ItemStack(Item.diamond, customData), x, y, z);
+				addItemToTileInventory(world, new ItemStack(Item.diamond, customData1), x, y, z);
 
 				// Here we use customData to add a metadata block to the chest
-				addItemToTileInventory(world, new ItemStack(Block.cloth.blockID, 1, customData), x, y, z);
+				addItemToTileInventory(world, new ItemStack(Block.cloth.blockID, 1, customData1), x, y, z);
 			}
 			break;
 		case StructureArrays.CUSTOM_DISPENSER:
@@ -110,14 +111,14 @@ public class WorldGenStructure extends StructureGeneratorBase
 			while (addmore)
 			{
 				// Here we use customData as the itemID to place
-				addmore = addItemToTileInventory(world, new ItemStack(customData, 64, 0), x, y, z);
+				addmore = addItemToTileInventory(world, new ItemStack(customData1, 64, 0), x, y, z);
 			}
 			break;
 		case StructureArrays.CUSTOM_SIGNWALL:
 			// An array that stores up to 4 Strings, the max capacity of a sign
 			String[] text = new String[5];
 			// Set different text for each custom sign
-			if (customData == StructureArrays.CUSTOM_SIGN_1)
+			if (customData1 == StructureArrays.CUSTOM_SIGN_1)
 			{
 				text[0] = EnumChatFormatting.DARK_RED + "   BEWARE";
 				text[1] = EnumChatFormatting.DARK_RED + "  NO ENTRY";
@@ -130,7 +131,7 @@ public class WorldGenStructure extends StructureGeneratorBase
 			break;
 		case StructureArrays.CUSTOM_SKULL:
 			// Easily set the skull type or player name if you know it:
-			setSkullData(world, "", customData, x, y, z);
+			setSkullData(world, "", customData1, x, y, z);
 			break;
 		case StructureArrays.ITEM_FRAME:
 			ItemStack frame = new ItemStack(Item.itemFrame);
@@ -141,7 +142,7 @@ public class WorldGenStructure extends StructureGeneratorBase
 			int facing = setHangingEntity(world, frame, x, y, z);
 			
 			// Use this method for default rotation:
-			setItemFrameStack(world, new ItemStack(customData,1,0), x, y, z, facing);
+			setItemFrameStack(world, new ItemStack(customData1,1,0), x, y, z, facing);
 
 			// or this one if you want to specify rotation:
 			// setItemFrameStack(world, x, y, z, facing, new ItemStack(customData,1,0),2);
@@ -174,7 +175,7 @@ public class WorldGenStructure extends StructureGeneratorBase
 			break;
 		case StructureArrays.SPAWN_VILLAGER:
 			// here I'm using customData as the villagerID
-			Entity bob = new EntityVillager(world, customData);
+			Entity bob = new EntityVillager(world, customData1);
 			//Entity X = new EntityHorse(world);
 			
 			// Now use the preset method to avoid spawning in walls
