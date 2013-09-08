@@ -11,8 +11,7 @@ FEATURES
 - Full metadata block rotation compatibility
 - Compatibility with custom blocks; just use addCustomBlockRotation to define its rotation type
 - Set any block as a 'buffer' so your structure spawns more naturally in the environment
-- Custom 'hooks' allow you to define specific behavior for any block set, such as setting tile entity data
-  or spawning entities at that location
+- Custom 'hooks' allow you to easily manipulate tile entity data
 - Place blocks where they can't otherwise be placed, such as trapdoors on glass or torches in air
 
 CUSTOM 'HOOKS'
