@@ -24,6 +24,8 @@ import net.minecraft.item.ItemHangingEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityChest;
+import net.minecraft.tileentity.TileEntitySign;
+import net.minecraft.tileentity.TileEntitySkull;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.Direction;
 import net.minecraft.util.MathHelper;
@@ -40,7 +42,7 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 	public static final int SOUTH = 0, WEST = 1, NORTH = 2, EAST = 3;
 	
 	/** Valid rotation types. Each type is handled like vanilla blocks of this kind. */
-	public static enum ROTATION {ANVIL, DOOR, GENERIC, PISTON_CONTAINER, RAIL, REPEATER,
+	public static enum ROTATION {ANVIL, DOOR, GENERIC, PISTON_CONTAINER, QUARTZ, RAIL, REPEATER,
 		SIGNPOST, SKULL, STAIRS, TRAPDOOR, VINE, WALL_MOUNTED, WOOD};
 	
 	/**
@@ -412,6 +414,54 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 	}
 	
 	/**
+	 * Sets skull type and name for a TileEntitySkull at x/y/z
+	 * @param name Must be a valid player username
+	 * @param type Type of skull: 0 Skeleton, 1 Wither Skeleton, 2 Zombie, 3 Human, 4 Creeper
+	 * @return false if errors were encountered (i.e. incorrect tile entity at x/y/z)
+	 */
+	public final boolean setSkullData(World world, String name, int type, int x, int y, int z)
+	{
+		TileEntitySkull skull = (world.getBlockTileEntity(x, y, z) instanceof TileEntitySkull ? (TileEntitySkull) world.getBlockTileEntity(x, y, z) : null);
+		if (skull != null)
+		{
+			if (type > 4 || type < 0)
+			{
+				System.out.println("[GEN STRUCTURE][WARNING] Custom data value " + type + " not valid for skulls. Valid values are 0 to 4.");
+				type = 0;
+			}
+			skull.setSkullType(type, name);
+			// skull.setSkullRotation(0); // need 2nd customData parameter for this
+			return true;
+		}
+		return false;
+	}
+	
+	/**
+	 * Adds text to a sign in the world. Use EnumChatFormatting to set colors. Text of more
+	 * than 15 characters per line will be truncated automatically.
+	 * @param text A String array of no more than 4 elements; additional elements will be ignored
+	 * @return false if no sign tile entity was found at x/y/z
+	 */
+	public final boolean setSignText(World world, String[] text, int x, int y, int z)
+	{
+		TileEntitySign sign = (world.getBlockTileEntity(x, y, z) instanceof TileEntitySign ? (TileEntitySign) world.getBlockTileEntity(x, y, z) : null);
+		
+		if (sign != null)
+		{
+			for (int i = 0; i < sign.signText.length && i < text.length; ++i) {
+				if (text[i].length() > 15)
+					sign.signText[i] = text[i].substring(0, 15);
+				else
+					sign.signText[i] = text[i];
+			}
+			sign.signText = text;
+			return true;
+		}
+		
+		return false;
+	}
+	
+	/**
 	 * Sets the direction in which the player is facing. The structure will be generated
 	 * opposite of player view (so player will be looking at front when finished)
 	 */
@@ -775,6 +825,9 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 				if (meta > 1) meta = meta == 2 ? 5 : meta == 5 ? 3 : meta == 3 ? 4 : 2;
 				meta |= bit8 | bit9 << 3;
 				break;
+			case QUARTZ:
+				meta = meta == 3 ? 4 : meta == 4 ? 3 : meta;
+				break;
 			case RAIL:
 				if (meta < 2) meta ^= 1;
 				else if (meta < 6) meta = meta == 2 ? 5 : meta == 5 ? 3 : meta == 3 ? 4 : 2;
@@ -871,6 +924,8 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 		blockRotationData.put(Block.railActivator.blockID, ROTATION.PISTON_CONTAINER);
 		blockRotationData.put(Block.railDetector.blockID, ROTATION.PISTON_CONTAINER);
 		blockRotationData.put(Block.railPowered.blockID, ROTATION.PISTON_CONTAINER);
+		
+		blockRotationData.put(Block.blockNetherQuartz.blockID, ROTATION.QUARTZ);
 		
 		blockRotationData.put(Block.rail.blockID, ROTATION.RAIL);
 		

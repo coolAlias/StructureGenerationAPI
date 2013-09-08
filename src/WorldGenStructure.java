@@ -14,6 +14,7 @@ import net.minecraft.entity.passive.EntityHorse;
 import net.minecraft.entity.passive.EntityVillager;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
 
@@ -56,6 +57,10 @@ public class WorldGenStructure extends StructureGeneratorBase
 			return Block.torchWood.blockID; // need to do post-generation setting of this entity
 		case StructureArrays.SPAWN_VILLAGER:
 			return Block.torchWood.blockID; // using this, the villager will be spawned post-generation
+		case StructureArrays.CUSTOM_SKULL:
+			return Block.skull.blockID;
+		case StructureArrays.CUSTOM_SIGNWALL:
+			return Block.signWall.blockID;
 		default:
 			// note that SPAWN_VILLAGER would return 0 by default if we didn't set a custom id above,
 			// which is what we would want for 'air' if we didn't care about post-gen spawning
@@ -107,6 +112,25 @@ public class WorldGenStructure extends StructureGeneratorBase
 				// Here we use customData as the itemID to place
 				addmore = addItemToTileInventory(world, new ItemStack(customData, 64, 0), x, y, z);
 			}
+			break;
+		case StructureArrays.CUSTOM_SIGNWALL:
+			// An array that stores up to 4 Strings, the max capacity of a sign
+			String[] text = new String[5];
+			// Set different text for each custom sign
+			if (customData == StructureArrays.CUSTOM_SIGN_1)
+			{
+				text[0] = EnumChatFormatting.DARK_RED + "   BEWARE";
+				text[1] = EnumChatFormatting.DARK_RED + "  NO ENTRY";
+				text[2] = EnumChatFormatting.DARK_BLUE + "Enter at your abcdefghijklm";
+				text[3] = EnumChatFormatting.DARK_GRAY + "  own risk.";
+				text[4] = EnumChatFormatting.DARK_GRAY + "CRASH TEST";
+			}
+			// Use this easy method to add text to the sign's tile entity:
+			setSignText(world, text, x, y, z);
+			break;
+		case StructureArrays.CUSTOM_SKULL:
+			// Easily set the skull type or player name if you know it:
+			setSkullData(world, "", customData, x, y, z);
 			break;
 		case StructureArrays.ITEM_FRAME:
 			ItemStack frame = new ItemStack(Item.itemFrame);

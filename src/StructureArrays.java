@@ -16,10 +16,10 @@ import net.minecraft.world.World;
 public class StructureArrays
 {
 	/** Some predefined values for custom hooks that I use in the demo structure */
-	public static final int CUSTOM_CHEST = 4097, CUSTOM_DISPENSER = 4098, ITEM_FRAME = 4099, PAINTING = 4100, SPAWN_VILLAGER = 4101;
+	public static final int CUSTOM_CHEST = 4097, CUSTOM_DISPENSER = 4098, ITEM_FRAME = 4099, PAINTING = 4100, SPAWN_VILLAGER = 4101, CUSTOM_SKULL = 4102, CUSTOM_SIGNWALL = 4103;
 	
 	/** Start of specific chests; I'll use negative values so as not to conflict with item types and such */
-	public static final int CUSTOM_CHEST_1 = -1;
+	public static final int CUSTOM_CHEST_1 = -1, CUSTOM_SIGN_1 = 1;
 	
 	/**
 	This file contains a demo and a template structure to illustrate how to go about
@@ -433,6 +433,17 @@ public class StructureArrays
 		places the itemstack inside with the rotation provided, or default if no itemRotation
 		value is given.
 	
+	5. public final boolean setSignText(World world, String[] text, int x, int y, int z)
+	
+		Adds the provided text to a sign tile entity at the provided coordinates, or returns
+		false if no TileEntitySign was found. String[] must be manually set for each sign, as
+		there is currently no way to store this information within the block array.
+	
+	6. public final boolean setSkullData(World world, String name, int type, int x, int y, int z)
+	
+		Sets the skull type and player username (if you can get one) for the tile entity at
+		the provided coordinates. Returns false if no TileEntitySkull was found.
+	
 	=====================================================================================
 				CONGRATULATIONS! YOU'VE REACHED THE END!
 	=====================================================================================
@@ -529,12 +540,12 @@ public class StructureArrays
 		{ // y = 0 demonstrating a layer of 'soft' spawning cobblestone
 			{ // x = 0 (since this structure faces EAST, this is the back side)
 				// below is the z axis; blocks run from north to south for our default facing
-				{-Block.cobblestone.blockID}, // z = 0 (this is the NORTH side)
+				{-Block.cobblestone.blockID}, // z = 0 (this is the NORTH side, which is on the right)
 				{-Block.cobblestone.blockID}, // z = 1
 				{-Block.cobblestone.blockID}, // z = 2
 				{-Block.cobblestone.blockID}, // z = 3
 				{-Block.cobblestone.blockID}, // z = 4
-				{-Block.cobblestone.blockID}, // z = 5 (this is the SOUTH side)
+				{-Block.cobblestone.blockID}, // z = 5 (this is the SOUTH side, which is on the left)
 			},
 			{ // x = 1
 				{-Block.cobblestone.blockID}, // z = 0
@@ -690,7 +701,7 @@ public class StructureArrays
 				{0}
 			},
 			{ // x = 5 z values:
-				{0},{PAINTING,1},{0},{0},{Block.signWall.blockID,5},{0}
+				{0},{PAINTING,1},{0},{0},{CUSTOM_SIGNWALL,5,0,CUSTOM_SIGN_1},{0}
 			}
 			// note that since we don't spawn anything at x = 6 from here on, we don't need to include it
 			// excluding x=0, however, would cause this entire layer to be out of place
@@ -761,7 +772,7 @@ public class StructureArrays
 				{Block.cocoaPlant.blockID,8},{Block.wood.blockID,3},{Block.planks.blockID},{Block.planks.blockID},{Block.wood.blockID},{0}
 			},
 			{ // x = 5 z values:
-				{0},{Block.torchWood.blockID,1},{0},{Block.skull.blockID,5},{Block.torchWood.blockID,1},{0}
+				{0},{Block.torchWood.blockID,1},{0},{CUSTOM_SKULL,5,0,3},{Block.torchWood.blockID,1},{0}
 			}
 		},
 		{ // y = 5
