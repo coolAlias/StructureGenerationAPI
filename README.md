@@ -13,19 +13,19 @@ FEATURES
 - Set any block as a 'buffer' so your structure spawns more naturally in the environment
 - Custom 'hooks' allow you to define specific behavior for any block set, such as setting tile entity data
   or spawning entities at that location
+- Place blocks where they can't otherwise be placed, such as trapdoors on glass or torches in air
+- Easy method for adding items to any tile entity inventory
+- Easy method to ensure your spawned entity doesn't spawn in a wall
 - Easy method of adding hanging entities such as item frames or paintings
 - Easy method to auto-set items in placed item frames
-- Easy method for adding items to any tile entity inventory
  
 POSSIBLE FUTURE FEATURES
 ========================
-- Easy method to ensure your spawned entity doesn't spawn in a wall
-- Ability to set default x/y/z offsets for your structure
 - Reading structures from a file to avoid compile-time size limitations (big maybe)
  
 KNOWN BUGS
 ==========
-- Default offset isn't perfect... working on this
+- Large entities such as horses have problems spawning in confined spaces
 
 LIMITATIONS
 ===========
