@@ -81,7 +81,7 @@ public class WorldGenStructure extends StructureGeneratorBase
 			// Here we use customData to subtype custom_chest:
 			if (customData == StructureArrays.CUSTOM_CHEST_1)
 			{
-				// Let's load it with goodies; don't worry about over-filling it, the method will take care of it
+				// Let's load it with goodies; don't worry about over-filling, the method will take care of it
 				for (int i = 0; i < 30; ++i) {
 					addItemToTileInventory(world, new ItemStack(Item.diamond, 64), x, y, z);
 					addItemToTileInventory(world, new ItemStack(Item.emerald, 64), x, y, z);
@@ -99,7 +99,8 @@ public class WorldGenStructure extends StructureGeneratorBase
 			break;
 		case StructureArrays.CUSTOM_DISPENSER:
 			// We're going to take advantage of addItemToTileInventory's return value to fill
-			// the container to the brim
+			// the container to the brim; note that this way is better than the for loop from
+			// above because it doesn't waste processing time - it stops as soon as it is full
 			boolean addmore = true;
 			while (addmore)
 			{
