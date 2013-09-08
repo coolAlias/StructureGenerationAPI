@@ -141,8 +141,9 @@ public class StructureArrays
 	
 	Note that you only need to fill this array up to the point you need, so if your block does
 	not use metadata, you could simply use {blockID} for the array, instead of {blockID,0,0,0};
-	conversely, if your block is directional, you MUST include a metadata value, even if that
-	value is zero (0), otherwise your block will not be set correctly.
+	conversely, if your block is directional, you should include a metadata value. If no meta
+	value is found, directional blocks default to a value of 0 which may or may not be correct
+	for the type of block you are setting.
 	
 	{blockID}
 	If left blank, the structure generator will skip the coordinate of the missing block.
@@ -230,17 +231,12 @@ public class StructureArrays
 			Read this or your directional blocks WILL face the wrong direction!
 	=====================================================================================
 	
-	!!!VERY IMPORTANT!!! If the block uses metadata to determine direction, you MUST include
-	a metadata value in the array, EVEN if the value for that block happens to be 0 (zero).
-	
-	{Block.cobblestoneStairs.blockID} will NOT get rotated, but
-	{Block.cobblestoneStairs.blockID,0} will.
-	
-	That goes for all blocks that have direction, not just stairs.
-	
 	Set metadata value in relation to player facing opposite your structure's facing.
 	Default structure facing is EAST, so I set all my metadata based on a player looking
 	WEST, e.g. if I want stairs leading away from the player, I set the metadata to 1.
+	
+	Note that if you fail to include a metadata value for a directional block, it will be
+	interpreted as a value of 0 for purposes of rotation.
 	
 	(ROTATION) type is in parentheses, followed by metadata explanations for all blocks
 	that use that type. Use this as a guide for setting custom block rotation type.
@@ -1470,7 +1466,7 @@ public class StructureArrays
 			}
 		};
 		*/
-	/*
+	
 	public static final int[][][][] blockArrayShop =
 	{
 		{//y = 0
@@ -1595,19 +1591,19 @@ public class StructureArrays
 		{//y = 1
 			{//x = 0
 				{0},
-				{Block.stairsWoodSpruce.blockID,0},
-				{Block.stairsWoodSpruce.blockID,0},
-				{Block.stairsWoodSpruce.blockID,0},
-				{Block.stairsWoodSpruce.blockID,0},
-				{Block.stairsWoodSpruce.blockID,0},
-				{Block.stairsWoodSpruce.blockID,0},
+				{Block.stairsWoodSpruce.blockID},
+				{Block.stairsWoodSpruce.blockID},
+				{Block.stairsWoodSpruce.blockID},
+				{Block.stairsWoodSpruce.blockID},
+				{Block.stairsWoodSpruce.blockID},
+				{Block.stairsWoodSpruce.blockID},
 				{0},
-				{Block.stairsWoodSpruce.blockID,0},
-				{Block.stairsWoodSpruce.blockID,0},
+				{Block.stairsWoodSpruce.blockID},
+				{Block.stairsWoodSpruce.blockID},
 				{0}
 			},
 			{//x = 1
-				{Block.stairsWoodSpruce.blockID,0},
+				{Block.stairsWoodSpruce.blockID},
 				{Block.stoneBrick.blockID},
 				{Block.stoneBrick.blockID},
 				{Block.stoneBrick.blockID},
@@ -1717,19 +1713,19 @@ public class StructureArrays
 			},
 			{//x = 1
 				{0},
-				{Block.stairsWoodSpruce.blockID,0},
+				{Block.stairsWoodSpruce.blockID},
 				{Block.fence.blockID},
 				{0},
 				{Block.fence.blockID},
-				{Block.stairsWoodSpruce.blockID,0},
-				{Block.stairsWoodSpruce.blockID,0},
+				{Block.stairsWoodSpruce.blockID},
+				{Block.stairsWoodSpruce.blockID},
 				{Block.doorWood.blockID, 10},
-				{Block.stairsWoodSpruce.blockID,0},
-				{Block.stairsWoodSpruce.blockID,0},
+				{Block.stairsWoodSpruce.blockID},
+				{Block.stairsWoodSpruce.blockID},
 				{0}
 			},
 			{//x = 2
-				{Block.stairsWoodSpruce.blockID,0},
+				{Block.stairsWoodSpruce.blockID},
 				{Block.wood.blockID, 1},
 				{0},
 				{0},
@@ -1839,19 +1835,19 @@ public class StructureArrays
 			},
 			{//x = 2
 				{0},
-				{Block.stairsWoodSpruce.blockID,0},
+				{Block.stairsWoodSpruce.blockID},
 				{Block.cobblestone.blockID},
 				{Block.cobblestone.blockID},
 				{Block.cobblestone.blockID},
-				{Block.stairsWoodSpruce.blockID,0},
-				{Block.stairsWoodSpruce.blockID,0},
+				{Block.stairsWoodSpruce.blockID},
+				{Block.stairsWoodSpruce.blockID},
 				{Block.stairsCobblestone.blockID,0},
-				{Block.stairsWoodSpruce.blockID,0},
-				{Block.stairsWoodSpruce.blockID,0},
+				{Block.stairsWoodSpruce.blockID},
+				{Block.stairsWoodSpruce.blockID},
 				{0}
 			},
 			{//x = 3
-				{Block.stairsWoodSpruce.blockID,0},
+				{Block.stairsWoodSpruce.blockID},
 				{Block.wood.blockID, 1},
 				{0},
 				{0},
@@ -1941,15 +1937,15 @@ public class StructureArrays
 			},
 			{//x = 3
 				{0},
-				{Block.stairsWoodSpruce.blockID,0},
+				{Block.stairsWoodSpruce.blockID},
 				{Block.stairsCobblestone.blockID,0},
 				{Block.stairsCobblestone.blockID,0},
 				{Block.stairsCobblestone.blockID,0},
-				{Block.stairsWoodSpruce.blockID,0},
-				{Block.stairsWoodSpruce.blockID,0},
+				{Block.stairsWoodSpruce.blockID},
+				{Block.stairsWoodSpruce.blockID},
 				{Block.stairsCobblestone.blockID,0},
-				{Block.stairsWoodSpruce.blockID,0},
-				{Block.stairsWoodSpruce.blockID,0},
+				{Block.stairsWoodSpruce.blockID},
+				{Block.stairsWoodSpruce.blockID},
 				{0}
 			},
 			{//x = 4
@@ -2007,7 +2003,7 @@ public class StructureArrays
 			}
 		}
 	};
-	*/
+	
 	public static final int[][][][] blockArrayRedstone =
 		{
 			{ // y = 0

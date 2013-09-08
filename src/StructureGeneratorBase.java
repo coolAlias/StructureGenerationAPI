@@ -673,14 +673,13 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 						world.setBlockToAir(rotX, rotY, rotZ);
 					}
 					else
-					{
-						int fakeID = blockArray[y][x][z][0];
-						int meta = (blockArray[y][x][z].length > 1 ? blockArray[y][x][z][1] : NO_METADATA);
+					{	
 						int customData1 = (blockArray[y][x][z].length > 2 ? blockArray[y][x][z][2] : 0);
 						int customData2 = (blockArray[y][x][z].length > 3 ? blockArray[y][x][z][3] : 0);
-						
+						int fakeID = blockArray[y][x][z][0];
 						int realID = (Math.abs(fakeID) > 4096 ? getRealBlockID(fakeID, customData1) : fakeID);
-
+						int meta = (blockArray[y][x][z].length > 1 ? blockArray[y][x][z][1] : blockRotationData.containsKey(Math.abs(realID)) ? 0 : NO_METADATA);
+						
 						if (Math.abs(realID) > 4096) {
 							System.out.println("[GEN STRUCTURE][WARNING] Invalid block ID. Initial ID: " + fakeID + ", returned id from getRealID: " + realID);
 							continue;
