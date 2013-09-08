@@ -25,7 +25,8 @@ public class StructureArrays
 	This file contains a demo and a template structure to illustrate how to go about
 	creating your own. Use this in conjunction with the provided StructureGen mod to
 	test out your creation before adding it to your own mod.
-	
+	*/
+	/**
 	=====================================================================================
 					HOW TO GENERATE YOUR CUSTOM STRUCTURES
 	=====================================================================================
@@ -48,13 +49,16 @@ public class StructureArrays
 	Step 2: Set your structure's facing (defaults to EAST if not specifically set)
 	
 	"setStructureFacing(StructureGeneratorBase.DIRECTION)"
-	 where DIRECTION is NORTH, SOUTH, EAST, WEST
+	 
+	Valid DIRECTION values are NORTH, SOUTH, EAST, WEST, enumerated in StructureGeneratorBase.
+	
+	See below for more information on choosing a default facing for your structure.
 	
 	Step 3: REQUIRED! Set how much to offset the structure's position when generated
 	
 	This can be done in one of three ways:
 	
-	- Automatically so structure always generates in front of player:
+	- Automatically so structure always generates completely in front of player:
 				"setDefaultOffset()" [recommended method]
 	
 	- Automatically, but with custom adjustments relative to default:
@@ -83,6 +87,8 @@ public class StructureArrays
 	
 	"generate(World world, Random random, int x, int y, int z)"
 	
+	*/
+	/**
 	=====================================================================================
 					SETTING UP A STRUCTURE'S BLOCK ARRAY
 	=====================================================================================
@@ -91,34 +97,49 @@ public class StructureArrays
 	providing all the correct metadata values for block facing - I highly recommend you
 	use MCEdit first and use it as a template to manually convert the array. 
 	
-	You can choose any direction to be the default facing of your structure. It is the
-	side that will always face the player when generated, which doesn't necessarily have
-	to be the front door. The structure's facing is set from the WorldGenStructure constructor.
+	================
+	STRUCTURE FACING
+	================
+	Structure facing determines which 'side' of the array faces the player when generated.
 	
-	Keep your structure's facing in mind when creating the blockArray. For example, with
-	the default structure facing of EAST, all blocks that I want to be right in front
-	of the player will be placed in the east-most bounds of my array. Since x is the
-	east-west axis and east is positive, that means the maximum x value possible will
-	store the face of my structure, while x=0 will be the back side.
+	Facing		Array Setup
+	NORTH		Front: min z, Back: max z, Left (east): max x, Right (west): x = 0
+	SOUTH		Front: max z, Back: min z, Left (west): x = 0, Right (east): max x
+	EAST		Front: max x, Back: x = 0, Left (south): max z, Right (north): z = 0
+	WEST		Front: x = 0, Back: max x, Left (north): z = 0, Right (south): max z
 	
+	Choose a default structure facing that is easy for you to visualize while making the array;
+	you can always rotate the structure later to get any facing you desire.
+	
+	Personally, I like WEST because then my z values start in the north at 0 and work south
+	the larger the index gets, so the larger values are naturally to the right in the array
+	as well as in the world. Similarly, the front of my structure is the first x index, which
+	is the topmost line in each y layer, and the back of the structure is the bottom-most line.
+	This makes it easy for me to visualize the structure by looking at the array.
+	
+	Cardinal directions are determined by x and z regardless of structure facing:
+	NORTH = Min Z, SOUTH = MAX Z, EAST = Max X, WEST = Min X
+	
+	Left/right values given above are based on the player looking at the front face of the
+	structure in its default orientation.
+	
+	All directional blocks should be set in relation to your structure's default facing.
+	
+	===============
+	THE BLOCK ARRAY
+	===============
 	The first array [] stores y values, so we're building a structure one flat layer at
 	a time because I personally feel it's easier to visualize that way.
 	
-	The next two array [][] store x and z values, in any order, but you must maintain
-	whichever order you choose throughout your structure or you will probably misplace
-	blocks. If x is first, you will be building your structure as a flat layer, adding
-	one line of blocks starting at north (z=0) and west (x=0), building towards the south.
-	The next line will be in the north (z=0) and one block east of the first line.
+	The second array [] stores x, the third stores z, and the fourth individual block data.
 	
-	If it's easier for you to visualize adding lines along the east-west axis starting
-	in the northwest corner, adding blocks toward the east and lines toward the south,
-	put your z values first and x values second.
-	
-	The final array stores the following variables:
+	Each block uses the following variables:
 	{blockID, metadata, flag, customData}
 	
-	Note that you only need to fill this array up to the point you need, so if your block
-	doesn't use metadata, you could simply use {blockID} for the array, instead of {blockID, 0, 0, 0}
+	Note that you only need to fill this array up to the point you need, so if your block does
+	not use metadata, you could simply use {blockID} for the array, instead of {blockID,0,0,0};
+	conversely, if your block is directional, you MUST include a metadata value, even if that
+	value is zero (0), otherwise your block will not be set correctly.
 	
 	{blockID}
 	If left blank, the structure generator will skip the coordinate of the missing block.
@@ -127,7 +148,7 @@ public class StructureArrays
 	block ID. This will prevent your block from spawning in the world if another block
 	already exists at that location, allowing your structure to more naturally fit in with
 	the environment. To set an air block that doesn't overwrite pre-existing blocks, use
-	the value SET_NO_BLOCK instead of a block ID.
+	the value SET_NO_BLOCK instead of a block ID or simply leave the field blank.
 	
 	A quick example: Block.cobblestone.blockID will only spawn a cobblestone block if its
 	spawn location is air or occupied by a block such as grass that doesn't block movement.
@@ -144,7 +165,7 @@ public class StructureArrays
 	Stores the block's metadata. If metadata determines orientation, see below for details on
 	setting the value correctly.
 	
-	{flag}
+	{flag} - REMOVE and use as secondary custom data field, as flag always seems to be 2
 	Will automatically be set to 2 to notify the client if you don't set it yourself.
 	See 'World.setBlock' method for more information on setting your own flag.
 	
@@ -162,14 +183,16 @@ public class StructureArrays
 	
 	This is because I use the first index to determine the structure's center, saving myself
 	the trouble and processing time of iterating through the entire structure array to find
-	the max length and width.
+	the max length and width. If you don't follow this rule, be prepared for your structure
+	to generate off-center and possible on top of you.
 	
 	As an example, consider a tower whose base is 6x6, but the roof is 8x8. The first array
 	stored at blockArray[0] must contain 8 elements (i.e. 8 arrays for the x axis) and the
 	first array stored at blockArray[0][0] must also contain 8 elements (i.e 8 arrays for the
 	z axis). blockArray[1]-[maxHeight] can all contain as few as 0 elements, but no more than
 	8; same goes for blockArray[n][1]-[n][maxWidth].
-	
+	*/
+	/**
 	=====================================================================================
 				GENERATING LARGE STRUCTURES: USING MULTIPLE ARRAYS
 	=====================================================================================
@@ -196,7 +219,8 @@ public class StructureArrays
 	it and add it multiple times to the generator. For instance, if you're making a wizard
 	tower with 10 identical floor layouts, you only need to create an array for a single
 	floor and then addBlockArray(floorWizardTower) 10 times.
-	
+	*/
+	/**
 	=====================================================================================
 		 				IMPORTANT: NOTES ON SETTING METADATA
 			Read this or your directional blocks WILL face the wrong direction!
@@ -274,17 +298,20 @@ public class StructureArrays
 	Same as Rails for values 0-5. No corner pieces.
 	Add 8 if powered (should be set automatically, but maybe not)
 	
-	(RAIL) Rails:
+	(RAIL)
+	Rails:
 	0,1 flat track along north-south/east-west axis
 	2,3,4,5 track ascending to the east, west, north, south
 	6,7,8,9 corner track: NW, NE, SE, SW corner
 	Corner pieces connect the opposite directions, so 6 (NW corner) connects to the south and east
 	
-	(REPEATER) Redstone Repeater and Comparator:
+	(REPEATER)
+	Redstone Repeater and Comparator:
 	0,1,2,3 facing north, east, south, west. Add 4 per tick delay beyond the first.
 	Example: Repeater facing south with 3 ticks = 2 + 4 + 4 = 10.
 	
-	(SIGNPOST) Sign Posts:
+	(SIGNPOST)
+	Sign Posts:
 	16 directions, 0 being due south and working clockwise towards south-southeast at 15
 	Keep in mind that this is the direction in which the writing will show, but the player
 	will be looking at it from the opposite direction which may at first seem counter-intuitive.
@@ -302,7 +329,8 @@ public class StructureArrays
 	Note that placing active redstone signals near trapdoors will cause them to detach IF
 	in a location not otherwise allowed (e.g. attached to glass panes instead of blocks)
 	
-	(VINE) Vines:
+	(VINE)
+	Vines:
 	1,2,4,8 anchored to the south, west, north or east side of the vine block, NOT
 	neighboring block (so the position may be opposite what you think)
 	
@@ -316,18 +344,22 @@ public class StructureArrays
 	7,0 ceiling lever, south or east when off, +8 for switched on (might want
 	to set the flag value to 3 if switched on to notify neighboring blocks)
 	
-	(WOOD) Wood:
+	(WOOD)
+	Wood:
 	0,1,2,3 Oak/Spruce/Birch/Jungle placed vertically
 	Add 4 will face east/west, add 8 will face north/south, add 12 bark only
 	
-	(SKULL) Skull Blocks:
+	(SKULL)
+	Skull Blocks:
 	1 is on the floor, 2,3,4,5 on a wall and facing south, north, west, east.
-	Note that these are opposite from what the wiki claims, but it's what I saw in my
-	tests. For example, while looking WEST at a structure of facing EAST, no rotations
-	would be applied to metadata. A value of 4, which the wiki claims is facing east,
-	in fact faces west, AWAY from the player.
-	Associated tile entity will determine skull type, as well as rotation if on floor.
-	
+	Note that these are opposite from what the wiki claims, but it's what I saw in my tests.
+	For example, while looking WEST at a structure of facing EAST, no rotations would be
+	applied to metadata. A value of 4, which the wiki claims is facing east, in fact faces
+	west, AWAY from the player. Perhaps they meant 'attached to' instead of facing.
+	Associated tile entity will determine skull type, as well as rotation if on floor, so
+	you must make a CUSTOM_BLOCK case to get anything other than skeleton skulls.
+	*/
+	/**
 	=====================================================================================
 						HOW TO USE CUSTOM HOOK METHOD:
 	"onCustomBlockAdded(World world, int x, int y, int z, int fakeID, int customData)"
@@ -361,7 +393,9 @@ public class StructureArrays
 	
 	See WorldGenStructure's demo implementation of this method for concrete examples.
 	
+	===================
 	SOME USEFUL METHODS
+	===================
 	The following are methods designed to make handling onCustomBlockAdded cases easier:
 	
 	1. addItemToTileInventory(World world, ItemStack itemstack, int x, int y, int z)
