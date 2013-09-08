@@ -78,11 +78,24 @@ public class WorldGenStructure extends StructureGeneratorBase
 		case StructureArrays.CUSTOM_CHEST:
 			// Using the pre-made method addItemToTileInventory adds items to the first slot available
 
-			// Here we're using customData for stack size to add
-			addItemToTileInventory(world, new ItemStack(Item.diamond, customData), x, y, z);
-			
-			// Here we use customData to add a metadata block to the chest
-			addItemToTileInventory(world, new ItemStack(Block.cloth.blockID, 1, customData), x, y, z);
+			// Here we use customData to subtype custom_chest:
+			if (customData == StructureArrays.CUSTOM_CHEST_1)
+			{
+				// Let's load it with goodies; don't worry about over-filling it, the method will take care of it
+				for (int i = 0; i < 30; ++i) {
+					addItemToTileInventory(world, new ItemStack(Item.diamond, 64), x, y, z);
+					addItemToTileInventory(world, new ItemStack(Item.emerald, 64), x, y, z);
+				}
+			}
+			// Not our specific chest, so we'll do some generic stuff
+			else
+			{
+				// Here we're using customData for stack size to add
+				addItemToTileInventory(world, new ItemStack(Item.diamond, customData), x, y, z);
+
+				// Here we use customData to add a metadata block to the chest
+				addItemToTileInventory(world, new ItemStack(Block.cloth.blockID, 1, customData), x, y, z);
+			}
 			break;
 		case StructureArrays.CUSTOM_DISPENSER:
 			// We're going to take advantage of addItemToTileInventory's return value to fill
