@@ -308,14 +308,12 @@ public class StructureArrays
 	(REPEATER)
 	Redstone Repeater and Comparator:
 	0,1,2,3 facing north, east, south, west. Add 4 per tick delay beyond the first.
-	Example: Repeater facing south with 3 ticks = 2 + 4 + 4 = 10.
+	Example: Repeater facing south with 1 tick = 2; 3 ticks = 2 + 4 + 4 = 10.
 	
 	(SIGNPOST)
 	Sign Posts:
 	16 directions, 0 being due south and working clockwise towards south-southeast at 15
-	Keep in mind that this is the direction in which the writing will show, but the player
-	will be looking at it from the opposite direction which may at first seem counter-intuitive.
-	I know I set mine backwards a few times.
+	Keep in mind that this is the direction in which the writing will show.
 	See http://www.minecraftwiki.net/wiki/Data_values#Sign_Posts for exact details
 	
 	(TRAPDOOR)
@@ -327,7 +325,7 @@ public class StructureArrays
 	half of the block (these are additive, so east wall open on upper half is 2+4+8 = 14)
 	
 	Note that placing active redstone signals near trapdoors will cause them to detach IF
-	in a location not otherwise allowed (e.g. attached to glass panes instead of blocks)
+	in a location not otherwise allowed (e.g. attached to glass of any kind)
 	
 	(VINE)
 	Vines:
@@ -356,7 +354,8 @@ public class StructureArrays
 	applied to metadata. A value of 4, which the wiki claims is facing east, in fact faces
 	west, AWAY from the player. Perhaps they meant 'attached to' instead of facing.
 	Associated tile entity will determine skull type, as well as rotation if on floor, so
-	you must make a CUSTOM_BLOCK case to get anything other than skeleton skulls.
+	you must make a CUSTOM_BLOCK case to get anything other than skeleton skulls and then
+	use one of the "setSkullData" methods below.
 	*/
 	/**
 	=====================================================================================
@@ -408,10 +407,10 @@ public class StructureArrays
 	2.1 spawnEntityInStructure(World world, Entity entity, int x, int y, int z)
 	
 		Spawns the passed in entity within the structure such that it doesn't spawn inside of
-		walls. If no valid location was found, the entity will still spawn but the method will
-		return false.
+		walls by using the method setEntityInStructure below. If no valid location was found,
+		the entity will still spawn but the method will return false.
 		
-	2.2. setEntityInStructure(World world, Entity entity, int x, int y, int z)
+	2.2 setEntityInStructure(World world, Entity entity, int x, int y, int z)
 	
 		 Sets an entity's location so that it doesn't spawn inside of walls, but doesn't spawn
 		 the entity. Automatically removes placeholder block at coordinates x/y/z.
@@ -438,10 +437,15 @@ public class StructureArrays
 		false if no TileEntitySign was found. String[] must be manually set for each sign, as
 		there is currently no way to store this information within the block array.
 	
-	6. setSkullData(World world, String name, int type, int x, int y, int z)
+	6.1 setSkullData(World world, String name, int type, int x, int y, int z)
 	
 		Sets the skull type and player username (if you can get one) for the tile entity at
 		the provided coordinates. Returns false if no TileEntitySkull was found.
+		
+	6.2 setSkullData(World world, String name, int type, int rot, int x, int y, int z)
+	
+		As above but with additional rotation data (rot). This only applies to skulls sitting
+		on the floor, not mounted to walls.
 	
 	=====================================================================================
 				CONGRATULATIONS! YOU'VE REACHED THE END!

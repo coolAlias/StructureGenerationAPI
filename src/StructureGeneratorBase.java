@@ -642,8 +642,8 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 			{
 				for (int z = 0; z < blockArray[y][x].length; ++z)
 				{
-					if ((blockArray[y][x][z].length == 0 || blockArray[y][x][z][0] == SET_NO_BLOCK)
-							&& !this.removeStructure) continue;
+					if (blockArray[y][x][z].length == 0 || blockArray[y][x][z][0] == SET_NO_BLOCK)
+						continue; // && !this.removeStructure) <- but we only want to remove blocks set by array
 
 					int rotX = posX, rotZ = posZ, rotY = posY + y + offsetY;
 					
@@ -668,22 +668,31 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 						System.out.println("[GEN STRUCTURE] Error computing number of rotations.");
 						break;
 					}
+					
+					int customData1 = (blockArray[y][x][z].length > 2 ? blockArray[y][x][z][2] : 0);
+					int fakeID = blockArray[y][x][z][0];
+					int realID = (Math.abs(fakeID) > 4096 ? getRealBlockID(fakeID, customData1) : fakeID);
 
-					if (this.removeStructure) {
-						world.setBlockToAir(rotX, rotY, rotZ);
+					if (this.removeStructure)
+					{
+						if (world.isAirBlock(rotX, rotY, rotZ))
+							continue;
+						else if (Math.abs(realID) == world.getBlockId(rotX, rotY, rotZ))
+							world.setBlockToAir(rotX, rotY, rotZ);
+						else {
+							System.out.println("[GEN STRUCTURE][WARNING] Removing structure at incorrect location, aborting.");
+							return false;
+						}
 					}
 					else
-					{	
-						int customData1 = (blockArray[y][x][z].length > 2 ? blockArray[y][x][z][2] : 0);
-						int customData2 = (blockArray[y][x][z].length > 3 ? blockArray[y][x][z][3] : 0);
-						int fakeID = blockArray[y][x][z][0];
-						int realID = (Math.abs(fakeID) > 4096 ? getRealBlockID(fakeID, customData1) : fakeID);
-						int meta = (blockArray[y][x][z].length > 1 ? blockArray[y][x][z][1] : blockRotationData.containsKey(Math.abs(realID)) ? 0 : NO_METADATA);
-						
+					{
 						if (Math.abs(realID) > 4096) {
 							System.out.println("[GEN STRUCTURE][WARNING] Invalid block ID. Initial ID: " + fakeID + ", returned id from getRealID: " + realID);
 							continue;
 						}
+						
+						int customData2 = (blockArray[y][x][z].length > 3 ? blockArray[y][x][z][3] : 0);
+						int meta = (blockArray[y][x][z].length > 1 ? blockArray[y][x][z][1] : blockRotationData.containsKey(Math.abs(realID)) ? 0 : NO_METADATA);
 						
 						// Allows 'soft-spawning' blocks to be spawned only in air or on blocks that allow movement, such as air or grass
 						if (realID >= 0 || world.isAirBlock(rotX, rotY, rotZ) || 
