@@ -1,6 +1,9 @@
 STRUCTURE GENERATION TOOL
 =========================
-This is a tool I created for those of you who don't want to use schematics, for whatever reason, to generate structures in your world. It allows you to design and generate custom structures as well as rotate and offset your custom structures as they are generated in the world. Additionally, there are methods that allow you to set custom tile entity data, spawn entities or whatever else you can imagine.
+This is a tool I created for those of you who don't want to use schematics, for whatever reason, to generate structures
+in your world. It allows you to design and generate custom structures as well as rotate and offset your custom structures
+as they are generated in the world. Additionally, there are methods that allow you to set custom tile entity data, spawn
+entities or whatever else you can imagine.
 
 FEATURES
 ========
@@ -16,10 +19,15 @@ FEATURES
 
 CUSTOM 'HOOKS'
 ==============
+There are a number of pre-written methods to allow easy manipulation of your structure, from adding loot to decorating
+as you see fit. These methods can be accessed by using an out-of-bounds block id to trigger the 'hook' method
+'onCustomBlockAdded'. For the full instructions, see StructureArrays.java.
+
 - Add items to any tile entity inventory with a single method
 - Spawn entities without fear of spawning in a wall
 - Add hanging entities such as item frames or paintings
 - Set items in placed item frames
+- Set art for paintings
 - Add text to signs, with color example
 - Place any kind of mob head
  
@@ -33,11 +41,15 @@ KNOWN BUGS
 
 LIMITATIONS
 ===========
-Due to the maximum byte limit of static initializers, the structure array size cannot exceed 65535 bytes. What this means for you is that a single horizontal layer of your structure cannot exceed roughly 3400 blocks in area, so about a 68x50 rectangular base, judging by my tests so far.
+Due to the maximum byte limit of static initializers, the structure array size cannot exceed 65535 bytes. What this
+means for you is that a single horizontal layer of your structure cannot exceed roughly 3400 blocks in area, so about
+a 68x50 rectangular base, judging by my tests so far.
 
-You would then build your structure by adding layers to the generator list. See StructureArrays.java for complete details on how to go about this.
+You would then build your structure by adding layers to the generator list. See StructureArrays.java for complete
+details on how to go about this.
 
-If your structure is very large (more than 3 or so maxed static arrays), you will probably need to store them in separate files or you will get a compile time error.
+If your structure is very large (more than 3 or so maxed static arrays), you will probably need to store them in
+separate files or you will get a compile time error.
 
 DEMO MOD INCLUDED
 =================
@@ -50,7 +62,8 @@ Two structures are included:
 
 These are the controls:
 
-'O' - changes structure's default orientation by 90 degrees. This will have the effect of changing which side spawns facing the player.
+'O' - changes structure's default orientation by 90 degrees. This will have the effect of changing which side spawns
+      facing the player.
 
 'I' - toggles between increment and decrement offset values below
 
@@ -62,7 +75,8 @@ These are the controls:
 
 'U' - reset x/y/z offsets to 0
 
-'V' - toggles between generate / remove structure - when removing, be sure to click the EXACT position you clicked when spawning it
+'V' - toggles between generate / remove structure - when removing, be sure to click the EXACT position you clicked
+      when spawning it
 
 Right click - spawn / remove structure at tile location clicked
 
