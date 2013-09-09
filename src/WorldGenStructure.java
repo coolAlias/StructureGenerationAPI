@@ -20,6 +20,11 @@ import net.minecraft.world.World;
 
 public class WorldGenStructure extends StructureGeneratorBase
 {
+	int random_hole;
+	// a better way would be to pass World in to the constructors and set the random_hole
+	// value there, but I'm feeling lazy
+	boolean value_set = false;
+	
 	public WorldGenStructure(Entity entity, int[][][][] blocks){
 		super(entity, blocks);
 	}
@@ -61,6 +66,8 @@ public class WorldGenStructure extends StructureGeneratorBase
 			return Block.skull.blockID;
 		case StructureArrays.CUSTOM_SIGNWALL:
 			return Block.signWall.blockID;
+		case StructureArrays.RANDOM_HOLE: // Used customData1 to store the real block id
+			return customData1;
 		default:
 			// note that SPAWN_VILLAGER would return 0 by default if we didn't set a custom id above,
 			// which is what we would want for 'air' if we didn't care about post-gen spawning
@@ -77,6 +84,12 @@ public class WorldGenStructure extends StructureGeneratorBase
 	@Override
 	public void onCustomBlockAdded(World world, int x, int y, int z, int fakeID, int customData1, int customData2)
 	{
+		if (!value_set) {
+			// if using this method, this should only be done once per structure, preferably with a better method
+			// sets one value of RANDOM_HOLE to remove from the structure, allowing for patterns
+			random_hole = world.rand.nextInt(5);
+			value_set = true;
+		}
 		int meta = world.getBlockMetadata(x, y, z);
 		System.out.println("[CUSTOM BLOCK ADDED] metadata = " + meta);
 		System.out.println("[GEN STRUCTURE] Setting custom block info for fake id " + fakeID + " and customData1 " + customData1);
@@ -172,6 +185,18 @@ public class WorldGenStructure extends StructureGeneratorBase
 				}
 			}
 			*/
+			break;
+		case StructureArrays.RANDOM_HOLE:
+			// One way to generate holes would be to set a random int once per structure,
+			// then remove only hole blocks with that value, allowing for custom patterns
+			//if (random_hole == customData2)
+				//world.setBlockToAir(x, y, z);
+			
+			// another way that doesn't use customData2 would be to use world.rand.nextFloat()
+			// use whatever value you want to check against, I used 0.25F so 25% will become holes
+			// this way is nice because we don't need to set customData2 for all these blocks
+			if (world.rand.nextFloat() < 0.25F)
+				world.setBlockToAir(x, y, z);
 			break;
 		case StructureArrays.SPAWN_VILLAGER:
 			// here I'm using customData as the villagerID

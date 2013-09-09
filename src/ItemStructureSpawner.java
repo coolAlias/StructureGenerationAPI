@@ -92,7 +92,7 @@ public class ItemStructureSpawner extends BaseModItem
 		if (!world.isRemote)
 		{
 			gen.setPlayerFacing(player);
-			gen.addBlockArray(StructureArrays.blockArrayRedstone);
+			gen.addBlockArray(StructureArrays.blockArrayShop);
 
 			// adjust for structure generating centered on player's position (including height)
 			gen.setDefaultOffset(this.offsetX, this.offsetY - 1, this.offsetZ); // adjust down one for the buffer layer

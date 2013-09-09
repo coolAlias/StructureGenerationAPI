@@ -680,7 +680,7 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 						else if (Math.abs(realID) == world.getBlockId(rotX, rotY, rotZ))
 							world.setBlockToAir(rotX, rotY, rotZ);
 						else {
-							System.out.println("[GEN STRUCTURE][WARNING] Removing structure at incorrect location, aborting.");
+							System.out.println("[GEN STRUCTURE][WARNING] Incorrect location for structure removal, aborting.");
 							return false;
 						}
 					}
