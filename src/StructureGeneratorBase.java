@@ -142,7 +142,7 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 	/**
 	 * A custom 'hook' to allow setting of tile entities, spawning entities, etc.
 	 * @param fakeID The custom identifier used to distinguish between types
-	 * @param customData1 Custom data used to subtype events for given fakeID
+	 * @param customData1 Custom data which can be used to subtype events for given fakeID
 	 * @param customData2 Additional custom data
 	 */
 	public abstract void onCustomBlockAdded(World world, int x, int y, int z, int fakeID, int customData1, int customData2);
@@ -315,10 +315,11 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 	/**
 	 * Places a hanging item entity in the world at the correct location and facing.
 	 * Note that you MUST use a WALL_MOUNTED type block id (such as torch) for your custom
-	 * block id's getRealBlockID return value in order for orienation to be correct.
+	 * block id's getRealBlockID return value in order for orientation to be correct.
 	 * Coordinates x,y,z are the location of the block used to spawn the entity
-	 * Automatically removes the dummy block at x/y/z before placing the entity, so the
-	 * metadata stored in the block will no longer be available.
+	 * NOTE: Automatically removes the dummy block at x/y/z before placing the entity, so the
+	 * metadata stored in the block will no longer be available, but will be returned by this
+	 * method so it can be stored in a local variable for later use.
 	 * @param hanging Must be an instance of ItemHangingEntity, such as Item.painting
 	 * @return Returns direction for further processing such as for ItemFrames, or -1 if no entity set
 	 */
@@ -415,7 +416,7 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 		            if (enumart.title.equals(name))
 		            {
 		                toEdit.art = enumart;
-		                PacketDispatcher.sendPacketToAllAround(x, y, z, 64, 0, new Packet25EntityPainting(toEdit));
+		                PacketDispatcher.sendPacketToAllAround(x, y, z, 64, world.provider.dimensionId, new Packet25EntityPainting(toEdit));
 		                return true;
 		            }
 		        }
