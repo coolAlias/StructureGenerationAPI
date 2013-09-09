@@ -430,20 +430,26 @@ public class StructureArrays
 	
 		Finds the correct ItemFrame in the world for the coordinates and direction given and
 		places the itemstack inside with the rotation provided, or default if no itemRotation
-		value is given.
+		value is given. 'direction' parameter is value returned from setHangingEntity
 	
-	5. setSignText(World world, String[] text, int x, int y, int z)
+	5. setPaintingArt(World world, String name, int x, int y, int z, int direction)
+	
+		Sets the art for a painting at location x/y/z and sends a packet to update players.
+		'direction' parameter is value returned from setHangingEntity
+	 	Returns false if 'name' didn't match any EnumArt values.
+	
+	6. setSignText(World world, String[] text, int x, int y, int z)
 	
 		Adds the provided text to a sign tile entity at the provided coordinates, or returns
 		false if no TileEntitySign was found. String[] must be manually set for each sign, as
 		there is currently no way to store this information within the block array.
 	
-	6.1 setSkullData(World world, String name, int type, int x, int y, int z)
+	7.1 setSkullData(World world, String name, int type, int x, int y, int z)
 	
 		Sets the skull type and player username (if you can get one) for the tile entity at
 		the provided coordinates. Returns false if no TileEntitySkull was found.
 		
-	6.2 setSkullData(World world, String name, int type, int rot, int x, int y, int z)
+	7.2 setSkullData(World world, String name, int type, int rot, int x, int y, int z)
 	
 		As above but with additional rotation data (rot). This only applies to skulls sitting
 		on the floor, not mounted to walls.
@@ -671,7 +677,7 @@ public class StructureArrays
 				{PAINTING,3} // facing south (since default structure faces EAST, this is the left-hand side)
 			},
 			{ // x = 1 z values:
-				{PAINTING,4}, // facing north (since default structure faces EAST, this is the right-hand side)
+				{PAINTING,4,1}, // facing north (since default structure faces EAST, this is the right-hand side)
 				// if you change the above block to wood, the painting at y=2,x=0,z=0 will work fine
 				{Block.planks.blockID},
 				{Block.bed.blockID,10},
@@ -705,7 +711,7 @@ public class StructureArrays
 				{0}
 			},
 			{ // x = 5 z values:
-				{0},{PAINTING,1},{0},{0},{CUSTOM_SIGNWALL,5,CUSTOM_SIGN_1},{0}
+				{PAINTING,1},{PAINTING,1,1},{PAINTING,1},{0},{CUSTOM_SIGNWALL,5,CUSTOM_SIGN_1},{0}
 			}
 			// note that since we don't spawn anything at x = 6 from here on, we don't need to include it
 			// excluding x=0, however, would cause this entire layer to be out of place

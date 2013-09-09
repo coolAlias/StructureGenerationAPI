@@ -162,29 +162,11 @@ public class WorldGenStructure extends StructureGeneratorBase
 			break;
 		case StructureArrays.PAINTING:
 			ItemStack painting = new ItemStack(Item.painting);
-			setHangingEntity(world, painting, x, y, z);
+			facing = setHangingEntity(world, painting, x, y, z);
 			// choose painting you want based on custom data; look at EnumArt for painting names
-			/*
-			String custom = (customData == 1 ? "Aztec" : "Bomb");
-			
-			List paintings = world.getEntitiesWithinAABB(EntityPainting.class, AxisAlignedBB.getBoundingBox((double) x - 1, (double) y - 1, (double) z - 1, (double) x + 1, (double) y + 1, (double) z + 1));
-			
-			if (paintings != null && !paintings.isEmpty())
-			{
-				Iterator iterator = paintings.iterator();
-
-				while (iterator.hasNext())
-				{
-					EntityPainting toEdit = (EntityPainting) iterator.next();
-					System.out.println("[PAINTING] setting custom painting for " + toEdit.getEntityData().getString("Motive"));
-					toEdit.getEntityData().setString("Motive", custom);
-					System.out.println("[PAINTING] new painting is " + toEdit.getEntityData().getString("Motive"));
-					//EntityPainting newPainting = new EntityPainting(world, (int) toEdit.posX, (int) toEdit.posY, (int) toEdit.posZ, 2, custom);
-					//toEdit.setDead();
-					//world.spawnEntityInWorld(newPainting);
-				}
-			}
-			*/
+			String custom = (customData1 == 1 ? "Aztec" : "Bomb");
+			// use following method to set painting and update client automatically
+			setPaintingArt(world, custom, x, y, z, facing);
 			break;
 		case StructureArrays.RANDOM_HOLE:
 			// One way to generate holes would be to set a random int once per structure,

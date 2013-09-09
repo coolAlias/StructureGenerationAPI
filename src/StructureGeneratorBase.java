@@ -14,20 +14,24 @@ import java.util.Map;
 import java.util.Random;
 
 import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.common.network.PacketDispatcher;
 import cpw.mods.fml.relauncher.Side;
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItemFrame;
+import net.minecraft.entity.item.EntityPainting;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemHangingEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.network.packet.Packet25EntityPainting;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityChest;
 import net.minecraft.tileentity.TileEntitySign;
 import net.minecraft.tileentity.TileEntitySkull;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.Direction;
+import net.minecraft.util.EnumArt;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
 import net.minecraft.world.gen.feature.WorldGenerator;
@@ -371,47 +375,77 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 	 */
 	public final void setItemFrameStack(World world, ItemStack itemstack, int x, int y, int z, int direction, int itemRotation)
 	{
-		double minX = (double) x, minZ = (double) z, maxX = minX, maxZ =  minZ;
-		
-		switch(direction) {
-		case 2: // frame facing NORTH
-			minX += 0.25D;
-			maxX += 0.75D;
-			minZ += 0.5D;
-			maxZ += 1.5D;
-			break;
-		case 3: // frame facing SOUTH
-			minX += 0.25D;
-			maxX += 0.75D;
-			minZ -= 0.5D;
-			maxZ += 0.5D;
-			break;
-		case 4: // frame facing WEST
-			minX += 0.5D;
-			maxX += 1.5D;
-			minZ += 0.25D;
-			maxZ += 0.75D;
-			break;
-		case 5: // frame facing EAST
-			minX -= 0.5D;
-			maxX += 0.5D;
-			minZ += 0.25D;
-			maxZ += 0.75D;
-			break;
-		}
-		
-		List<EntityItemFrame> frames = world.getEntitiesWithinAABB(EntityItemFrame.class, AxisAlignedBB.getBoundingBox(minX, (double) y, minZ, maxX, (double) y + 1, maxZ));
+		List<EntityItemFrame> frames = world.getEntitiesWithinAABB(EntityItemFrame.class, getHangingEntityAxisAligned(x, y, z, direction));
 		if (frames != null && !frames.isEmpty())
 		{
-			Iterator iterator = frames.iterator();
+			Iterator<EntityItemFrame> iterator = frames.iterator();
 
 			while (iterator.hasNext())
 			{
-				EntityItemFrame frame1 = (EntityItemFrame) iterator.next();
+				EntityItemFrame frame1 = iterator.next();
 				frame1.setDisplayedItem(itemstack);
 				frame1.setItemRotation(itemRotation);
 			}
 		}
+	}
+	
+	/**
+	 * Sets the art for a painting at location x/y/z and sends a packet to update players.
+	 * @param direction Use the value returned from the setHangingEntity method
+	 * @return false if 'name' didn't match any EnumArt values.
+	 */
+	public final boolean setPaintingArt(World world, String name, int x, int y, int z, int direction)
+	{
+		List<EntityPainting> paintings = world.getEntitiesWithinAABB(EntityPainting.class, getHangingEntityAxisAligned(x, y, z, direction));
+		
+		if (paintings != null && !paintings.isEmpty() && name.length() > 0)
+		{
+			Iterator<EntityPainting> iterator = paintings.iterator();
+
+			while (iterator.hasNext())
+			{
+				EntityPainting toEdit = iterator.next();
+				EnumArt[] aenumart = EnumArt.values();
+		        int i1 = aenumart.length;
+
+		        for (int j1 = 0; j1 < i1; ++j1)
+		        {
+		            EnumArt enumart = aenumart[j1];
+
+		            if (enumart.title.equals(name))
+		            {
+		                toEdit.art = enumart;
+		                PacketDispatcher.sendPacketToAllAround(x, y, z, 64, 0, new Packet25EntityPainting(toEdit));
+		                return true;
+		            }
+		        }
+			}
+		}
+		return false;
+	}
+	
+	/**
+	 * Adds text to a sign in the world. Use EnumChatFormatting to set colors. Text of more
+	 * than 15 characters per line will be truncated automatically.
+	 * @param text A String array of no more than 4 elements; additional elements will be ignored
+	 * @return false if no sign tile entity was found at x/y/z
+	 */
+	public final boolean setSignText(World world, String[] text, int x, int y, int z)
+	{
+		TileEntitySign sign = (world.getBlockTileEntity(x, y, z) instanceof TileEntitySign ? (TileEntitySign) world.getBlockTileEntity(x, y, z) : null);
+		
+		if (sign != null)
+		{
+			for (int i = 0; i < sign.signText.length && i < text.length; ++i) {
+				if (text[i].length() > 15)
+					sign.signText[i] = text[i].substring(0, 15);
+				else
+					sign.signText[i] = text[i];
+			}
+			return true;
+		}
+		
+		return false;
 	}
 	
 	/**
@@ -442,31 +476,6 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 			skull.setSkullType(type, name);
 			if (rot > -1)
 				skull.setSkullRotation(rot);
-			return true;
-		}
-		
-		return false;
-	}
-	
-	/**
-	 * Adds text to a sign in the world. Use EnumChatFormatting to set colors. Text of more
-	 * than 15 characters per line will be truncated automatically.
-	 * @param text A String array of no more than 4 elements; additional elements will be ignored
-	 * @return false if no sign tile entity was found at x/y/z
-	 */
-	public final boolean setSignText(World world, String[] text, int x, int y, int z)
-	{
-		TileEntitySign sign = (world.getBlockTileEntity(x, y, z) instanceof TileEntitySign ? (TileEntitySign) world.getBlockTileEntity(x, y, z) : null);
-		
-		if (sign != null)
-		{
-			for (int i = 0; i < sign.signText.length && i < text.length; ++i) {
-				if (text[i].length() > 15)
-					sign.signText[i] = text[i].substring(0, 15);
-				else
-					sign.signText[i] = text[i];
-			}
-			sign.signText = text;
 			return true;
 		}
 		
@@ -910,6 +919,43 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 			this.offsetX = x;
 			this.offsetZ = z;
 		}
+	}
+	
+	/**
+	 * Returns an AxisAlignedBB suitable for a hanging entity at x/y/z facing direction
+	 */
+	private final AxisAlignedBB getHangingEntityAxisAligned(int x, int y, int z, int direction)
+	{
+		double minX = (double) x, minZ = (double) z, maxX = minX, maxZ =  minZ;
+		
+		switch(direction) {
+		case 2: // frame facing NORTH
+			minX += 0.25D;
+			maxX += 0.75D;
+			minZ += 0.5D;
+			maxZ += 1.5D;
+			break;
+		case 3: // frame facing SOUTH
+			minX += 0.25D;
+			maxX += 0.75D;
+			minZ -= 0.5D;
+			maxZ += 0.5D;
+			break;
+		case 4: // frame facing WEST
+			minX += 0.5D;
+			maxX += 1.5D;
+			minZ += 0.25D;
+			maxZ += 0.75D;
+			break;
+		case 5: // frame facing EAST
+			minX -= 0.5D;
+			maxX += 0.5D;
+			minZ += 0.25D;
+			maxZ += 0.75D;
+			break;
+		}
+		
+		return AxisAlignedBB.getBoundingBox(minX, (double) y, minZ, maxX, (double) y + 1, maxZ);
 	}
 	
 	/** Set rotation data for vanilla blocks */
