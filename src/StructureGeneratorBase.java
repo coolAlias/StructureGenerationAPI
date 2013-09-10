@@ -646,7 +646,7 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 		// It seems to work both ways, so for now, use the one with fewest computations
 		// int centerX, centerZ;
 
-		for (int y = 0; y < blockArray.length; ++y)
+		for (int y = (this.removeStructure ? blockArray.length - 1 : 0); (this.removeStructure ? y >= 0 : y < blockArray.length); y = (this.removeStructure ? --y : ++y))
 		{
 			for (int x = 0; x < blockArray[y].length; ++x)
 			{
@@ -685,9 +685,11 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 
 					if (this.removeStructure)
 					{
-						if (world.isAirBlock(rotX, rotY, rotZ))
+						if (world.isAirBlock(rotX, rotY, rotZ) || (realID < 0 && Math.abs(realID) != world.getBlockId(rotX, rotY, rotZ)))
 							continue;
-						else if (Math.abs(realID) == world.getBlockId(rotX, rotY, rotZ))
+						else if (Math.abs(realID) == world.getBlockId(rotX, rotY, rotZ) || 
+								(Block.blocksList[world.getBlockId(rotX, rotY, rotZ)].blockMaterial.isLiquid() &&
+								(Block.blocksList[Math.abs(realID)].blockMaterial.isLiquid() || realID == 0)))
 							world.setBlockToAir(rotX, rotY, rotZ);
 						else {
 							System.out.println("[GEN STRUCTURE][WARNING] Incorrect location for structure removal, aborting.");
