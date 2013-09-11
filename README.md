@@ -59,6 +59,7 @@ Tool. There is currently no recipe for the item that spawns structures, so try i
 
 Several structures are included:
 - "Hut" - A highly modified village hut. Enter at your own risk.
+- "Redstone Dungeon" - Can you find the treasure and live to tell about it?
 - "Blacksmith" - Vanilla blacksmith shop. Thanks to Microjunk for this one!
 - "Viking Shop" - A cool viking-style shop, but riddled with holes from disuse. Credit again to Microjunk.
 
