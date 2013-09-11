@@ -33,6 +33,7 @@ as you see fit. These methods can be accessed by using an out-of-bounds block id
  
 POSSIBLE FUTURE FEATURES
 ========================
+- Coming soon: Toggle between structures from within the item - no more quitting to edit the code!
 - Reading structures from a file to avoid compile-time size limitations (big maybe)
  
 KNOWN BUGS
@@ -56,22 +57,21 @@ DEMO MOD INCLUDED
 A ready-to-go mod that will help familiarize you with the capabilities and functionality of the Structure Generation
 Tool. There is currently no recipe for the item that spawns structures, so try it in Creative.
 
-Two structures are included:
-- blockArrayNPCBlackSmith - Vanilla blacksmith shop. Thanks to Microjunk for this one!
-- blockArrayNPCHut - A highly modified village hut. Enter at your own risk.
+Several structures are included:
+- "Hut" - A highly modified village hut. Enter at your own risk.
+- "Blacksmith" - Vanilla blacksmith shop. Thanks to Microjunk for this one!
+- "Viking Shop" - A cool viking-style shop, but riddled with holes from disuse. Credit again to Microjunk.
 
 These are the controls:
+
+'Arrow Keys' - up: moves structure away from player; down: moves structure towards/behind player; left / right
 
 'O' - changes structure's default orientation by 90 degrees. This will have the effect of changing which side spawns
       facing the player.
 
-'I' - toggles between increment and decrement offset values below
+'I' - toggles between increment and decrement y offset
 
-'X' - offsets the structure's spawn location towards (+) or away (-) from the player
-
-'Y' - increments or decrements y value to offset spawn location
-
-'Z' - offsets the structure's spawn location to the right (+) or left (-) of the player
+'Y' - increments or decrements y offset (i.e. structure will generate further up / down)
 
 'U' - reset x/y/z offsets to 0
 
