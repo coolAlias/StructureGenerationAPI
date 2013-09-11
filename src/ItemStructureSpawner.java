@@ -42,16 +42,18 @@ public class ItemStructureSpawner extends BaseModItem
 				gen.rotateStructureFacing();
 				player.addChatMessage("[STRUCTURE GEN] Structure orientation rotated to face " + gen.currentStructureFacing());
 			}
-			else if (Keyboard.isKeyDown(Keyboard.KEY_X)) {
-				if (increment) {
-					++this.offsetX;
-					player.addChatMessage("[STRUCTURE GEN] Incremented x offset: " + this.offsetX);
-				} else {
-					--this.offsetX;
-					player.addChatMessage("[STRUCTURE GEN] Decremented x offset: " + this.offsetX);
-				}
+			else if (Keyboard.isKeyDown(Keyboard.KEY_UP))
+			{
+				++this.offsetX;
+				player.addChatMessage("[STRUCTURE GEN] Incremented x offset: " + this.offsetX);
 			}
-			else if (Keyboard.isKeyDown(Keyboard.KEY_Y)) {
+			else if (Keyboard.isKeyDown(Keyboard.KEY_DOWN))
+			{
+				--this.offsetX;
+				player.addChatMessage("[STRUCTURE GEN] Decremented x offset: " + this.offsetX);
+			}
+			else if (Keyboard.isKeyDown(Keyboard.KEY_Y))
+			{
 				if (increment) {
 					++this.offsetY;
 					player.addChatMessage("[STRUCTURE GEN] Incremented y offset: " + this.offsetY);
@@ -60,14 +62,15 @@ public class ItemStructureSpawner extends BaseModItem
 					player.addChatMessage("[STRUCTURE GEN] Decremented y offset: " + this.offsetY);
 				}
 			}
-			else if (Keyboard.isKeyDown(Keyboard.KEY_Z)) {
-				if (increment) {
-					++this.offsetZ;
-					player.addChatMessage("[STRUCTURE GEN] Incremented z offset: " + this.offsetZ);
-				} else {
-					--this.offsetZ;
-					player.addChatMessage("[STRUCTURE GEN] Decremented z offset: " + this.offsetZ);
-				}
+			else if (Keyboard.isKeyDown(Keyboard.KEY_RIGHT))
+			{
+				++this.offsetZ;
+				player.addChatMessage("[STRUCTURE GEN] Incremented z offset: " + this.offsetZ);
+			}
+			else if (Keyboard.isKeyDown(Keyboard.KEY_LEFT))
+			{
+				--this.offsetZ;
+				player.addChatMessage("[STRUCTURE GEN] Decremented z offset: " + this.offsetZ);
 			}
 			else if (Keyboard.isKeyDown(Keyboard.KEY_U)) {
 				this.offsetX = this.offsetY = this.offsetZ = 0;
