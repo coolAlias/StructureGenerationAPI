@@ -500,6 +500,26 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 	}
 	
 	/**
+	 * Adds all elements contained in the parameter list to the structure
+	 */
+	public final void addBlockArrayList(List<int[][][][]> list)
+	{
+		this.blockArrayList.addAll(list);
+		if (this.blockArray == null && list.size() > 0)
+			this.blockArray = list.get(0);
+	}
+	
+	/**
+	 * Overwrites current blockArrayList with list provided
+	 */
+	public final void setBlockArrayList(List<int[][][][]> list)
+	{
+		this.blockArrayList.clear();
+		this.blockArrayList.addAll(list);
+		this.blockArray = (list.size() > 0 ? list.get(0) : null);
+	}
+	
+	/**
 	 * Adds a block array 'layer' to the list to be generated
 	 */
 	public final void addBlockArray(int blocks[][][][]) {
@@ -592,10 +612,7 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 			this.offsetZ = -z;
 			break;
 		}
-		//this.offsetX = -(getWidthX() / 2) + x;
 		this.offsetY = 1 + y;
-		//this.offsetZ = 0 + z;
-		LogHelper.log(Level.FINEST, "Default offsetX " + this.offsetX + " for width " + getWidthX());
 	}
 	
 	/**
