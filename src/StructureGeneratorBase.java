@@ -596,16 +596,16 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 	public final void setDefaultOffset(int x, int y, int z) {
 		switch(this.getOriginalFacing()) {
 		case SOUTH:
-			this.offsetZ = -(getWidthZ() / 2) - x;
-			this.offsetX = z;
-			break;
-		case WEST:
-			this.offsetZ = (getWidthX() / 2) + x;
-			this.offsetX = z;
-			break;
-		case NORTH:
 			this.offsetZ = (getWidthZ() / 2) + x;
 			this.offsetX = -z;
+			break;
+		case WEST:
+			this.offsetX = (getWidthX() / 2) + x;
+			this.offsetZ = z;
+			break;
+		case NORTH:
+			this.offsetZ = -(getWidthZ() / 2) - x;
+			this.offsetX = z;
 			break;
 		case EAST:
 			this.offsetX = -(getWidthX() / 2) - x;
@@ -955,13 +955,18 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 	private final void setOffsetFromRotation()
 	{
 		int x, z;
-		
 		// adjust for generating on opposite axis
-		if (this.manualRotations == 1 || this.manualRotations == 3)
-			this.offsetX -= (this.getWidthZ() - this.getWidthX());
+		if (this.isOppositeAxis()) {
+			switch(this.getOriginalFacing()) {
+			case SOUTH: this.offsetZ += (this.getWidthX() - this.getWidthZ()); break;
+			case WEST: this.offsetX += (this.getWidthZ() - this.getWidthX()); break;
+			case NORTH: this.offsetZ -= (this.getWidthX() - this.getWidthZ()); break;
+			case EAST: this.offsetX -= (this.getWidthZ() - this.getWidthX()); break;
+			}
+		}
 		
-		// adjust by one block for one and two rotations
-		this.offsetX -= (this.manualRotations == 2 || this.manualRotations == 3 ? 1 : 0);
+		// adjust by one block for opposite axis
+		this.offsetX -= (this.isOppositeAxis() ? 1 : 0);
 		
 		for (int i = 0; i < this.manualRotations; ++i)
 		{
