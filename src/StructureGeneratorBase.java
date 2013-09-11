@@ -533,13 +533,22 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 	}
 	
 	/**
+	 * Returns the original facing for the structure
+	 */
+	public final int getOriginalFacing() {
+		return (this.structureFacing + (4 - this.manualRotations)) % 4;
+	}
+	
+	/**
+	 * Returns true if the structure has been rotated onto the opposite axis from original
+	 */
+	public final boolean isOppositeAxis() {
+		return getOriginalFacing() % 2 != this.structureFacing % 2;
+	}
+	
+	/**
 	 * Sets the amount by which to offset the structure's generated location in the world.
-	 * -x values will move the structure away from the player, +x towards the player
-	 * +/-z will move the structure to the left/right of the player
-	 * These will auto-adjust based on rotation, so x is always towards or away from player
-	 * @param offX Amount to offset the structure's location towards/away from player
-	 * @param offY Amount to offset the structure's location along the vertical axis
-	 * @param offZ Amount to offset the structure's location left/right of the player
+	 * For advanced users only. Recommended to use setDefaultOffset() methods instead.
 	 */
 	public final void setOffset(int offX, int offY, int offZ) {
 		this.offsetX = offX;
@@ -557,14 +566,36 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 	}
 	
 	/**
-	 * Use this to set the structure's offset to the default, offset by the amounts
-	 * provided as parameters
+	 * Sets offsets such that the structure always generates in front of the player,
+	 * regardless of structure facing, offset by parameters x/y/z.
+	 * NOTE: If your structures y=0 layer has an area smaller than another part of the structure,
+	 * setting default offset will not work correctly.
+	 * @param x Positive value spawns structure further away from player, negative closer to or behind
+	 * @param z Positive value spawns structure more to the right, negative to the left
 	 */
 	public final void setDefaultOffset(int x, int y, int z) {
-		this.offsetX = -(getWidthX()  / 2) + x;
+		switch(this.getOriginalFacing()) {
+		case SOUTH:
+			this.offsetZ = -(getWidthZ() / 2) - x;
+			this.offsetX = z;
+			break;
+		case WEST:
+			this.offsetZ = (getWidthX() / 2) + x;
+			this.offsetX = z;
+			break;
+		case NORTH:
+			this.offsetZ = (getWidthZ() / 2) + x;
+			this.offsetX = -z;
+			break;
+		case EAST:
+			this.offsetX = -(getWidthX() / 2) - x;
+			this.offsetZ = -z;
+			break;
+		}
+		//this.offsetX = -(getWidthX() / 2) + x;
 		this.offsetY = 1 + y;
-		this.offsetZ = 0 + z;
-		System.out.println("[GEN STRUCTURE] Default offsetX " + this.offsetX + " for width " + getWidthX());
+		//this.offsetZ = 0 + z;
+		LogHelper.log(Level.FINEST, "Default offsetX " + this.offsetX + " for width " + getWidthX());
 	}
 	
 	/**
