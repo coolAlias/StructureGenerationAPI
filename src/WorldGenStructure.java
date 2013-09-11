@@ -130,11 +130,12 @@ public class WorldGenStructure extends StructureGeneratorBase
 		case StructureArrays.CUSTOM_SIGNWALL:
 			// An array that stores up to 4 Strings, the max capacity of a sign
 			String[] text = new String[5];
-			// Set different text for each custom sign
+			// Set different text for each custom sign, using different colors
 			if (customData1 == StructureArrays.CUSTOM_SIGN_1)
 			{
 				text[0] = EnumChatFormatting.DARK_RED + "   BEWARE";
 				text[1] = EnumChatFormatting.DARK_RED + "  NO ENTRY";
+				// the following string is too long and will automatically be truncated to the correct length
 				text[2] = EnumChatFormatting.DARK_BLUE + "Enter at your abcdefghijklm";
 				text[3] = EnumChatFormatting.DARK_GRAY + "  own risk.";
 				text[4] = EnumChatFormatting.DARK_GRAY + "CRASH TEST";

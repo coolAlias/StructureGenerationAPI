@@ -4,7 +4,7 @@
  * License. To view a copy of this license, visit http://creativecommons.org/licenses/by-sa/3.0/.
  */
 
-package coolalias.structuregen;
+package coolalias.structuregen.items;
 
 import coolalias.structuregen.ModInfo;
 import cpw.mods.fml.relauncher.Side;

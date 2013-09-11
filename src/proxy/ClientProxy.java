@@ -4,7 +4,8 @@
  * License. To view a copy of this license, visit http://creativecommons.org/licenses/by-sa/3.0/.
  */
 
-package coolalias.structuregen;
+package coolalias.structuregen.proxy;
+
 
 public class ClientProxy extends CommonProxy
 {

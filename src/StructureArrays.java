@@ -6,6 +6,7 @@
 
 package coolalias.structuregen;
 
+import java.util.List;
 import java.util.Random;
 
 import net.minecraft.block.Block;
@@ -26,9 +27,9 @@ public class StructureArrays
 	public static final int CUSTOM_SIGN_1 = 1;
 	
 	/**
-	This file contains a demo and a template structure to illustrate how to go about
-	creating your own. Use this in conjunction with the provided StructureGen mod to
-	test out your creation before adding it to your own mod.
+	This file contains several sample structures as well as a template structure array
+	to illustrate how to go about creating your own. Use this in conjunction with the
+	provided StructureGen mod to test out your creation before adding it to your own mod.
 	*/
 	/**
 	=====================================================================================
@@ -44,7 +45,11 @@ public class StructureArrays
 	Once you have your blockArray(s) set up correctly (see below), you will need to add
 	them to the WorldGenStructure generator's list of arrays to generate.
 	
-	This is done with the method "addBlockArray(int[][][][])"
+	This is done with one of four methods:
+	"addBlockArray(int[][][][])" - adds a blockArray to current list
+	"setBlockArray(int[][][][])" - overwrites current list with provided blockArray
+	"addBlockArrayList(List<int[][][][]>)" - adds a list of blockArrays to current list
+	"setBlockArrayList(List<int[][][][]>)" - overwrites current list with provided list
 	
 	If you have more than one layer, they should be added from the bottom up, so first
 	the base, then the layer on top of the base, and so on until the final topmost layer
@@ -73,6 +78,8 @@ public class StructureArrays
 	
 	- Do nothing:
 				Your structure will probably generate on top of you. You were warned.
+				This, however, wouldn't be a problem if the structure is being generated
+				during world gen and not with an item or block.
 	
 	Negative offX values place the structure further away from the player, +offX will move
 	toward the player. Thinking about inverting this.
@@ -82,7 +89,8 @@ public class StructureArrays
 	"setPlayerFacing(Entity)"
 	
 	This will ensure the structure always orients itself toward the player; important if
-	you put the front door on the structureFacing side.
+	you put the front door on the structureFacing side, but not important if generating
+	the structure during world gen.
 	=======
 	Step 5: ABSOLUTELY REQUIRED! Generate your structure
 	=======
@@ -677,7 +685,7 @@ public class StructureArrays
 				{PAINTING,3} // facing south (since default structure faces EAST, this is the left-hand side)
 			},
 			{ // x = 1 z values:
-				{PAINTING,4,1}, // facing north (since default structure faces EAST, this is the right-hand side)
+				{PAINTING,4}, // facing north (since default structure faces EAST, this is the right-hand side)
 				// if you change the above block to wood, the painting at y=2,x=0,z=0 will work fine
 				{Block.planks.blockID},
 				{Block.bed.blockID,10},
@@ -711,7 +719,7 @@ public class StructureArrays
 				{0}
 			},
 			{ // x = 5 z values:
-				{PAINTING,1},{PAINTING,1,1},{PAINTING,1},{0},{CUSTOM_SIGNWALL,5,CUSTOM_SIGN_1},{0}
+				{0},{PAINTING,1},{PAINTING,1},{0},{CUSTOM_SIGNWALL,5,CUSTOM_SIGN_1},{0}
 			}
 			// note that since we don't spawn anything at x = 6 from here on, we don't need to include it
 			// excluding x=0, however, would cause this entire layer to be out of place
@@ -852,7 +860,7 @@ public class StructureArrays
 				{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
 			},
 			{//x = 7
-				{},{},{},{},{},{},{RANDOM_HOLE,1,Block.stairsCobblestone.blockID},{RANDOM_HOLE,1,Block.stairsCobblestone.blockID},{RANDOM_HOLE,1,Block.stairsCobblestone.blockID},{}
+				{},{},{},{},{},{},{Block.stairsCobblestone.blockID,1},{Block.stairsCobblestone.blockID,1},{Block.stairsCobblestone.blockID,1},{}
 			}
 		},
 		{//y = 1
@@ -1481,7 +1489,7 @@ public class StructureArrays
 	public static final int[][][][] blockArrayShop =
 	{
 		{//y = 0
-			{//x = 0
+			{ //x = 0
 				{Block.grass.blockID},
 				{Block.grass.blockID},
 				{Block.grass.blockID},
@@ -1494,7 +1502,7 @@ public class StructureArrays
 				{Block.grass.blockID},
 				{Block.grass.blockID}
 			},
-			{//x = 1
+			{ //x = 1
 				{Block.grass.blockID},
 				{Block.dirt.blockID},
 				{Block.dirt.blockID},
@@ -1507,7 +1515,7 @@ public class StructureArrays
 				{Block.dirt.blockID},
 				{Block.grass.blockID}
 			},
-			{//x = 2
+			{ //x = 2
 				{Block.dirt.blockID},
 				{Block.dirt.blockID},
 				{RANDOM_HOLE,1,Block.wood.blockID},
@@ -1520,7 +1528,7 @@ public class StructureArrays
 				{Block.dirt.blockID},
 				{Block.dirt.blockID}
 			},
-			{//x = 3
+			{ //x = 3
 				{RANDOM_HOLE,0,Block.wood.blockID},
 				{Block.dirt.blockID},
 				{RANDOM_HOLE,1,Block.wood.blockID},
@@ -1533,7 +1541,7 @@ public class StructureArrays
 				{Block.dirt.blockID},
 				{RANDOM_HOLE,0,Block.wood.blockID}
 			},
-			{//x = 4
+			{ //x = 4
 				{RANDOM_HOLE,0,Block.wood.blockID},
 				{Block.dirt.blockID},
 				{RANDOM_HOLE,1,Block.wood.blockID},
@@ -1546,7 +1554,7 @@ public class StructureArrays
 				{RANDOM_HOLE,0,Block.cobblestone.blockID,3},
 				{RANDOM_HOLE,0,Block.wood.blockID}
 			},
-			{//x = 5
+			{ //x = 5
 				{RANDOM_HOLE,0,Block.wood.blockID},
 				{Block.dirt.blockID},
 				{RANDOM_HOLE,1,Block.wood.blockID},
@@ -1559,7 +1567,7 @@ public class StructureArrays
 				{Block.dirt.blockID},
 				{RANDOM_HOLE,0,Block.wood.blockID}
 			},
-			{//x = 6
+			{ //x = 6
 				{Block.dirt.blockID},
 				{Block.dirt.blockID},
 				{RANDOM_HOLE,1,Block.wood.blockID},
@@ -1572,7 +1580,7 @@ public class StructureArrays
 				{Block.dirt.blockID},
 				{Block.dirt.blockID}
 			},
-			{//x = 7
+			{ //x = 7
 				{Block.grass.blockID},
 				{Block.dirt.blockID},
 				{Block.dirt.blockID},
@@ -1585,7 +1593,7 @@ public class StructureArrays
 				{Block.dirt.blockID},
 				{Block.grass.blockID}
 			},
-			{//x = 8
+			{ //x = 8
 				{Block.grass.blockID},
 				{Block.grass.blockID},
 				{Block.grass.blockID},
@@ -1599,8 +1607,8 @@ public class StructureArrays
 				{Block.grass.blockID}
 			}
 		},
-		{//y = 1
-			{//x = 0
+		{ //y = 1
+			{ //x = 0
 				{0},
 				{RANDOM_HOLE,0,Block.stairsWoodSpruce.blockID,0},
 				{RANDOM_HOLE,0,Block.stairsWoodSpruce.blockID,4},
@@ -1724,19 +1732,19 @@ public class StructureArrays
 			},
 			{//x = 1
 				{0},
-				{RANDOM_HOLE,1,Block.stairsWoodSpruce.blockID,0},
+				{RANDOM_HOLE,0,Block.stairsWoodSpruce.blockID,0},
 				{Block.fence.blockID},
 				{0},
 				{Block.fence.blockID},
-				{RANDOM_HOLE,1,Block.stairsWoodSpruce.blockID,0},
-				{RANDOM_HOLE,1,Block.stairsWoodSpruce.blockID,0},
+				{RANDOM_HOLE,0,Block.stairsWoodSpruce.blockID,0},
+				{RANDOM_HOLE,0,Block.stairsWoodSpruce.blockID,0},
 				{Block.doorWood.blockID, 10},
-				{RANDOM_HOLE,1,Block.stairsWoodSpruce.blockID,0},
-				{RANDOM_HOLE,1,Block.stairsWoodSpruce.blockID,0},
+				{RANDOM_HOLE,0,Block.stairsWoodSpruce.blockID,0},
+				{RANDOM_HOLE,0,Block.stairsWoodSpruce.blockID,0},
 				{0}
 			},
 			{//x = 2
-				{Block.stairsWoodSpruce.blockID},
+				{RANDOM_HOLE,0,Block.stairsWoodSpruce.blockID,0},
 				{RANDOM_HOLE,1,Block.wood.blockID},
 				{0},
 				{0},
@@ -1746,7 +1754,7 @@ public class StructureArrays
 				{0},
 				{0},
 				{RANDOM_HOLE,1,Block.wood.blockID},
-				{Block.stairsWoodSpruce.blockID,0}
+				{RANDOM_HOLE,0,Block.stairsWoodSpruce.blockID,00}
 			},
 			{//x = 3
 				{RANDOM_HOLE,0,Block.wood.blockID},
@@ -2016,334 +2024,370 @@ public class StructureArrays
 	};
 	
 	public static final int[][][][] blockArrayRedstone =
+	{
+		{ // y = 0
+			{ // x = 0
+				{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},
+				{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
+			},
+			{ // x = 1
+				{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},
+				{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
+			},
+			{ // x = 2
+				{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},
+				{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
+			},
+			{ // x = 3
+				{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},
+				{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
+			},
+			{ // x = 4
+				{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},
+				{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
+			},
+			{ // x = 5
+				{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},
+				{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
+			},
+			{ // x = 6
+				{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},
+				{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
+			},
+			{ // x = 7
+				{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.lavaStill.blockID},
+				{Block.lavaStill.blockID},{Block.lavaStill.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
+			},
+			{ // x = 8
+				{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.lavaStill.blockID},
+				{Block.lavaStill.blockID},{Block.lavaStill.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
+			},
+			{ // x = 9
+				{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.lavaStill.blockID},
+				{Block.lavaStill.blockID},{Block.lavaStill.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
+			},
+			{ // x = 10
+				{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},
+				{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
+			},
+			{ // x = 11
+				{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},
+				{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
+			}
+		},
+		{ // y = 1
+			{ // x = 0
+				{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},
+				{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
+			},
+			{ // x = 1
+				{Block.cobblestone.blockID},{0},{0},{Block.cobblestone.blockID},{0},{0},{0},{Block.cobblestone.blockID}
+			},
+			{ // x = 2
+				{Block.cobblestone.blockID},{0},{0},{Block.redstoneWire.blockID},{0},{0},{0},{Block.cobblestone.blockID}
+			},
+			{ // x = 3
+				{Block.cobblestone.blockID},{0},{0},{Block.redstoneWire.blockID},{0},{0},{0},{Block.cobblestone.blockID}
+			},
+			{ // x = 4
+				{Block.cobblestone.blockID},{0},{0},{Block.torchRedstoneActive.blockID,2},{0},{0},{0},{Block.cobblestone.blockID}
+			},
+			{ // x = 5
+				{Block.cobblestone.blockID},{0},{0},{Block.cobblestone.blockID},{0},{0},{0},{Block.cobblestone.blockID}
+			},
+			{ // x = 6
+				{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.redstoneWire.blockID},
+				{0},{0},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
+			},
+			{ // x = 7
+				{Block.cobblestone.blockID},{0},{0},{0},{0},{0},{0},{Block.cobblestone.blockID}
+			},
+			{ // x = 8
+				{Block.cobblestone.blockID},{0},{0},{0},{0},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
+			},
+			{ // x = 9
+				{Block.cobblestone.blockID},{0},{0},{0},{0},{0},{0},{Block.stairsCobblestone.blockID,3}
+			},
+			{ // x = 10
+				{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},
+				{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.stairsCobblestone.blockID,3}
+			},
+			{ // x = 11
+				{0},{0},{0},{0},{0},{0},{Block.torchWood.blockID,1},{0}
+			}
+		},
+		{ // y = 2
+			{ // x = 0
+				{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},
+				{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
+			},
+			{ // x = 1
+				{Block.cobblestone.blockID},{0},{0},{Block.redstoneWire.blockID},{0},{0},{0},{Block.cobblestone.blockID}
+			},
+			{ // x = 2
+				{Block.cobblestone.blockID},{0},{0},{0},{0},{0},{0},{Block.cobblestone.blockID}
+			},
+			{ // x = 3
+				{Block.cobblestone.blockID},{0},{0},{0},{0},{0},{0},{Block.cobblestone.blockID}
+			},
+			{ // x = 4
+				{Block.cobblestone.blockID},{0},{0},{0},{0},{0},{0},{Block.cobblestone.blockID}
+			},
+			{ // x = 5
+				{Block.cobblestone.blockID},{0},{0},{Block.redstoneWire.blockID},{0},{0},{0},{Block.cobblestone.blockID}
+			},
+			{ // x = 6
+				{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.redstoneWire.blockID},{0},
+				{0},{0},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
+			},
+			{ // x = 7
+				{Block.cobblestone.blockID},{0},{0},{0},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
+			},
+			{ // x = 8
+				{Block.cobblestone.blockID},{0},{0},{Block.cobblestone.blockID},{0},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
+			},
+			{ // x = 9
+				{Block.cobblestone.blockID},{0},{0},{0},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.stairsCobblestone.blockID,3},{0}
+			},
+			{ // x = 10
+				{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},
+				{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.stairsCobblestone.blockID,3},{0}
+			},
+			{ // x = 11
+				{0},{0},{0},{0},{0},{Block.torchWood.blockID,1},{0},{0}
+			}
+		},
+		{ // y = 3
+			{ // x = 0
+				{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.redstoneWire.blockID},
+				{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
+			},
+			{ // x = 1
+				{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{0},
+				{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
+			},
+			{ // x = 2
+				{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},
+				{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
+			},
+			{ // x = 3
+				{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},
+				{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
+			},
+			{ // x = 4
+				{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},
+				{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
+			},
+			{ // x = 5
+				{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},
+				{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
+			},
+			{ // x = 6
+				{Block.cobblestone.blockID},{Block.redstoneWire.blockID},{0},{Block.cobblestone.blockID},
+				{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
+			},
+			{ // x = 7
+				{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},
+				{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
+			},
+			{ // x = 8
+				{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},
+				{0},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
+			},
+			{ // x = 9
+				{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},
+				{Block.cobblestone.blockID},{Block.stairsCobblestone.blockID,3},{0},{0}
+			},
+			{ // x = 10
+				{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},
+				{Block.cobblestone.blockID},{Block.stairsCobblestone.blockID,3},{0},{0}
+			},
+			{ // x = 11
+				{0},{0},{0},{0},{Block.torchWood.blockID,1},{0},{0},{0}
+			}
+		},
+		{ // y = 4
+			{ // x = 0
+				{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{0},
+				{Block.redstoneWire.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
+			},
+			{ // x = 1
+				{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},
+				{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
+			},
+			{ // x = 2
+				{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},
+				{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
+			},
+			{ // x = 3
+				{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},
+				{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
+			},
+			{ // x = 4
+				{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},
+				{Block.pistonStickyBase.blockID,5},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
+			},
+			{ // x = 5
+				{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},
+				{0},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
+			},
+			{ // x = 6
+				{Block.cobblestone.blockID},{0},{Block.cobblestone.blockID},{Block.cobblestone.blockID},
+				{Block.pistonStickyBase.blockID,5},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
+			},
+			{ // x = 7
+				{Block.redstoneWire.blockID},{Block.redstoneWire.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},
+				{0},{0},{CUSTOM_CHEST,2,CUSTOM_CHEST_1},{Block.cobblestone.blockID}
+			},
+			{ // x = 8
+				{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},
+				{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
+			},
+			{ // x = 9
+				{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},
+				{0},{0},{0},{Block.torchWood.blockID,1}
+			},
+			{ // x = 10
+				{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},
+				{0},{0},{0},{0}
+			},
+			{ // x = 11
+				{0},{0},{0},{Block.torchWood.blockID,1},{0},{0},{0},{0}
+			}
+		},
+		{ // y = 5
+			{ // x = 0
+				{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},
+				{0},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
+			},
+			{ // x = 1
+				{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},
+				{Block.redstoneWire.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
+			},
+			{ // x = 2
+				{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.redstoneWire.blockID},{Block.redstoneWire.blockID},
+				{Block.redstoneWire.blockID},{Block.redstoneWire.blockID},{Block.redstoneWire.blockID},{Block.cobblestone.blockID}
+			},
+			{ // x = 3
+				{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.redstoneWire.blockID},{Block.cobblestone.blockID},
+				{Block.redstoneWire.blockID},{Block.cobblestone.blockID},{Block.redstoneRepeaterActive.blockID,9},{Block.cobblestone.blockID}
+			},
+			{ // x = 4
+				{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.redstoneWire.blockID},{Block.cobblestone.blockID},
+				{Block.pistonStickyBase.blockID,5},{Block.redstoneRepeaterActive.blockID,0},{Block.redstoneWire.blockID},{Block.cobblestone.blockID}
+			},
+			{ // x = 5
+				{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.redstoneWire.blockID},{Block.cobblestone.blockID},
+				{0},{Block.redstoneRepeaterActive.blockID,12},{Block.redstoneWire.blockID},{Block.cobblestone.blockID}
+			},
+			{ // x = 6
+				{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.redstoneWire.blockID},{Block.redstoneRepeaterActive.blockID,6},
+				{Block.pistonStickyBase.blockID,5},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
+			},
+			{ // x = 7
+				{0},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},
+				{0},{Block.torchWood.blockID,2},{0},{Block.cobblestone.blockID}
+			},
+			{ // x = 8
+				{Block.redstoneWire.blockID},{Block.redstoneWire.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},
+				{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
+			},
+			{ // x = 9
+				{Block.cobblestone.blockID},{Block.redstoneWire.blockID},{Block.redstoneWire.blockID},{Block.cobblestone.blockID},
+				{Block.lever.blockID,3},{0},{0},{0}
+			},
+			{ // x = 10
+				{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},
+				{0},{0},{0},{0}
+			},
+			{ // x = 11
+				{0},{0},{Block.torchWood.blockID,1},{0},{0},{0},{0},{0}
+			}
+		},
+		{ // y = 6
+			{ // x = 0
+				{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},
+				{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
+			},
+			{ // x = 1
+				{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},
+				{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
+			},
+			{ // x = 2
+				{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},
+				{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
+			},
+			{ // x = 3
+				{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},
+				{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
+			},
+			{ // x = 4
+				{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},
+				{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
+			},
+			{ // x = 5
+				{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},
+				{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
+			},
+			{ // x = 6
+				{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},
+				{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
+			},
+			{ // x = 7
+				{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},
+				{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
+			},
+			{ // x = 8
+				{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},
+				{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
+			},
+			{ // x = 9
+				{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},
+				{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
+			},
+			{ // x = 10
+				{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},
+				{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
+			},
+			{ // x = 11
+				{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},
+				{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
+			}
+		}
+	};
+	
+	public static final int[][][][] blockArrayOffsetTest1 = 
+	{
+		{ // y = 0
+			{ // x = 0
+				{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
+			},
+			{ // x = 1
+				{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
+			},
+			{ // x = 2
+				{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
+			},
+			{ // x = 3
+				{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
+			},
+			{ // x = 4
+				{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
+			}
+		}
+	};
+	
+	public static final int[][][][] blockArrayOffsetTest2 = 
 		{
 			{ // y = 0
 				{ // x = 0
-					{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},
-					{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
+					{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
 				},
 				{ // x = 1
-					{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},
-					{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
+					{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
 				},
 				{ // x = 2
-					{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},
-					{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
-				},
-				{ // x = 3
-					{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},
-					{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
-				},
-				{ // x = 4
-					{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},
-					{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
-				},
-				{ // x = 5
-					{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},
-					{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
-				},
-				{ // x = 6
-					{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},
-					{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
-				},
-				{ // x = 7
-					{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.lavaStill.blockID},
-					{Block.lavaStill.blockID},{Block.lavaStill.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
-				},
-				{ // x = 8
-					{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.lavaStill.blockID},
-					{Block.lavaStill.blockID},{Block.lavaStill.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
-				},
-				{ // x = 9
-					{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.lavaStill.blockID},
-					{Block.lavaStill.blockID},{Block.lavaStill.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
-				},
-				{ // x = 10
-					{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},
-					{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
-				},
-				{ // x = 11
-					{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},
-					{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
-				}
-			},
-			{ // y = 1
-				{ // x = 0
-					{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},
-					{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
-				},
-				{ // x = 1
-					{Block.cobblestone.blockID},{0},{0},{Block.cobblestone.blockID},{0},{0},{0},{Block.cobblestone.blockID}
-				},
-				{ // x = 2
-					{Block.cobblestone.blockID},{0},{0},{Block.redstoneWire.blockID},{0},{0},{0},{Block.cobblestone.blockID}
-				},
-				{ // x = 3
-					{Block.cobblestone.blockID},{0},{0},{Block.redstoneWire.blockID},{0},{0},{0},{Block.cobblestone.blockID}
-				},
-				{ // x = 4
-					{Block.cobblestone.blockID},{0},{0},{Block.torchRedstoneActive.blockID,2},{0},{0},{0},{Block.cobblestone.blockID}
-				},
-				{ // x = 5
-					{Block.cobblestone.blockID},{0},{0},{Block.cobblestone.blockID},{0},{0},{0},{Block.cobblestone.blockID}
-				},
-				{ // x = 6
-					{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.redstoneWire.blockID},
-					{0},{0},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
-				},
-				{ // x = 7
-					{Block.cobblestone.blockID},{0},{0},{0},{0},{0},{0},{Block.cobblestone.blockID}
-				},
-				{ // x = 8
-					{Block.cobblestone.blockID},{0},{0},{0},{0},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
-				},
-				{ // x = 9
-					{Block.cobblestone.blockID},{0},{0},{0},{0},{0},{0},{Block.stairsCobblestone.blockID,3}
-				},
-				{ // x = 10
-					{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},
-					{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.stairsCobblestone.blockID,3}
-				},
-				{ // x = 11
-					{0},{0},{0},{0},{0},{0},{Block.torchWood.blockID,1},{0}
-				}
-			},
-			{ // y = 2
-				{ // x = 0
-					{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},
-					{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
-				},
-				{ // x = 1
-					{Block.cobblestone.blockID},{0},{0},{Block.redstoneWire.blockID},{0},{0},{0},{Block.cobblestone.blockID}
-				},
-				{ // x = 2
-					{Block.cobblestone.blockID},{0},{0},{0},{0},{0},{0},{Block.cobblestone.blockID}
-				},
-				{ // x = 3
-					{Block.cobblestone.blockID},{0},{0},{0},{0},{0},{0},{Block.cobblestone.blockID}
-				},
-				{ // x = 4
-					{Block.cobblestone.blockID},{0},{0},{0},{0},{0},{0},{Block.cobblestone.blockID}
-				},
-				{ // x = 5
-					{Block.cobblestone.blockID},{0},{0},{Block.redstoneWire.blockID},{0},{0},{0},{Block.cobblestone.blockID}
-				},
-				{ // x = 6
-					{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.redstoneWire.blockID},{0},
-					{0},{0},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
-				},
-				{ // x = 7
-					{Block.cobblestone.blockID},{0},{0},{0},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
-				},
-				{ // x = 8
-					{Block.cobblestone.blockID},{0},{0},{Block.cobblestone.blockID},{0},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
-				},
-				{ // x = 9
-					{Block.cobblestone.blockID},{0},{0},{0},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.stairsCobblestone.blockID,3},{0}
-				},
-				{ // x = 10
-					{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},
-					{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.stairsCobblestone.blockID,3},{0}
-				},
-				{ // x = 11
-					{0},{0},{0},{0},{0},{Block.torchWood.blockID,1},{0},{0}
-				}
-			},
-			{ // y = 3
-				{ // x = 0
-					{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.redstoneWire.blockID},
-					{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
-				},
-				{ // x = 1
-					{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{0},
-					{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
-				},
-				{ // x = 2
-					{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},
-					{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
-				},
-				{ // x = 3
-					{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},
-					{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
-				},
-				{ // x = 4
-					{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},
-					{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
-				},
-				{ // x = 5
-					{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},
-					{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
-				},
-				{ // x = 6
-					{Block.cobblestone.blockID},{Block.redstoneWire.blockID},{0},{Block.cobblestone.blockID},
-					{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
-				},
-				{ // x = 7
-					{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},
-					{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
-				},
-				{ // x = 8
-					{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},
-					{0},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
-				},
-				{ // x = 9
-					{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},
-					{Block.cobblestone.blockID},{Block.stairsCobblestone.blockID,3},{0},{0}
-				},
-				{ // x = 10
-					{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},
-					{Block.cobblestone.blockID},{Block.stairsCobblestone.blockID,3},{0},{0}
-				},
-				{ // x = 11
-					{0},{0},{0},{0},{Block.torchWood.blockID,1},{0},{0},{0}
-				}
-			},
-			{ // y = 4
-				{ // x = 0
-					{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{0},
-					{Block.redstoneWire.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
-				},
-				{ // x = 1
-					{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},
-					{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
-				},
-				{ // x = 2
-					{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},
-					{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
-				},
-				{ // x = 3
-					{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},
-					{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
-				},
-				{ // x = 4
-					{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},
-					{Block.pistonStickyBase.blockID,5},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
-				},
-				{ // x = 5
-					{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},
-					{0},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
-				},
-				{ // x = 6
-					{Block.cobblestone.blockID},{0},{Block.cobblestone.blockID},{Block.cobblestone.blockID},
-					{Block.pistonStickyBase.blockID,5},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
-				},
-				{ // x = 7
-					{Block.redstoneWire.blockID},{Block.redstoneWire.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},
-					{0},{0},{CUSTOM_CHEST,2,CUSTOM_CHEST_1},{Block.cobblestone.blockID}
-				},
-				{ // x = 8
-					{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},
-					{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
-				},
-				{ // x = 9
-					{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},
-					{0},{0},{0},{Block.torchWood.blockID,1}
-				},
-				{ // x = 10
-					{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},
-					{0},{0},{0},{0}
-				},
-				{ // x = 11
-					{0},{0},{0},{Block.torchWood.blockID,1},{0},{0},{0},{0}
-				}
-			},
-			{ // y = 5
-				{ // x = 0
-					{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},
-					{0},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
-				},
-				{ // x = 1
-					{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},
-					{Block.redstoneWire.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
-				},
-				{ // x = 2
-					{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.redstoneWire.blockID},{Block.redstoneWire.blockID},
-					{Block.redstoneWire.blockID},{Block.redstoneWire.blockID},{Block.redstoneWire.blockID},{Block.cobblestone.blockID}
-				},
-				{ // x = 3
-					{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.redstoneWire.blockID},{Block.cobblestone.blockID},
-					{Block.redstoneWire.blockID},{Block.cobblestone.blockID},{Block.redstoneRepeaterActive.blockID,9},{Block.cobblestone.blockID}
-				},
-				{ // x = 4
-					{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.redstoneWire.blockID},{Block.cobblestone.blockID},
-					{Block.pistonStickyBase.blockID,5},{Block.redstoneRepeaterActive.blockID,0},{Block.redstoneWire.blockID},{Block.cobblestone.blockID}
-				},
-				{ // x = 5
-					{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.redstoneWire.blockID},{Block.cobblestone.blockID},
-					{0},{Block.redstoneRepeaterActive.blockID,12},{Block.redstoneWire.blockID},{Block.cobblestone.blockID}
-				},
-				{ // x = 6
-					{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.redstoneWire.blockID},{Block.redstoneRepeaterActive.blockID,6},
-					{Block.pistonStickyBase.blockID,5},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
-				},
-				{ // x = 7
-					{0},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},
-					{0},{Block.torchWood.blockID,2},{0},{Block.cobblestone.blockID}
-				},
-				{ // x = 8
-					{Block.redstoneWire.blockID},{Block.redstoneWire.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},
-					{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
-				},
-				{ // x = 9
-					{Block.cobblestone.blockID},{Block.redstoneWire.blockID},{Block.redstoneWire.blockID},{Block.cobblestone.blockID},
-					{Block.lever.blockID,3},{0},{0},{0}
-				},
-				{ // x = 10
-					{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},
-					{0},{0},{0},{0}
-				},
-				{ // x = 11
-					{0},{0},{Block.torchWood.blockID,1},{0},{0},{0},{0},{0}
-				}
-			},
-			{ // y = 6
-				{ // x = 0
-					{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},
-					{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
-				},
-				{ // x = 1
-					{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},
-					{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
-				},
-				{ // x = 2
-					{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},
-					{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
-				},
-				{ // x = 3
-					{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},
-					{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
-				},
-				{ // x = 4
-					{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},
-					{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
-				},
-				{ // x = 5
-					{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},
-					{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
-				},
-				{ // x = 6
-					{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},
-					{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
-				},
-				{ // x = 7
-					{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},
-					{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
-				},
-				{ // x = 8
-					{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},
-					{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
-				},
-				{ // x = 9
-					{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},
-					{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
-				},
-				{ // x = 10
-					{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},
-					{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
-				},
-				{ // x = 11
-					{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},
-					{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
+					{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
 				}
 			}
 		};

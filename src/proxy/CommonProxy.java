@@ -4,7 +4,7 @@
  * License. To view a copy of this license, visit http://creativecommons.org/licenses/by-sa/3.0/.
  */
 
-package coolalias.structuregen;
+package coolalias.structuregen.proxy;
 
 import cpw.mods.fml.common.network.IGuiHandler;
 import net.minecraft.entity.player.EntityPlayer;

@@ -8,6 +8,9 @@ package coolalias.structuregen;
 
 import java.io.File;
 
+import coolalias.structuregen.items.ItemStructureSpawner;
+import coolalias.structuregen.lib.LogHelper;
+import coolalias.structuregen.proxy.CommonProxy;
 import net.minecraft.item.Item;
 import net.minecraftforge.common.Configuration;
 import cpw.mods.fml.common.Mod;
@@ -23,10 +26,10 @@ import cpw.mods.fml.common.registry.LanguageRegistry;
 @Mod(modid = ModInfo.MOD_ID, name = ModInfo.MOD_NAME, version = ModInfo.VERSION)
 @NetworkMod(clientSideRequired=true, serverSideRequired=false)
 
-public class StructureGen
+public class StructureGenMain
 {
 	@Instance(ModInfo.MOD_ID)
-	public static StructureGen instance = new StructureGen();
+	public static StructureGenMain instance = new StructureGenMain();
 	
 	@SidedProxy(clientSide = ModInfo.CLIENT_PROXY, serverSide = ModInfo.COMMON_PROXY)
 	public static CommonProxy proxy;
@@ -39,6 +42,7 @@ public class StructureGen
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event)
 	{
+		LogHelper.init();
 		Configuration config = new Configuration(new File(event.getModConfigurationDirectory().getAbsolutePath() + "/StructureGenMod.cfg"));
         config.load();
         modItemIndex = config.getItem("modItemIndex", MOD_ITEM_INDEX_DEFAULT).getInt() - 256;
