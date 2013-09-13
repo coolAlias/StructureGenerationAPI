@@ -6,6 +6,9 @@
 
 package coolalias.structuregen;
 
+import java.util.logging.Level;
+
+import coolalias.structuregen.lib.LogHelper;
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.monster.EntityZombie;
@@ -91,8 +94,9 @@ public class WorldGenStructure extends StructureGeneratorBase
 			value_set = true;
 		}
 		int meta = world.getBlockMetadata(x, y, z);
-		System.out.println("[CUSTOM BLOCK ADDED] metadata = " + meta);
-		System.out.println("[GEN STRUCTURE] Setting custom block info for fake id " + fakeID + " and customData1 " + customData1);
+		LogHelper.log(Level.FINE, "Setting custom block info for fake id " + fakeID + " and customData1 " + customData1);
+		LogHelper.log(Level.FINEST, "Custom block metadata from world = " + meta);
+		
 		switch(fakeID) {
 		case StructureArrays.CUSTOM_CHEST:
 			// Using the pre-made method addItemToTileInventory adds items to the first slot available
@@ -185,13 +189,13 @@ public class WorldGenStructure extends StructureGeneratorBase
 			// here I'm using customData as the villagerID
 			Entity bob = new EntityVillager(world, customData1);
 			//Entity X = new EntityHorse(world);
+			//((EntityHorse) X).func_110235_q(1026);
 			
 			// Now use the preset method to avoid spawning in walls
 			spawnEntityInStructure(world, bob, x, y, z);
 			break;
 		default:
-			System.out.println("[GEN STRUCTURE] No custom method defined for this id.");
+			LogHelper.log(Level.WARNING, "No custom method defined for id " + fakeID);
 		}
 	}
-
 }

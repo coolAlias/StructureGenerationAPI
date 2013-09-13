@@ -85,7 +85,7 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 	
 	/**
 	 * Basic constructor. Sets generator to notify other blocks of blocks it changes.
-     	*/
+     */
 	public StructureGeneratorBase() {
 		super(true);
 	}
@@ -622,7 +622,10 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 			this.offsetZ = -z;
 			break;
 		}
+		//this.offsetX = -(getWidthX() / 2) + x;
 		this.offsetY = 1 + y;
+		//this.offsetZ = 0 + z;
+		LogHelper.log(Level.FINEST, "Default offsetX " + this.offsetX + " for width " + getWidthX());
 	}
 	
 	/**
@@ -670,32 +673,37 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 	public final boolean generate(World world, Random random, int posX, int posY, int posZ)
 	{
 		if (world.isRemote || !canGenerate()) { return false; }
-		
+		// only time generated = false is if removing structure at incorrect location
+		boolean generated = true;
 		int rotations = ((this.isOppositeAxis() ? this.structureFacing + 2 : this.structureFacing) + this.facing) % 4;
 		
 		setOffsetFromRotation();
 		
 		Iterator iterator = blockArrayList.iterator();
-		while (iterator.hasNext())
+		while (iterator.hasNext() && generated)
 		{
 			this.blockArray = (int[][][][]) iterator.next();
-			generateLayer(world, random, posX, posY, posZ, rotations);
+			generated = generateLayer(world, random, posX, posY, posZ, rotations);
 			this.offsetY += this.blockArray.length;
 		}
 		
-		doPostGenProcessing(world);
+		if (generated)
+			doPostGenProcessing(world);
 		
 		reset();
 		
-		return true;
+		return generated;
 	}
-
+	
 	/**
 	 * Custom 'generate' method that generates a single 'layer' from the list of blockArrays
 	 */
 	private final boolean generateLayer(World world, Random random, int posX, int posY, int posZ, int rotations)
 	{
 		int centerX = blockArray[0].length / 2, centerZ = blockArray[0][0].length / 2;
+		// does center need to be calculated each time? What if first index isn't true size of structure?
+		// It seems to work both ways, so for now, use the one with fewest computations
+		// int centerX, centerZ;
 
 		for (int y = (this.removeStructure ? blockArray.length - 1 : 0); (this.removeStructure ? y >= 0 : y < blockArray.length); y = (this.removeStructure ? --y : ++y))
 		{
@@ -766,6 +774,7 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 								meta = 0;
 							else if (blockRotationData.containsKey(realID))
 								meta = getMetadata(Math.abs(realID), meta, facing);
+							//else {} // leave metadata alone
 
 							// Get color data for wool blocks
 							int flag = (Math.abs(realID) == Block.cloth.blockID ? customData1 : 2);
@@ -879,10 +888,7 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 		// No rotational metadata value associated with this block, return
 		if (blockRotationData.get(id) == null) return 0;
 		
-		// original:
-		// int rotation = (((this.structureFacing == NORTH || this.structureFacing == SOUTH) ? this.structureFacing + 2 : this.structureFacing) + this.facing) % 4;
-		// should use manualRotation
-		int rotation = (((this.manualRotations == 1 || this.manualRotations == 3) ? this.structureFacing + 2 : this.structureFacing) + this.facing) % 4;
+		int rotation = ((this.isOppositeAxis() ? this.structureFacing + 2 : this.structureFacing) + this.facing) % 4;
 		
 		int meta = origMeta, bitface, tickDelay = meta >> 2, bit9 = meta >> 3,
 			bit4 = meta & 4, bit8 = meta & 8, extra = meta & ~3;
@@ -960,18 +966,6 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 	private final void setOffsetFromRotation()
 	{
 		int x, z;
-		// adjust for generating on opposite axis
-		if (this.isOppositeAxis()) {
-			switch(this.getOriginalFacing()) {
-			case SOUTH: this.offsetZ += (this.getWidthX() - this.getWidthZ()); break;
-			case WEST: this.offsetX += (this.getWidthZ() - this.getWidthX()); break;
-			case NORTH: this.offsetZ -= (this.getWidthX() - this.getWidthZ()); break;
-			case EAST: this.offsetX -= (this.getWidthZ() - this.getWidthX()); break;
-			}
-		}
-		
-		// adjust by one block for opposite axis
-		this.offsetX -= (this.isOppositeAxis() ? 1 : 0);
 		
 		for (int i = 0; i < this.manualRotations; ++i)
 		{
@@ -1017,6 +1011,17 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 		}
 		
 		return AxisAlignedBB.getBoundingBox(minX, (double) y, minZ, maxX, (double) y + 1, maxZ);
+	}
+	
+	/**
+	 * Resets data for next structure: blockArray, blockArrayList, offsets
+	 */
+	private final void reset()
+	{
+		this.blockArrayList.clear();
+		this.blockArray = null;
+		//this.offsetX = this.offsetY = this.offsetZ = 0;
+		// this.manualRotations = 0; // will need to save this for multiple structure generation
 	}
 	
 	/** Set rotation data for vanilla blocks */

@@ -502,53 +502,53 @@ public class StructureArrays
 			}
 		}
 	};
-	/*
+	
 	public static final int[][][][] blockArraySpawnTest =
-		{
-			{ // y = 0
-				{ // x = 0
-					{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
-				},
-				{ // x = 1
-					{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
-				},
-				{ // x = 2
-					{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
-				},
-				{ // x = 3
-					{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
-				}
+	{
+		{ // y = 0
+			{ // x = 0
+				{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
 			},
-			{ // y = 1
-				{ // x = 0
-					{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
-				},
-				{ // x = 1
-					{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
-				},
-				{ // x = 2
-					{Block.cobblestone.blockID},{SPAWN_VILLAGER},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
-				},
-				{ // x = 3
-					{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
-				}
+			{ // x = 1
+				{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
 			},
-			{ // y = 2
-				{ // x = 0
-					{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
-				},
-				{ // x = 1
-					{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
-				},
-				{ // x = 2
-					{Block.cobblestone.blockID},{0},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
-				},
-				{ // x = 3
-					{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
-				}
+			{ // x = 2
+				{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
+			},
+			{ // x = 3
+				{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
 			}
-		};
-	*/
+		},
+		{ // y = 1
+			{ // x = 0
+				{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
+			},
+			{ // x = 1
+				{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
+			},
+			{ // x = 2
+				{Block.cobblestone.blockID},{SPAWN_VILLAGER},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
+			},
+			{ // x = 3
+				{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
+			}
+		},
+		{ // y = 2
+			{ // x = 0
+				{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
+			},
+			{ // x = 1
+				{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
+			},
+			{ // x = 2
+				{Block.cobblestone.blockID},{0},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
+			},
+			{ // x = 3
+				{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
+			}
+		}
+	};
+	
 	/**
 	 * Here is my demo structure, a showcase NPC Hut. Dimensions: 7x6 base, 8 blocks high.
 	 * Uses lots of different kinds of blocks and metadata to demonstrate them in use.

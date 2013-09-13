@@ -9,6 +9,7 @@ package coolalias.structuregen;
 import java.io.File;
 
 import coolalias.structuregen.items.ItemStructureSpawner;
+import coolalias.structuregen.lib.KeyBindSGT;
 import coolalias.structuregen.lib.LogHelper;
 import coolalias.structuregen.proxy.CommonProxy;
 import net.minecraft.item.Item;
@@ -46,6 +47,7 @@ public class StructureGenMain
 		Configuration config = new Configuration(new File(event.getModConfigurationDirectory().getAbsolutePath() + "/StructureGenMod.cfg"));
         config.load();
         modItemIndex = config.getItem("modItemIndex", MOD_ITEM_INDEX_DEFAULT).getInt() - 256;
+        KeyBindSGT.init(config);
         config.save();
 	}
 	
@@ -60,6 +62,5 @@ public class StructureGenMain
 	@EventHandler
 	public void postInit(FMLPostInitializationEvent event)
 	{
-		
 	}
 }
