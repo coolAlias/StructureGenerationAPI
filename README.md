@@ -56,7 +56,7 @@ DEMO MOD INCLUDED
 A ready-to-go mod that will help familiarize you with the capabilities and functionality of the Structure Generation
 Tool. There is currently no recipe for the item that spawns structures, so try it in Creative.
 
-Several structures are included:
+Several structures are included and can be easily toggled between in-game:
 - "Hut" - A highly modified village hut. Enter at your own risk.
 - "Redstone Dungeon" - Can you find the treasure and live to tell about it?
 - "Blacksmith" - Vanilla blacksmith shop. Thanks to Microjunk for this one!
@@ -78,7 +78,7 @@ These are the default controls:
 'V' - toggles between generate / remove structure - when removing, be sure to click the EXACT position you clicked
       when spawning it
 
-'[' / ']' - Previous / Next structure in the list.
+'[' / ']' - Previous / Next structure in the list
 
 Right click - spawn / remove structure at tile location clicked
 
