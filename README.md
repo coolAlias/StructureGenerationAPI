@@ -33,7 +33,6 @@ as you see fit. These methods can be accessed by using an out-of-bounds block id
  
 POSSIBLE FUTURE FEATURES
 ========================
-- Coming soon: Toggle between structures from within the item - no more quitting to edit the code!
 - Reading structures from a file to avoid compile-time size limitations (big maybe)
  
 KNOWN BUGS
@@ -63,7 +62,7 @@ Several structures are included:
 - "Blacksmith" - Vanilla blacksmith shop. Thanks to Microjunk for this one!
 - "Viking Shop" - A cool viking-style shop, but riddled with holes from disuse. Credit again to Microjunk.
 
-These are the controls:
+These are the default controls:
 
 'Arrow Keys' - up: moves structure away from player; down: moves structure towards/behind player; left / right
 
@@ -79,10 +78,11 @@ These are the controls:
 'V' - toggles between generate / remove structure - when removing, be sure to click the EXACT position you clicked
       when spawning it
 
+'[' / ']' - Previous / Next structure in the list.
+
 Right click - spawn / remove structure at tile location clicked
 
-Note that if you want to change what structure is spawned, you must do that manually in ItemStructureSpawner's
-onItemUse method. Sorry for the inconvenience.
+Controls can be customized from the config file that is generated the first time you load this mod.
 
 INSTALLATION
 ============
