@@ -1,3 +1,20 @@
+/**
+    Copyright (C) <2013> <coolAlias>
+
+    This file is part of coolAlias' Structure Generation Tool; as such,
+    you can redistribute it and/or modify it under the terms of the GNU
+    General Public License as published by the Free Software Foundation,
+    either version 3 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package coolalias.structuregen.handlers;
 
 import java.util.EnumSet;
@@ -15,8 +32,9 @@ import cpw.mods.fml.relauncher.Side;
 
 public class KeyHandlerSGT extends KeyHandler
 {
-	private EnumSet tickTypes = EnumSet.of(TickType.PLAYER);
 	public static final String label = ModInfo.MOD_NAME + " Key";
+	
+	private EnumSet tickTypes = EnumSet.of(TickType.PLAYER);
 			
 	public KeyHandlerSGT(KeyBinding[] keyBindings, boolean[] repeatings)
 	{
@@ -61,8 +79,8 @@ public class KeyHandlerSGT extends KeyHandler
 					player.addChatMessage("[STRUCTURE GEN] Offsets x/y/z reset to 0.");
 					break;
 				case KeyBindSGT.ROTATE: player.addChatMessage("[STRUCTURE GEN] Structure orientation rotated by " + (spawner.rotate() * 90) + " degrees."); break;
-				case KeyBindSGT.PREV_STRUCT: player.addChatMessage("[STRUCTURE GEN] Selected structure " + spawner.getStructureName(spawner.prevStructure()) + " at index " + (spawner.getCurrentStructure() + 1)); break;
-				case KeyBindSGT.NEXT_STRUCT: player.addChatMessage("[STRUCTURE GEN] Selected structure " + spawner.getStructureName(spawner.nextStructure()) + " at index " + (spawner.getCurrentStructure() + 1)); break;
+				case KeyBindSGT.PREV_STRUCT: player.addChatMessage("[STRUCTURE GEN] Selected structure: " + spawner.getStructureName(spawner.prevStructure()) + " at index " + (spawner.getCurrentStructureIndex() + 1)); break;
+				case KeyBindSGT.NEXT_STRUCT: player.addChatMessage("[STRUCTURE GEN] Selected structure: " + spawner.getStructureName(spawner.nextStructure()) + " at index " + (spawner.getCurrentStructureIndex() + 1)); break;
 				case KeyBindSGT.TOGGLE_REMOVE: player.addChatMessage("[STRUCTURE GEN] Structure will " + (spawner.toggleRemove() ? "be removed" : "generate") + " on right click."); break;
 				}
 			}
