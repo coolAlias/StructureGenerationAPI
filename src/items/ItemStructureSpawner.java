@@ -21,20 +21,13 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Level;
 
-import org.lwjgl.input.Keyboard;
-
 import coolalias.structuregen.StructureArrays;
 import coolalias.structuregen.StructureGeneratorBase;
 import coolalias.structuregen.WorldGenStructure;
-import coolalias.structuregen.handlers.KeyHandlerSGT;
-import coolalias.structuregen.lib.KeyBindSGT;
 import coolalias.structuregen.lib.LogHelper;
 import coolalias.structuregen.util.Structure;
-import cpw.mods.fml.client.FMLClientHandler;
 import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 
@@ -199,7 +192,6 @@ public class ItemStructureSpawner extends BaseModItem
 		structure = new Structure("Blacksmith");
 		structure.addBlockArray(StructureArrays.blockArrayNPCBlackSmith);
 		structure.setFacing(StructureGeneratorBase.NORTH);
-		//structure.setDefaultOffset();
 		structures.add(structure);
 		LogHelper.log(Level.FINE, "Added " + structure.name + ". Structure list size is now " + this.structures.size());
 		LogHelper.log(Level.FINEST, structure.name + " size: " + this.structures.get(1).blockArrayList().size());
@@ -207,7 +199,6 @@ public class ItemStructureSpawner extends BaseModItem
 		structure = new Structure("Viking Shop");
 		structure.addBlockArray(StructureArrays.blockArrayShop);
 		structure.setFacing(StructureGeneratorBase.WEST);
-		//structure.setDefaultOffset();
 		structures.add(structure);
 		LogHelper.log(Level.FINE, "Added " + structure.name + ". Structure list size is now " + this.structures.size());
 		LogHelper.log(Level.FINEST, structure.name + " size: " + this.structures.get(2).blockArrayList().size());
@@ -229,7 +220,6 @@ public class ItemStructureSpawner extends BaseModItem
 		structure.addBlockArray(StructureArrays.blockArrayOffsetTest1);
 		*/
 		structure.setFacing(StructureGeneratorBase.NORTH);
-		//structure.setDefaultOffset();
 		structures.add(structure);
 	}
 }

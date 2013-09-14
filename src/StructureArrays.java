@@ -17,14 +17,8 @@
 
 package coolalias.structuregen;
 
-import java.util.List;
-import java.util.Random;
-
-import coolalias.structuregen.util.Structure;
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.world.World;
 
 public class StructureArrays
 {
