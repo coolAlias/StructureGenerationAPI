@@ -20,6 +20,7 @@ package coolalias.structuregen;
 import java.util.List;
 import java.util.Random;
 
+import coolalias.structuregen.util.Structure;
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -46,6 +47,9 @@ public class StructureArrays
 	=====================================================================================
 					HOW TO GENERATE YOUR CUSTOM STRUCTURES
 	=====================================================================================
+	Note: With the addition of the Structure class (see below), I recommend using those
+	instead as it entails all the same steps but gives extra benefits.
+	
 	Here I explain in detail how to generate and manipulate the position for your custom
 	structure. Only steps 1 and 5 are absolutely required, and step 3 is pretty much also
 	absolutely required, but you could skip it. Steps 2 and 4 just give you further
@@ -110,6 +114,59 @@ public class StructureArrays
 	
 	"generate(World world, Random random, int x, int y, int z)"
 	
+	*/
+	/**
+	=====================================================================================
+						USING THE NEW STRUCTURE CLASS (Optional)
+	=====================================================================================
+	The Structure class is a simple utility class that stores all information needed to
+	properly generate a structure. Its use is not required, but convenient for several
+	reasons:
+	
+	- Give your structure a displayable name
+	- Set a specific offset for your structure independent of any other offset
+	- Easily switch between entire structures by using a List<Structure>
+	
+	To setup a Structure object, you must first declare a new Structure.
+	
+	Step 1: Declare a new Structure object; this must include your structure's name.
+		 
+		 	Structure structure = new Structure("Hut");
+	
+	Step 2: Add all necessary blockArrays (see below) to the structure
+	
+			a. structure.addBlockArray(int[][][][])
+			b. structure.addBlockArrayList(List<int[][][][]>)
+			
+			An example using the first method:
+				structure.addBlockArray(StructureArrays.blockArrayNPCHut);
+				
+			An example using the first method with multiple layers:
+				structure.addBlockArray(StructureArrays.blockArrayOffsetTest1);
+				structure.addBlockArray(StructureArrays.blockArrayOffsetTest2);
+				structure.addBlockArray(StructureArrays.blockArrayOffsetTest2);
+				structure.addBlockArray(StructureArrays.blockArrayOffsetTest2);
+				structure.addBlockArray(StructureArrays.blockArrayOffsetTest1);
+				
+	Step 3: (Optional) Set the default direction you want the structure to face:
+	
+			structure.setFacing(StructureGeneratorBase.EAST);
+	
+	Step 4: (Optional) Set custom offsets, if needed:
+	
+			// This structure has a buffer layer on the bottom in case there is no ground;
+			// need to offset y by -1 to generate at ground level
+			
+			structure.setStructureOffset(0, -1, 0);
+	
+	Step 5: (Optional) Add the new structure to your List<Structure>, if you have one
+	
+			List<Structure> structures = new LinkedList();
+	
+			structures.add(structure); // adds the "Hut" we set up above
+	
+	That's it! Basically the same steps as needed for generating your structure in the first
+	place, but now you can have all the benefits above for the same amount of work.
 	*/
 	/**
 	=====================================================================================
