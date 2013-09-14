@@ -12,6 +12,6 @@ public class ModInfo
 			MOD_NAME = "coolAlias' Structure Generation Tool",
 			VERSION = "1.0.0",
 			CLIENT_PROXY = "coolalias.structuregen.proxy.ClientProxy",
-			COMMON_PROXY = "coolalias.structuregen..proxy.CommonProxy",
+			COMMON_PROXY = "coolalias.structuregen.proxy.CommonProxy",
 			LOGGER = "STRUCTURE GEN";
 }
