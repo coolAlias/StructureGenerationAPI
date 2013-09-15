@@ -62,7 +62,7 @@ public class SGTKeyHandler extends KeyHandler
 		{
 			EntityClientPlayerMP player = FMLClientHandler.instance().getClient().thePlayer;
 			
-			if (player.getHeldItem().getItem() instanceof ItemStructureSpawner)
+			if (player.getHeldItem() != null && player.getHeldItem().getItem() instanceof ItemStructureSpawner)
 				player.sendQueue.addToSendQueue(SGTPacketKeyPress.getPacket((byte) SGTKeyBindings.SGTKeyMap.get(kb.keyCode)));
 		}
 	}
