@@ -51,10 +51,7 @@ public class SGTPacketHandler implements IPacketHandler
 			return;
 		}
 		
-		if (player.getHeldItem() == null) {
-			LogHelper.log(Level.SEVERE, "Player held item is null - unable to process key press packet");
-			return;
-		} else if (!(player.getHeldItem().getItem() instanceof ItemStructureSpawner)) {
+		if (!(player.getHeldItem().getItem() instanceof ItemStructureSpawner)) {
 			LogHelper.log(Level.SEVERE, "Held item is not an instance of ItemStructureSpawner - unable to process key press packet");
 			return;
 		}

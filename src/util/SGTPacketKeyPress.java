@@ -26,11 +26,7 @@ public class SGTPacketKeyPress
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
-		Packet250CustomPayload packet = new Packet250CustomPayload();
-		packet.channel = ModInfo.CHANNEL;
-		packet.data = bos.toByteArray();
-		packet.length = bos.size();
 		
-		return packet;
+		return new Packet250CustomPayload(ModInfo.CHANNEL, bos.toByteArray());
 	}
 }
