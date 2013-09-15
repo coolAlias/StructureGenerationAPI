@@ -65,39 +65,12 @@ public class SGTKeyHandler extends KeyHandler
 			if (player.getHeldItem() != null && player.getHeldItem().getItem() instanceof ItemStructureSpawner)
 			{
 				PacketDispatcher.sendPacketToServer(SGTPacketKeyPress.getPacket((byte) SGTKeyBindings.SGTKeyMap.get(kb.keyCode)));
-				
-				ItemStructureSpawner spawner = (ItemStructureSpawner) player.getHeldItem().getItem();
-				
-				switch (SGTKeyBindings.SGTKeyMap.get(kb.keyCode)) {
-				case SGTKeyBindings.PLUS_X: player.addChatMessage("[STRUCTURE GEN] Incremented x offset: " + spawner.incrementOffset(player.getHeldItem(), ItemStructureSpawner.Offset.OFFSET_X)); break;
-				case SGTKeyBindings.MINUS_X: player.addChatMessage("[STRUCTURE GEN] Decremented x offset: " + spawner.decrementOffset(player.getHeldItem(), ItemStructureSpawner.Offset.OFFSET_X)); break;
-				case SGTKeyBindings.PLUS_Z: player.addChatMessage("[STRUCTURE GEN] Incremented z offset: " + spawner.incrementOffset(player.getHeldItem(), ItemStructureSpawner.Offset.OFFSET_Z)); break;
-				case SGTKeyBindings.MINUS_Z: player.addChatMessage("[STRUCTURE GEN] Decremented z offset: " + spawner.decrementOffset(player.getHeldItem(), ItemStructureSpawner.Offset.OFFSET_Z)); break;
-				case SGTKeyBindings.OFFSET_Y:
-					if (spawner.isInverted(player.getHeldItem()))
-						player.addChatMessage("[STRUCTURE GEN] Decremented y offset: " + spawner.decrementOffset(player.getHeldItem(), ItemStructureSpawner.Offset.OFFSET_Y));
-					else
-						player.addChatMessage("[STRUCTURE GEN] Incremented y offset: " + spawner.incrementOffset(player.getHeldItem(), ItemStructureSpawner.Offset.OFFSET_Y));
-					break;
-				case SGTKeyBindings.INVERT_Y: player.addChatMessage("[STRUCTURE GEN] y offset will now " + (spawner.invertY(player.getHeldItem()) ? "decrement." : "increment.")); break;
-				case SGTKeyBindings.RESET_OFFSET:
-					spawner.resetOffset(player.getHeldItem());
-					player.addChatMessage("[STRUCTURE GEN] Offsets x/y/z reset to 0.");
-					break;
-				case SGTKeyBindings.ROTATE: player.addChatMessage("[STRUCTURE GEN] Structure orientation rotated by " + (spawner.rotate(player.getHeldItem()) * 90) + " degrees."); break;
-				case SGTKeyBindings.PREV_STRUCT: player.addChatMessage("[STRUCTURE GEN] Selected structure: " + spawner.getStructureName(spawner.prevStructure(player.getHeldItem())) + " at index " + (spawner.getCurrentStructureIndex(player.getHeldItem()) + 1)); break;
-				case SGTKeyBindings.NEXT_STRUCT: player.addChatMessage("[STRUCTURE GEN] Selected structure: " + spawner.getStructureName(spawner.nextStructure(player.getHeldItem())) + " at index " + (spawner.getCurrentStructureIndex(player.getHeldItem()) + 1)); break;
-				case SGTKeyBindings.TOGGLE_REMOVE: player.addChatMessage("[STRUCTURE GEN] Structure will " + (spawner.toggleRemove() ? "be removed" : "generate") + " on right click."); break;
-				}
 			}
 		}
 	}
 
 	@Override
-	public void keyUp(EnumSet<TickType> types, KeyBinding kb, boolean tickEnd)
-	{
-		
-	}
+	public void keyUp(EnumSet<TickType> types, KeyBinding kb, boolean tickEnd) {}
 
 	@Override
 	public EnumSet<TickType> ticks() {

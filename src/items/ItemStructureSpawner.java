@@ -25,9 +25,7 @@ import coolalias.structuregen.StructureArrays;
 import coolalias.structuregen.StructureGeneratorBase;
 import coolalias.structuregen.WorldGenStructure;
 import coolalias.structuregen.lib.LogHelper;
-import coolalias.structuregen.util.SGTPacketNBTItem;
 import coolalias.structuregen.util.Structure;
-import cpw.mods.fml.common.network.PacketDispatcher;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -222,13 +220,10 @@ public class ItemStructureSpawner extends BaseModItem
 	@Override
 	public boolean onItemUse(ItemStack itemstack, EntityPlayer player, World world, int x, int y, int z, int par7, float par8, float par9, float par10)
     {
-		// NOTE: It isn't absolutely necessary to check if the world is not remote here,
-		// but I recommend it as the client will be notified automatically anyway.
 		if (!world.isRemote && structures.size() > 0)
 		{
 			NBTTagCompound tag = itemstack.stackTagCompound;
 			gen.setPlayerFacing(player);
-			//gen.addBlockArray(StructureArrays.blockArrayNPCBlackSmith);
 			Structure structure = structures.get(tag.getInteger(data[STRUCTURE_INDEX]));
 			gen.setBlockArrayList(structure.blockArrayList());
 			gen.setStructureFacing(structure.getFacing() + tag.getInteger(data[ROTATIONS]));
@@ -239,6 +234,9 @@ public class ItemStructureSpawner extends BaseModItem
         return true;
     }
 	
+	/**
+	 * Creates a new NBTTagCompound for the itemstack if none exists
+	 */
 	private final void initNBTCompound(ItemStack itemstack)
 	{
 		if (itemstack.stackTagCompound == null)
@@ -253,6 +251,9 @@ public class ItemStructureSpawner extends BaseModItem
     	LogHelper.log(Level.INFO, "NBT Tag initialized for ItemStructureSpawner");
 	}
 	
+	/**
+	 * Adds all structures to the Structure List
+	 */
 	private final void init()
 	{
 		Structure structure = new Structure("Hut");
@@ -277,7 +278,7 @@ public class ItemStructureSpawner extends BaseModItem
 		//structure.setFacing(StructureGeneratorBase.EAST);
 		structures.add(structure);
 		
-		structure = new Structure("Spawn Test");
+		structure = new Structure("Offset Test");
 		structure.addBlockArray(StructureArrays.blockArraySpawnTest);
 		/*
 		structure.addBlockArray(StructureArrays.blockArrayOffsetTest1);
