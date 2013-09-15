@@ -32,8 +32,10 @@ import cpw.mods.fml.common.network.PacketDispatcher;
 import cpw.mods.fml.relauncher.Side;
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.item.EntityItemFrame;
 import net.minecraft.entity.item.EntityPainting;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemHangingEntity;
 import net.minecraft.item.ItemStack;
@@ -43,11 +45,13 @@ import net.minecraft.tileentity.TileEntityChest;
 import net.minecraft.tileentity.TileEntitySign;
 import net.minecraft.tileentity.TileEntitySkull;
 import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.Direction;
 import net.minecraft.util.EnumArt;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
 import net.minecraft.world.gen.feature.WorldGenerator;
 import net.minecraftforge.common.FakePlayer;
+import net.minecraftforge.transformers.ForgeAccessTransformer;
 
 public abstract class StructureGeneratorBase extends WorldGenerator
 {
@@ -565,7 +569,6 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 	/**
 	 * Returns current structure layer's height or 0 if no structure has been set
 	 */
-	// do we need this?
 	public final int getHeight() {
 		return this.blockArray != null ? this.blockArray.length : 0;
 	}
@@ -630,10 +633,8 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 			this.offsetZ = -z;
 			break;
 		}
-		//this.offsetX = -(getWidthX() / 2) + x;
 		this.offsetY = 1 + y;
-		//this.offsetZ = 0 + z;
-		LogHelper.log(Level.FINEST, "Default offsetX " + this.offsetX + " for width " + getWidthX());
+		// LogHelper.log(Level.INFO, "Default offsetX " + this.offsetX + " for width " + getWidthX());
 	}
 	
 	/**
@@ -752,16 +753,8 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 
 					if (this.removeStructure)
 					{
-						if (world.isAirBlock(rotX, rotY, rotZ) || (realID < 0 && Math.abs(realID) != world.getBlockId(rotX, rotY, rotZ)))
-							continue;
-						else if (Math.abs(realID) == world.getBlockId(rotX, rotY, rotZ) || 
-								(Block.blocksList[world.getBlockId(rotX, rotY, rotZ)].blockMaterial.isLiquid() &&
-								(Block.blocksList[Math.abs(realID)].blockMaterial.isLiquid() || realID == 0)))
-							world.setBlockToAir(rotX, rotY, rotZ);
-						else {
-							LogHelper.log(Level.WARNING, "Incorrect location for structure removal, aborting. Last block id checked = " + realID);
+						if (!removeBlockAt(world, fakeID, realID, rotX, rotY, rotZ, rotations))
 							return false;
-						}
 					}
 					else
 					{
@@ -773,46 +766,85 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 						int customData2 = (blockArray[y][x][z].length > 3 ? blockArray[y][x][z][3] : 0);
 						int meta = (blockArray[y][x][z].length > 1 ? blockArray[y][x][z][1] : blockRotationData.containsKey(Math.abs(realID)) ? 0 : NO_METADATA);
 						
-						// Allows 'soft-spawning' blocks to be spawned only in air or on blocks that allow movement, such as air or grass
-						if (realID >= 0 || world.isAirBlock(rotX, rotY, rotZ) || 
-								(Block.blocksList[world.getBlockId(rotX, rotY, rotZ)] != null
-								&& !Block.blocksList[world.getBlockId(rotX, rotY, rotZ)].blockMaterial.blocksMovement()))
-						{
-							if (meta == NO_METADATA)
-								meta = 0;
-							else if (blockRotationData.containsKey(realID))
-								meta = getMetadata(Math.abs(realID), meta, facing);
-							//else {} // leave metadata alone
-
-							// Get color data for wool blocks
-							int flag = (Math.abs(realID) == Block.cloth.blockID ? customData1 : 2);
-							
-							// add torches and such to a list for after-generation setBlock calls
-							if (blockRotationData.get(realID) != null && blockRotationData.get(realID) == ROTATION.WALL_MOUNTED)
-							{
-								LogHelper.log(Level.FINE, "Block " + realID + " requires post-processing. Adding to list. Meta = " + meta);
-								this.postGenBlocks.add(new BlockData(rotX, rotY, rotZ, fakeID, meta, customData1, customData2));
-							}
-							// set all other blocks here
-							else
-							{
-								world.setBlock(rotX, rotY, rotZ, Math.abs(realID), meta, flag);
-								
-								// Fix things like rails that automatically update onBlockAdded from world.setBlock
-								if (blockRotationData.containsKey(realID))
-									setMetadata(world, rotX, rotY, rotZ, meta, facing);
-
-								// Call to custom block hooks
-								if (Math.abs(fakeID) > 4096) {
-									onCustomBlockAdded(world, rotX, rotY, rotZ, fakeID, customData1, customData2);
-								}
-							}
-						}
+						setBlockAt(world, fakeID, realID, meta, customData1, customData2, rotX, rotY, rotZ);
 					}
 				}
 			}
 		}
 
+		return true;
+	}
+	
+	/**
+	 * Handles setting block with fakeID at x/y/z in world.
+	 * Arguments should be those retrieved from blockArray
+	 */
+	private final void setBlockAt(World world, int fakeID, int realID, int meta, int customData1, int customData2, int x, int y, int z)
+	{
+		// Allows 'soft-spawning' blocks to be spawned only in air or on blocks that allow movement, such as air or grass
+		if (realID >= 0 || world.isAirBlock(x, y, z) || (Block.blocksList[world.getBlockId(x, y, z)] != null
+				&& !Block.blocksList[world.getBlockId(x, y, z)].blockMaterial.blocksMovement()))
+		{
+			if (meta == NO_METADATA)
+				meta = 0;
+			else if (blockRotationData.containsKey(realID))
+				meta = getMetadata(Math.abs(realID), meta, facing);
+			//else {} // leave metadata alone
+
+			// Get color data for wool blocks; maybe set flag to 3 for notify?
+			int flag = (Math.abs(realID) == Block.cloth.blockID ? customData1 : 2);
+			
+			// add torches and such to a list for after-generation setBlock calls
+			if (blockRotationData.get(realID) != null && blockRotationData.get(realID) == ROTATION.WALL_MOUNTED)
+			{
+				LogHelper.log(Level.FINE, "Block " + realID + " requires post-processing. Adding to list. Meta = " + meta);
+				this.postGenBlocks.add(new BlockData(x, y, z, fakeID, meta, customData1, customData2));
+			}
+			// set all other blocks here
+			else
+			{
+				world.setBlock(x, y, z, Math.abs(realID), meta, flag);
+				
+				// Fix things like rails that automatically update onBlockAdded from world.setBlock
+				if (blockRotationData.containsKey(realID))
+					setMetadata(world, x, y, z, meta, facing);
+
+				// Call to custom block hooks
+				if (Math.abs(fakeID) > 4096) {
+					onCustomBlockAdded(world, x, y, z, fakeID, customData1, customData2);
+				}
+			}
+		}
+	}
+	
+	/**
+	 * Removes block at x/y/z and cleans up any items/entities that may be left behind
+	 * Returns false if realID is mismatched with world's blockID at x/y/z
+	 */
+	private final boolean removeBlockAt(World world, int fakeID, int realID, int x, int y, int z, int rotations)
+	{
+		if ((world.isAirBlock(x, y, z) && Math.abs(fakeID) <= 4096) || (realID < 0 && Math.abs(realID) != world.getBlockId(x, y, z)))
+		{ }
+		else if (Math.abs(realID) == world.getBlockId(x, y, z) || Math.abs(fakeID) > 4096 ||
+				(Block.blocksList[world.getBlockId(x, y, z)].blockMaterial.isLiquid() &&
+				(Block.blocksList[Math.abs(realID)].blockMaterial.isLiquid() || realID == 0)))
+		{
+			world.setBlockToAir(x, y, z);
+			List <Entity> list = world.getEntitiesWithinAABB(Entity.class, getHangingEntityAxisAligned(x, y, z, Direction.directionToFacing[rotations]).expand(1.5F, 1.0F, 1.5F));
+			Iterator<Entity> iterator = list.iterator();
+			
+			while (iterator.hasNext())
+			{
+				Entity entity = iterator.next();
+				if (!(entity instanceof EntityPlayer))
+					entity.setDead();
+			}
+		}
+		else {
+			LogHelper.log(Level.WARNING, "Incorrect location for structure removal, aborting. Last block id checked = " + realID);
+			return false;
+		}
+		
 		return true;
 	}
 	

@@ -220,6 +220,9 @@ public class ItemStructureSpawner extends BaseModItem
 	@Override
 	public boolean onItemUse(ItemStack itemstack, EntityPlayer player, World world, int x, int y, int z, int par7, float par8, float par9, float par10)
     {
+		if (itemstack.stackTagCompound == null)
+			initNBTCompound(itemstack);
+		
 		if (!world.isRemote && structures.size() > 0)
 		{
 			NBTTagCompound tag = itemstack.stackTagCompound;
@@ -229,6 +232,7 @@ public class ItemStructureSpawner extends BaseModItem
 			gen.setStructureFacing(structure.getFacing() + tag.getInteger(data[ROTATIONS]));
 			gen.setDefaultOffset(structure.getOffsetX() + tag.getInteger(data[OFFSET_X]), structure.getOffsetY() + tag.getInteger(data[OFFSET_Y]), structure.getOffsetZ() + tag.getInteger(data[OFFSET_Z]));
 			gen.generate(world, world.rand, x, y, z);
+			// LogHelper.log(Level.INFO, "Structure " + structure.name + " offsetY = " + structure.getOffsetY());
 		}
 		
         return true;
@@ -254,7 +258,7 @@ public class ItemStructureSpawner extends BaseModItem
 	/**
 	 * Adds all structures to the Structure List
 	 */
-	private final void init()
+	private static final void init()
 	{
 		Structure structure = new Structure("Hut");
 		structure.addBlockArray(StructureArrays.blockArrayNPCHut);
