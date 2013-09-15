@@ -24,5 +24,6 @@ public class ModInfo
 			VERSION = "1.0.0",
 			CLIENT_PROXY = "coolalias.structuregen.proxy.ClientProxy",
 			COMMON_PROXY = "coolalias.structuregen.proxy.CommonProxy",
+			CHANNEL = "SGT_MAIN",
 			LOGGER = "STRUCTURE GEN";
 }

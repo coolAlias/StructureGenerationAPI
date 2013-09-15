@@ -19,6 +19,7 @@ package coolalias.structuregen;
 
 import java.util.logging.Level;
 
+import coolalias.arcanelegacy.item.ALItems;
 import coolalias.structuregen.lib.LogHelper;
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
@@ -126,6 +127,16 @@ public class WorldGenStructure extends StructureGeneratorBase
 
 				// Here we use customData to add a metadata block to the chest
 				addItemToTileInventory(world, new ItemStack(Block.cloth.blockID, 1, customData1), x, y, z);
+				
+				
+				//addItemToTileInventory(world, new ItemStack(Item.potion,1,8206), x, y, z);
+				//addItemToTileInventory(world, new ItemStack(Item.potion,1,8270), x, y, z);
+				//addItemToTileInventory(world, new ItemStack(Item.potion,1,8193), x, y, z);
+				//addItemToTileInventory(world, new ItemStack(Item.potion,1,16385), x, y, z);
+				addItemToTileInventory(world, new ItemStack(ALItems.scrollFly), x, y, z);
+				addItemToTileInventory(world, new ItemStack(ALItems.scrollDispel), x, y, z);
+				addItemToTileInventory(world, new ItemStack(ALItems.scrollResurrectI), x, y, z);
+				addItemToTileInventory(world, new ItemStack(ALItems.wandBasic, 4), x, y, z);
 			}
 			break;
 		case StructureArrays.CUSTOM_DISPENSER:

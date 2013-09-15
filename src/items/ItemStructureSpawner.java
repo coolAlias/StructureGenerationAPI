@@ -25,10 +25,13 @@ import coolalias.structuregen.StructureArrays;
 import coolalias.structuregen.StructureGeneratorBase;
 import coolalias.structuregen.WorldGenStructure;
 import coolalias.structuregen.lib.LogHelper;
+import coolalias.structuregen.util.SGTPacketNBTItem;
 import coolalias.structuregen.util.Structure;
+import cpw.mods.fml.common.network.PacketDispatcher;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.World;
 
 public class ItemStructureSpawner extends BaseModItem
@@ -41,10 +44,12 @@ public class ItemStructureSpawner extends BaseModItem
 	
 	private static final StructureGeneratorBase gen = new WorldGenStructure();
 	
-	private int index = 0, rotations = 0, offsetX = 0, offsetY = 0, offsetZ = 0;
+	/** String identifiers for NBT storage and retrieval */
+	private static final String[] data = {"Structure", "Rotations", "OffsetX", "OffsetY", "OffsetZ", "InvertY"};
 	
-	private boolean invert_y = false;
-
+	/** Indices for data variables */
+	private static final int STRUCTURE_INDEX = 0, ROTATIONS = 1, OFFSET_X = 2, OFFSET_Y = 3, OFFSET_Z = 4, INVERT_Y = 5;
+	
 	public ItemStructureSpawner(int par1)
 	{
 		super(par1);
@@ -57,13 +62,37 @@ public class ItemStructureSpawner extends BaseModItem
 	}
 	
 	/**
+     * Called when item is crafted/smelted. Not called from Creative Tabs.
+     */
+	@Override
+    public void onCreated(ItemStack itemstack, World world, EntityPlayer player)
+    {
+		initNBTCompound(itemstack);
+    }
+	
+	/**
 	 * Increments the appropriate Offset and returns the new value for convenience.
 	 */
-	public int incrementOffset(Offset type) {
+	public int incrementOffset(ItemStack itemstack, Offset type)
+	{
+		if (itemstack.stackTagCompound == null)
+			initNBTCompound(itemstack);
+		
+		int offset;
+		
 		switch(type) {
-		case OFFSET_X: return ++offsetX;
-		case OFFSET_Y: return ++offsetY;
-		case OFFSET_Z: return ++offsetZ;
+		case OFFSET_X:
+			offset = itemstack.stackTagCompound.getInteger(data[OFFSET_X]) + 1;
+			itemstack.stackTagCompound.setInteger(data[OFFSET_X], offset);
+			return offset;
+		case OFFSET_Y:
+			offset = itemstack.stackTagCompound.getInteger(data[OFFSET_Y]) + 1;
+			itemstack.stackTagCompound.setInteger(data[OFFSET_Y], offset);
+			return offset;
+		case OFFSET_Z:
+			offset = itemstack.stackTagCompound.getInteger(data[OFFSET_Z]) + 1;
+			itemstack.stackTagCompound.setInteger(data[OFFSET_Z], offset);
+			return offset;
 		default: return 0;
 		}
 	}
@@ -71,11 +100,26 @@ public class ItemStructureSpawner extends BaseModItem
 	/**
 	 * Decrements the appropriate Offset and returns the new value for convenience.
 	 */
-	public int decrementOffset(Offset type) {
+	public int decrementOffset(ItemStack itemstack, Offset type)
+	{
+		if (itemstack.stackTagCompound == null)
+			initNBTCompound(itemstack);
+		
+		int offset;
+		
 		switch(type) {
-		case OFFSET_X: return --offsetX;
-		case OFFSET_Y: return --offsetY;
-		case OFFSET_Z: return --offsetZ;
+		case OFFSET_X:
+			offset = itemstack.stackTagCompound.getInteger(data[OFFSET_X]) - 1;
+			itemstack.stackTagCompound.setInteger(data[OFFSET_X], offset);
+			return offset;
+		case OFFSET_Y:
+			offset = itemstack.stackTagCompound.getInteger(data[OFFSET_Y]) - 1;
+			itemstack.stackTagCompound.setInteger(data[OFFSET_Y], offset);
+			return offset;
+		case OFFSET_Z:
+			offset = itemstack.stackTagCompound.getInteger(data[OFFSET_Z]) - 1;
+			itemstack.stackTagCompound.setInteger(data[OFFSET_Z], offset);
+			return offset;
 		default: return 0;
 		}
 	}
@@ -83,47 +127,67 @@ public class ItemStructureSpawner extends BaseModItem
 	/**
 	 * Returns true if y offset is inverted (i.e. y will decrement)
 	 */
-	public boolean isInverted() {
-		return this.invert_y;
+	public boolean isInverted(ItemStack itemstack) {
+		if (itemstack.stackTagCompound == null)
+			initNBTCompound(itemstack);
+		return itemstack.stackTagCompound.getBoolean(data[INVERT_Y]);
 	}
 	
 	/**
 	 * Inverts Y axis for offset adjustments; returns new value for convenience.
 	 */
-	public boolean invertY() {
-		this.invert_y = !this.invert_y;
-		return this.invert_y;
+	public boolean invertY(ItemStack itemstack) {
+		if (itemstack.stackTagCompound == null)
+			initNBTCompound(itemstack);
+		boolean invert = !itemstack.stackTagCompound.getBoolean(data[INVERT_Y]);
+		itemstack.stackTagCompound.setBoolean(data[INVERT_Y], invert);
+		return invert;
 	}
 	
 	/**
 	 * Resets all manual offsets to 0.
 	 */
-	public void resetOffset() {
-		offsetX = offsetY = offsetZ = 0;
+	public void resetOffset(ItemStack itemstack) {
+		if (itemstack.stackTagCompound == null)
+			initNBTCompound(itemstack);
+		itemstack.stackTagCompound.setInteger(data[OFFSET_X], 0);
+		itemstack.stackTagCompound.setInteger(data[OFFSET_Y], 0);
+		itemstack.stackTagCompound.setInteger(data[OFFSET_Z], 0);
 	}
 	
 	/**
 	 * Rotates structure's facing by 90 degrees clockwise; returns number of rotations for convenience.
 	 */
-	public int rotate() {
-		this.rotations = (this.rotations == 3 ? 0 : ++this.rotations);
-		return this.rotations;
+	public int rotate(ItemStack itemstack) {
+		if (itemstack.stackTagCompound == null)
+			initNBTCompound(itemstack);
+		int rotations = (itemstack.stackTagCompound.getInteger(data[ROTATIONS]) + 1) % 4;
+		itemstack.stackTagCompound.setInteger(data[ROTATIONS], rotations);
+		return rotations;
 	}
 	
 	/**
 	 * Increments the structure index and returns the new value for convenience.
 	 */
-	public int nextStructure() {
-		this.index = (this.index + 1 == structures.size() ? 0 : this.index + 1);
-		return this.index;
+	public int nextStructure(ItemStack itemstack) {
+		if (itemstack.stackTagCompound == null)
+			initNBTCompound(itemstack);
+		int index = itemstack.stackTagCompound.getInteger(data[STRUCTURE_INDEX]) + 1;
+		if (index == structures.size()) index = 0;
+		itemstack.stackTagCompound.setInteger(data[STRUCTURE_INDEX], index);
+		return index;
 	}
 	
 	/**
 	 * Decrements the structure index and returns the new value for convenience.
 	 */
-	public int prevStructure() {
-		this.index = (this.index > 0 ? this.index - 1 : this.structures.size() - 1);
-		return this.index;
+	public int prevStructure(ItemStack itemstack) {
+		if (itemstack.stackTagCompound == null)
+			initNBTCompound(itemstack);
+		int index = itemstack.stackTagCompound.getInteger(data[STRUCTURE_INDEX]) - 1;
+		if (index < 0) index = this.structures.size() - 1;
+		itemstack.stackTagCompound.setInteger(data[STRUCTURE_INDEX], index);
+		return index;
 	}
 	
 	/**
@@ -136,8 +200,10 @@ public class ItemStructureSpawner extends BaseModItem
 	/**
 	 * Returns index of currently selected structure
 	 */
-	public int getCurrentStructureIndex() {
-		return this.index;
+	public int getCurrentStructureIndex(ItemStack itemstack) {
+		if (itemstack.stackTagCompound == null)
+			initNBTCompound(itemstack);
+		return itemstack.stackTagCompound.getInteger(data[STRUCTURE_INDEX]);
 	}
 	
 	/**
@@ -160,23 +226,32 @@ public class ItemStructureSpawner extends BaseModItem
 		// but I recommend it as the client will be notified automatically anyway.
 		if (!world.isRemote && structures.size() > 0)
 		{
-			// LogHelper.log(Level.INFO, "Preparing to generate structure");
+			NBTTagCompound tag = itemstack.stackTagCompound;
 			gen.setPlayerFacing(player);
 			//gen.addBlockArray(StructureArrays.blockArrayNPCBlackSmith);
-			Structure structure = structures.get(this.index);
-			// LogHelper.log(Level.INFO, "Structure size: " + structure.blockArrayList().size());
+			Structure structure = structures.get(tag.getInteger(data[STRUCTURE_INDEX]));
 			gen.setBlockArrayList(structure.blockArrayList());
-			gen.setStructureFacing(structure.getFacing() + this.rotations);
-			// LogHelper.log(Level.INFO, "Default offsets: " + structure.getOffsetX() + "/" + structure.getOffsetZ());
-			//structure.setDefaultOffset(this.offsetX, this.offsetY, this.offsetZ);
-			gen.setDefaultOffset(structure.getOffsetX() + this.offsetX, structure.getOffsetY() + this.offsetY, structure.getOffsetZ() + this.offsetZ);
-			// adjust for structure generating centered on player's position (including height)
-			//gen.setDefaultOffset(structure.getOffsetX() + this.offsetX, structure.getOffsetY() + this.offsetY, structure.getOffsetZ() + this.offsetZ); // adjust down one for the buffer layer
+			gen.setStructureFacing(structure.getFacing() + tag.getInteger(data[ROTATIONS]));
+			gen.setDefaultOffset(structure.getOffsetX() + tag.getInteger(data[OFFSET_X]), structure.getOffsetY() + tag.getInteger(data[OFFSET_Y]), structure.getOffsetZ() + tag.getInteger(data[OFFSET_Z]));
 			gen.generate(world, world.rand, x, y, z);
 		}
 		
         return true;
     }
+	
+	private final void initNBTCompound(ItemStack itemstack)
+	{
+		if (itemstack.stackTagCompound == null)
+			itemstack.stackTagCompound = new NBTTagCompound();
+		
+		for (int i = 0; i < INVERT_Y; ++i) {
+    		itemstack.stackTagCompound.setInteger(data[i], 0);
+    	}
+    	
+    	itemstack.stackTagCompound.setBoolean(data[INVERT_Y], false);
+    	
+    	LogHelper.log(Level.INFO, "NBT Tag initialized for ItemStructureSpawner");
+	}
 	
 	private final void init()
 	{
@@ -186,31 +261,23 @@ public class ItemStructureSpawner extends BaseModItem
 		// has a buffer layer on the bottom in case no ground; spawn at y-1 for ground level
 		structure.setStructureOffset(0, -1, 0);
 		structures.add(structure);
-		LogHelper.log(Level.FINE, "Added " + structure.name + ". Structure list size is now " + this.structures.size());
-		LogHelper.log(Level.FINEST, structure.name + " size: " + this.structures.get(0).blockArrayList().size());
 		
 		structure = new Structure("Blacksmith");
 		structure.addBlockArray(StructureArrays.blockArrayNPCBlackSmith);
 		structure.setFacing(StructureGeneratorBase.NORTH);
 		structures.add(structure);
-		LogHelper.log(Level.FINE, "Added " + structure.name + ". Structure list size is now " + this.structures.size());
-		LogHelper.log(Level.FINEST, structure.name + " size: " + this.structures.get(1).blockArrayList().size());
 		
 		structure = new Structure("Viking Shop");
 		structure.addBlockArray(StructureArrays.blockArrayShop);
 		structure.setFacing(StructureGeneratorBase.WEST);
 		structures.add(structure);
-		LogHelper.log(Level.FINE, "Added " + structure.name + ". Structure list size is now " + this.structures.size());
-		LogHelper.log(Level.FINEST, structure.name + " size: " + this.structures.get(2).blockArrayList().size());
 		
 		structure = new Structure("Redstone Dungeon");
 		structure.addBlockArray(StructureArrays.blockArrayRedstone);
 		//structure.setFacing(StructureGeneratorBase.EAST);
 		structures.add(structure);
-		LogHelper.log(Level.FINE, "Added " + structure.name + ". Structure list size is now " + this.structures.size());
-		LogHelper.log(Level.FINEST, structure.name + " size: " + this.structures.get(3).blockArrayList().size());
 		
-		structure = new Structure("Offset Test");
+		structure = new Structure("Spawn Test");
 		structure.addBlockArray(StructureArrays.blockArraySpawnTest);
 		/*
 		structure.addBlockArray(StructureArrays.blockArrayOffsetTest1);

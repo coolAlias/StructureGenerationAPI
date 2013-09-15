@@ -19,12 +19,16 @@ package coolalias.structuregen;
 
 import java.io.File;
 
+import coolalias.structuregen.handlers.SGTPacketHandler;
 import coolalias.structuregen.items.ItemStructureSpawner;
-import coolalias.structuregen.lib.KeyBindSGT;
+import coolalias.structuregen.lib.SGTKeyBindings;
 import coolalias.structuregen.lib.LogHelper;
 import coolalias.structuregen.proxy.CommonProxy;
+import net.minecraft.block.Block;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.Configuration;
+import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.Mod.EventHandler;
@@ -33,10 +37,13 @@ import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.network.NetworkMod;
+import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.common.registry.LanguageRegistry;
+import cpw.mods.fml.relauncher.Side;
 
 @Mod(modid = ModInfo.MOD_ID, name = ModInfo.MOD_NAME, version = ModInfo.VERSION)
-@NetworkMod(clientSideRequired=true, serverSideRequired=false)
+@NetworkMod(clientSideRequired=true, serverSideRequired=false,
+channels = {ModInfo.CHANNEL}, packetHandler = SGTPacketHandler.class)
 
 public class StructureGenMain
 {
@@ -55,10 +62,15 @@ public class StructureGenMain
 	public void preInit(FMLPreInitializationEvent event)
 	{
 		LogHelper.init();
+		
 		Configuration config = new Configuration(new File(event.getModConfigurationDirectory().getAbsolutePath() + "/StructureGenMod.cfg"));
         config.load();
+        
         modItemIndex = config.getItem("modItemIndex", MOD_ITEM_INDEX_DEFAULT).getInt() - 256;
-        KeyBindSGT.init(config);
+        
+        if (FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT)
+        	SGTKeyBindings.init(config);
+        
         config.save();
 	}
 	
@@ -66,6 +78,7 @@ public class StructureGenMain
 	public void load(FMLInitializationEvent event)
 	{
 		structureSpawner = new ItemStructureSpawner(modItemIndex++).setUnlocalizedName("structureSpawner");
+		GameRegistry.addShapelessRecipe(new ItemStack(structureSpawner), Item.stick, Block.dirt);
 		LanguageRegistry.addName(structureSpawner, "Structure Spawner");
 		proxy.registerRenderers();
 	}

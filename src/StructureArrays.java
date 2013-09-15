@@ -721,7 +721,7 @@ public class StructureArrays
 				{Block.fence.blockID},
 				{Block.signPost.blockID,14},
 				{Block.railPowered.blockID,11},
-				{RANDOM_HOLE,1,Block.stairsCobblestone.blockID}, // ascending to west
+				{Block.stairsCobblestone.blockID,1}, // ascending to west
 				{SPAWN_VILLAGER,1,2},
 				// we'll spawn him outside just so there's more room inside for stuff
 				// however, this way the villager will not move inside at night
