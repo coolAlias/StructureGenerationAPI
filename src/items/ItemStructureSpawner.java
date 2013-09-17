@@ -23,7 +23,7 @@ import java.util.logging.Level;
 
 import coolalias.structuregen.StructureArrays;
 import coolalias.structuregen.StructureGeneratorBase;
-import coolalias.structuregen.WorldGenStructure;
+import coolalias.structuregen.StructureGenerator;
 import coolalias.structuregen.lib.LogHelper;
 import coolalias.structuregen.util.Structure;
 import net.minecraft.creativetab.CreativeTabs;
@@ -37,10 +37,8 @@ public class ItemStructureSpawner extends BaseModItem
 	/** Enumerates valid values for increment / decrement offset methods */
 	public static enum Offset { OFFSET_X, OFFSET_Y, OFFSET_Z }
 	
-	/** List of all structures that can be generated with this item */
-	private static final List<Structure> structures = new LinkedList();
-	
-	private static final StructureGeneratorBase gen = new WorldGenStructure();
+	/** WorldGenStructure contains all the structures and methods needed */
+	private static final StructureGenerator gen = new StructureGenerator();
 	
 	/** String identifiers for NBT storage and retrieval */
 	private static final String[] data = {"Structure", "Rotations", "OffsetX", "OffsetY", "OffsetZ", "InvertY"};
@@ -54,9 +52,6 @@ public class ItemStructureSpawner extends BaseModItem
 		setMaxDamage(0);
 		setMaxStackSize(1);
 		setCreativeTab(CreativeTabs.tabMisc);
-		// constructor should only be called once anyways
-		init();
-		LogHelper.log(Level.INFO, "ItemStructureSpawner initialized structures.");
 	}
 	
 	/**
@@ -171,7 +166,7 @@ public class ItemStructureSpawner extends BaseModItem
 		if (itemstack.stackTagCompound == null)
 			initNBTCompound(itemstack);
 		int index = itemstack.stackTagCompound.getInteger(data[STRUCTURE_INDEX]) + 1;
-		if (index == structures.size()) index = 0;
+		if (index == gen.structures.size()) index = 0;
 		itemstack.stackTagCompound.setInteger(data[STRUCTURE_INDEX], index);
 		return index;
 	}
@@ -183,7 +178,7 @@ public class ItemStructureSpawner extends BaseModItem
 		if (itemstack.stackTagCompound == null)
 			initNBTCompound(itemstack);
 		int index = itemstack.stackTagCompound.getInteger(data[STRUCTURE_INDEX]) - 1;
-		if (index < 0) index = this.structures.size() - 1;
+		if (index < 0) index = gen.structures.size() - 1;
 		itemstack.stackTagCompound.setInteger(data[STRUCTURE_INDEX], index);
 		return index;
 	}
@@ -192,7 +187,7 @@ public class ItemStructureSpawner extends BaseModItem
 	 * Returns the name of the structure at provided index, or "" if index out of bounds
 	 */
 	public String getStructureName(int index) {
-		return (index < structures.size() ? structures.get(index).name : "");
+		return (index < gen.structures.size() ? gen.structures.get(index).name : "");
 	}
 	
 	/**
@@ -223,11 +218,11 @@ public class ItemStructureSpawner extends BaseModItem
 		if (itemstack.stackTagCompound == null)
 			initNBTCompound(itemstack);
 		
-		if (!world.isRemote && structures.size() > 0)
+		if (!world.isRemote && gen.structures.size() > 0)
 		{
 			NBTTagCompound tag = itemstack.stackTagCompound;
 			gen.setPlayerFacing(player);
-			Structure structure = structures.get(tag.getInteger(data[STRUCTURE_INDEX]));
+			Structure structure = gen.structures.get(tag.getInteger(data[STRUCTURE_INDEX]));
 			gen.setBlockArrayList(structure.blockArrayList());
 			gen.setStructureFacing(structure.getFacing() + tag.getInteger(data[ROTATIONS]));
 			gen.setDefaultOffset(structure.getOffsetX() + tag.getInteger(data[OFFSET_X]), structure.getOffsetY() + tag.getInteger(data[OFFSET_Y]), structure.getOffsetZ() + tag.getInteger(data[OFFSET_Z]));
@@ -253,45 +248,5 @@ public class ItemStructureSpawner extends BaseModItem
     	itemstack.stackTagCompound.setBoolean(data[INVERT_Y], false);
     	
     	LogHelper.log(Level.INFO, "NBT Tag initialized for ItemStructureSpawner");
-	}
-	
-	/**
-	 * Adds all structures to the Structure List
-	 */
-	private static final void init()
-	{
-		Structure structure = new Structure("Hut");
-		structure.addBlockArray(StructureArrays.blockArrayNPCHut);
-		structure.setFacing(StructureGeneratorBase.EAST);
-		// has a buffer layer on the bottom in case no ground; spawn at y-1 for ground level
-		structure.setStructureOffset(0, -1, 0);
-		structures.add(structure);
-		
-		structure = new Structure("Blacksmith");
-		structure.addBlockArray(StructureArrays.blockArrayNPCBlackSmith);
-		structure.setFacing(StructureGeneratorBase.NORTH);
-		structures.add(structure);
-		
-		structure = new Structure("Viking Shop");
-		structure.addBlockArray(StructureArrays.blockArrayShop);
-		structure.setFacing(StructureGeneratorBase.WEST);
-		structures.add(structure);
-		
-		structure = new Structure("Redstone Dungeon");
-		structure.addBlockArray(StructureArrays.blockArrayRedstone);
-		//structure.setFacing(StructureGeneratorBase.EAST);
-		structures.add(structure);
-		
-		structure = new Structure("Offset Test");
-		structure.addBlockArray(StructureArrays.blockArraySpawnTest);
-		/*
-		structure.addBlockArray(StructureArrays.blockArrayOffsetTest1);
-		structure.addBlockArray(StructureArrays.blockArrayOffsetTest2);
-		structure.addBlockArray(StructureArrays.blockArrayOffsetTest2);
-		structure.addBlockArray(StructureArrays.blockArrayOffsetTest2);
-		structure.addBlockArray(StructureArrays.blockArrayOffsetTest1);
-		*/
-		structure.setFacing(StructureGeneratorBase.NORTH);
-		structures.add(structure);
 	}
 }

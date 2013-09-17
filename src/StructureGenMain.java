@@ -81,6 +81,7 @@ public class StructureGenMain
 		GameRegistry.addShapelessRecipe(new ItemStack(structureSpawner), Item.stick, Block.dirt);
 		LanguageRegistry.addName(structureSpawner, "Structure Spawner");
 		proxy.registerRenderers();
+		//GameRegistry.registerWorldGenerator(new WorldStructureGenerator());
 	}
 	
 	@EventHandler

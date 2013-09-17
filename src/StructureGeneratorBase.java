@@ -27,6 +27,7 @@ import java.util.logging.Level;
 
 import coolalias.structuregen.lib.LogHelper;
 import coolalias.structuregen.util.BlockData;
+import coolalias.structuregen.util.Structure;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.network.PacketDispatcher;
 import cpw.mods.fml.relauncher.Side;
@@ -194,6 +195,22 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 		this.blockArrayList.clear();
 		this.blockArrayList.addAll(list);
 		this.blockArray = (list.size() > 0 ? list.get(0) : null);
+	}
+	
+	/**
+	 * Overwrites current Structure information with passed in structure
+	 * Sets structure facing, but not offset
+	 */
+	public final void setStructure(Structure structure)
+	{
+		if (structure != null) {
+			reset();
+			setBlockArrayList(structure.blockArrayList());
+			setStructureFacing(structure.getFacing());
+			// setOffset(structure.getOffsetX(), structure.getOffsetY(), structure.getOffsetZ());
+		}
+		else
+			LogHelper.log(Level.SEVERE, "NULL Structure cannot be set!");
 	}
 	
 	/**

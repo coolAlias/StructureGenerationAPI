@@ -17,10 +17,13 @@
 
 package coolalias.structuregen;
 
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Random;
 import java.util.logging.Level;
 
-import coolalias.arcanelegacy.item.ALItems;
 import coolalias.structuregen.lib.LogHelper;
+import coolalias.structuregen.util.Structure;
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.passive.EntityVillager;
@@ -29,28 +32,32 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
+import net.minecraft.world.chunk.IChunkProvider;
 
-public class WorldGenStructure extends StructureGeneratorBase
+public class StructureGenerator extends StructureGeneratorBase
 {
+	/** List storing all structures currently available */
+	public static final List<Structure> structures = new LinkedList();
+	
 	int random_hole;
 	// a better way would be to pass World in to the constructors and set the random_hole
 	// value there, but I'm feeling lazy
 	boolean value_set = false;
 	
-	public WorldGenStructure(Entity entity, int[][][][] blocks){
+	public StructureGenerator(Entity entity, int[][][][] blocks){
 		super(entity, blocks);
 	}
 
-	public WorldGenStructure(Entity entity, int[][][][] blocks, int structureFacing) {
+	public StructureGenerator(Entity entity, int[][][][] blocks, int structureFacing) {
 		super(entity, blocks, structureFacing);
 	}
 
-	public WorldGenStructure(Entity entity, int[][][][] blocks,
+	public StructureGenerator(Entity entity, int[][][][] blocks,
 			int structureFacing, int offX, int offY, int offZ) {
 		super(entity, blocks, structureFacing, offX, offY, offZ);
 	}
 
-	public WorldGenStructure() {
+	public StructureGenerator() {
 		super();
 	}
 
@@ -62,7 +69,7 @@ public class WorldGenStructure extends StructureGeneratorBase
 	 */
 	@Override
 	public int getRealBlockID(int fakeID, int customData1) {
-		System.out.println("[GEN STRUCTURE] Getting real id from fake id: " + fakeID);
+		LogHelper.log(Level.FINE, "Getting real id from fake id: " + fakeID);
 		switch(fakeID) {
 		case StructureArrays.CUSTOM_CHEST:
 			return Block.chest.blockID;
@@ -128,15 +135,11 @@ public class WorldGenStructure extends StructureGeneratorBase
 				// Here we use customData to add a metadata block to the chest
 				addItemToTileInventory(world, new ItemStack(Block.cloth.blockID, 1, customData1), x, y, z);
 				
-				
-				//addItemToTileInventory(world, new ItemStack(Item.potion,1,8206), x, y, z);
-				//addItemToTileInventory(world, new ItemStack(Item.potion,1,8270), x, y, z);
-				//addItemToTileInventory(world, new ItemStack(Item.potion,1,8193), x, y, z);
-				//addItemToTileInventory(world, new ItemStack(Item.potion,1,16385), x, y, z);
-				addItemToTileInventory(world, new ItemStack(ALItems.scrollFly), x, y, z);
-				addItemToTileInventory(world, new ItemStack(ALItems.scrollDispel), x, y, z);
-				addItemToTileInventory(world, new ItemStack(ALItems.scrollResurrectI), x, y, z);
-				addItemToTileInventory(world, new ItemStack(ALItems.wandBasic, 4), x, y, z);
+				// Adding potions
+				addItemToTileInventory(world, new ItemStack(Item.potion,1,8206), x, y, z);
+				addItemToTileInventory(world, new ItemStack(Item.potion,1,8270), x, y, z);
+				addItemToTileInventory(world, new ItemStack(Item.potion,1,8193), x, y, z);
+				addItemToTileInventory(world, new ItemStack(Item.potion,1,16385), x, y, z);
 			}
 			break;
 		case StructureArrays.CUSTOM_DISPENSER:
@@ -216,5 +219,45 @@ public class WorldGenStructure extends StructureGeneratorBase
 		default:
 			LogHelper.log(Level.WARNING, "No custom method defined for id " + fakeID);
 		}
+	}
+	
+	/**
+	 * Add all structures to the Structure List
+	 */
+	static
+	{
+		Structure structure = new Structure("Hut");
+		structure.addBlockArray(StructureArrays.blockArrayNPCHut);
+		structure.setFacing(StructureGeneratorBase.EAST);
+		// has a buffer layer on the bottom in case no ground; spawn at y-1 for ground level
+		structure.setStructureOffset(0, -1, 0);
+		structures.add(structure);
+		
+		structure = new Structure("Blacksmith");
+		structure.addBlockArray(StructureArrays.blockArrayNPCBlackSmith);
+		structure.setFacing(StructureGeneratorBase.NORTH);
+		structures.add(structure);
+		
+		structure = new Structure("Viking Shop");
+		structure.addBlockArray(StructureArrays.blockArrayShop);
+		structure.setFacing(StructureGeneratorBase.WEST);
+		structures.add(structure);
+		
+		structure = new Structure("Redstone Dungeon");
+		structure.addBlockArray(StructureArrays.blockArrayRedstone);
+		//structure.setFacing(StructureGeneratorBase.EAST);
+		structures.add(structure);
+		
+		structure = new Structure("Offset Test");
+		structure.addBlockArray(StructureArrays.blockArraySpawnTest);
+		/*
+		structure.addBlockArray(StructureArrays.blockArrayOffsetTest1);
+		structure.addBlockArray(StructureArrays.blockArrayOffsetTest2);
+		structure.addBlockArray(StructureArrays.blockArrayOffsetTest2);
+		structure.addBlockArray(StructureArrays.blockArrayOffsetTest2);
+		structure.addBlockArray(StructureArrays.blockArrayOffsetTest1);
+		*/
+		structure.setFacing(StructureGeneratorBase.NORTH);
+		structures.add(structure);
 	}
 }
