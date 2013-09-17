@@ -7,6 +7,7 @@ entities or whatever else you can imagine.
 
 FEATURES
 ========
+- NEW: Add custom structures to the world during world generation
 - Generate custom structures in the world with the click of a button
 - Auto-rotation of structures ensures it will always face the player
 - Default offset will place the structure so it never spawns on top of the player
@@ -41,6 +42,13 @@ KNOWN BUGS
 
 LIMITATIONS
 ===========
+World Gen
+The algorithms I use to place structures are currently not very sophisticated. You will get structures generating on
+top of or inside of each other at times, especially if you generate lots of them. They may also generate on village
+rooftops. I just included it to show that the API is not limited to onItemRightClick or onBlockActivated style methods,
+but is in fact much more flexible.
+
+Array Size
 Due to the maximum byte limit of static initializers, the structure array size cannot exceed 65535 bytes. What this
 means for you is that a single horizontal layer of your structure cannot exceed roughly 3400 blocks in area, so about
 a 68x50 rectangular base, judging by my tests so far.
@@ -53,6 +61,8 @@ separate files or you will get a compile time error.
 
 DEMO MOD INCLUDED
 =================
+NOW SMP Compatible!
+
 A ready-to-go mod that will help familiarize you with the capabilities and functionality of the Structure Generation
 Tool. There is currently no recipe for the item that spawns structures, so try it in Creative.
 
@@ -84,6 +94,9 @@ Right click - spawn / remove structure at tile location clicked
 
 Controls can be customized from the config file that is generated the first time you load this mod.
 
+Or use coolAliasStructureWorldGenDemo.zip to try out randomly generated structures dotting your landscape! Initial
+world loading times will be longer than normal.
+
 INSTALLATION
 ============
 To test out the mod:
@@ -92,9 +105,11 @@ Download the pre-compiled and zipped mod file and place it in your minecraft/mod
 For creating your own structures:
 
 1. Place the StructureGeneratorBase.java file in your mod package.
-2. Either use the included WorldGenStructure.java file or create your own class that extends StructureGeneratorBase
+2. Either use the included StructureGenerator.java file or create your own class that extends StructureGeneratorBase
 3. Build your own structure arrays by following the guidelines in StructureArrays.java
-4. Use your WorldGenStructure class to generate your structures from whatever location you choose, such as a block or item
+4. Use your StructureGenerator class to generate your structures from whatever location you choose, such as a block
+   or item, or create a class that implements IWorldGenerator (such as the included WorldStructureGenerator) to
+   generate structures during world generation
 
 Let me know if you find any bugs, but if it has to do with metadata blocks, please, before you submit a bug report,
 double and triple-check that you are setting metadata correctly. Each block has it's own way of determining facing,
