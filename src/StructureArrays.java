@@ -24,7 +24,7 @@ public class StructureArrays
 {
 	/** Some predefined values for custom hooks that I use in the demo structure */
 	public static final int CUSTOM_CHEST = 4097, CUSTOM_DISPENSER = 4098, ITEM_FRAME = 4099, PAINTING = 4100,
-			SPAWN_VILLAGER = 4101, CUSTOM_SKULL = 4102, CUSTOM_SIGNWALL = 4103, RANDOM_HOLE = 4104;
+			SPAWN_VILLAGER = 4101, CUSTOM_SKULL = 4102, CUSTOM_SIGNWALL = 4103, CUSTOM_SIGNPOST = 4104, RANDOM_HOLE = 4105;
 	
 	/** Start of specific chests; I'll use negative values so as not to conflict with item types and such */
 	public static final int CUSTOM_CHEST_1 = -1;
@@ -719,7 +719,7 @@ public class StructureArrays
 			},
 			{ // x = 5 z values:
 				{Block.fence.blockID},
-				{Block.signPost.blockID,14},
+				{CUSTOM_SIGNPOST,14},
 				{Block.railPowered.blockID,11},
 				{Block.stairsCobblestone.blockID,1}, // ascending to west
 				{SPAWN_VILLAGER,1,2},

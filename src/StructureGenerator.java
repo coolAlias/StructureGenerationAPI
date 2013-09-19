@@ -85,6 +85,8 @@ public class StructureGenerator extends StructureGeneratorBase
 			return Block.skull.blockID;
 		case StructureArrays.CUSTOM_SIGNWALL:
 			return Block.signWall.blockID;
+		case StructureArrays.CUSTOM_SIGNPOST:
+			return Block.signPost.blockID;
 		case StructureArrays.RANDOM_HOLE: // Used customData1 to store the real block id
 			return customData1;
 		default:
@@ -153,18 +155,28 @@ public class StructureGenerator extends StructureGeneratorBase
 				addmore = addItemToTileInventory(world, new ItemStack(customData1, 64, 0), x, y, z);
 			}
 			break;
-		case StructureArrays.CUSTOM_SIGNWALL:
+		case StructureArrays.CUSTOM_SIGNWALL: // no 'break' so it goes into the next case
+		case StructureArrays.CUSTOM_SIGNPOST:
 			// An array that stores up to 4 Strings, the max capacity of a sign
-			String[] text = new String[5];
+			// Best to allocate the array to the size you need
+			String[] text;
 			// Set different text for each custom sign, using different colors
 			if (customData1 == StructureArrays.CUSTOM_SIGN_1)
 			{
+				// max number of lines is 4; any more than that will be ignored
+				text = new String[5];
 				text[0] = EnumChatFormatting.DARK_RED + "   BEWARE";
 				text[1] = EnumChatFormatting.DARK_RED + "  NO ENTRY";
 				// the following string is too long and will automatically be truncated to the correct length
 				text[2] = EnumChatFormatting.DARK_BLUE + "Enter at your abcdefghijklm";
 				text[3] = EnumChatFormatting.DARK_GRAY + "  own risk.";
-				text[4] = EnumChatFormatting.DARK_GRAY + "CRASH TEST";
+				text[4] = "Never prints!";
+			}
+			else
+			{
+				// best to allocate only what is needed, here just one line
+				text = new String[1];
+				text[0] = EnumChatFormatting.BLACK + "Sign Post Text";
 			}
 			// Use this easy method to add text to the sign's tile entity:
 			setSignText(world, text, x, y, z);

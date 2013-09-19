@@ -522,7 +522,11 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 		if (sign != null)
 		{
 			for (int i = 0; i < sign.signText.length && i < text.length; ++i) {
-				if (text[i].length() > 15) {
+				if (text[i] == null) {
+					LogHelper.log(Level.WARNING, "Uninitialized String element while setting sign text at index " + i);
+					continue;
+				}
+				else if (text[i].length() > 15) {
 					LogHelper.log(Level.WARNING, text[i] + " is too long to fit on a sign; maximum length is 15 characters.");
 					sign.signText[i] = text[i].substring(0, 15);
 				}
