@@ -25,9 +25,9 @@ public class WorldStructureGenerator implements IWorldGenerator
 			// generateNether(world, random, chunkX * 16, chunkZ * 16);
 			break;
 		case 0:
-			// 50% chance of a single structure per chunk; could make a weighted list
+			// 25% chance of a single structure per chunk; could make a weighted list
 			// Recall that a chunk is only 16x16 blocks in area, so this is quite a lot of structures
-			if (random.nextFloat() < 0.5F)
+			if (random.nextFloat() < 0.25F)
 				generateStructure(world, random, chunkX * 16, chunkZ * 16);
 			break;
 		default:
@@ -40,30 +40,31 @@ public class WorldStructureGenerator implements IWorldGenerator
 		// Need to create a new instance each time or the generate() methods may overlap themselves and cause a crash
 		StructureGenerator gen = new StructureGenerator();
 		int struct; // This will store a random index of the structure to generate
-		
+
 		struct = rand.nextInt(gen.structures.size());
 		LogHelper.log(Level.INFO, "[GEN] Generating " + gen.structures.get(struct).name);
 		int x = chunkX + rand.nextInt(16);
-		int y = 128; // start high and we'll work down
 		int z = chunkZ + rand.nextInt(16);
 
-		// find ground level, ignoring blocks such as grass but may build on pre-existing structures such as villages
-		while (!world.doesBlockHaveSolidTopSurface(x, y, z) && y > 62)
+		// nice way of getting a height to work from; it returns the topmost
+		// non-air block at an x/z position, such as tall grass, dirt or leaves
+		int y = world.getHeightValue(x, z);
+
+		// find ground level, ignoring blocks such as grass and water
+		while (!world.doesBlockHaveSolidTopSurface(x, y, z) && y > world.provider.getAverageGroundLevel())
 		{
 			--y;
 		}
-		// Not biome-specific, only dirt for now.
+
 		if (!world.doesBlockHaveSolidTopSurface(x, y, z))
 		{
-			LogHelper.log(Level.INFO, "Failed to find suitable surface. Not generating structure.");
+			LogHelper.log(Level.INFO, "Failed to find suitable surface. Not generating structure. Block id " + world.getBlockId(x, y, z));
 			return;
 		}
 		int widthX = gen.structures.get(struct).getWidthX();
 		int widthZ = gen.structures.get(struct).getWidthZ();
 		int height = gen.structures.get(struct).getHeight();
-		
-		LogHelper.log(Level.INFO, "Y/X/Z dimensions of structure: " + height + "/" + widthX + "/" + widthZ);
-		
+
 		// check if structure will collide with any others in area
 		// might be able to use built-in StructureBoundBox
 		/*
@@ -77,7 +78,7 @@ public class WorldStructureGenerator implements IWorldGenerator
 				}
 			}
 		}
-		*/
+		 */
 		// Set structure and random facing, then generate; no offset needed here
 		gen.setStructure(gen.structures.get(struct));
 		gen.setStructureFacing(rand.nextInt(4));

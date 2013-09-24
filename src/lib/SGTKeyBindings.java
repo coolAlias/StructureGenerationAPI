@@ -34,7 +34,7 @@ import cpw.mods.fml.relauncher.SideOnly;
 public class SGTKeyBindings
 {
 	/** Key index for easy handling */
-	public static final int PLUS_X = 0, MINUS_X = 1, PLUS_Z = 2, MINUS_Z = 3, OFFSET_Y = 4,
+	public static final byte PLUS_X = 0, MINUS_X = 1, PLUS_Z = 2, MINUS_Z = 3, OFFSET_Y = 4,
 			INVERT_Y = 5, RESET_OFFSET = 6, ROTATE = 7, NEXT_STRUCT = 8, PREV_STRUCT = 9,
 			TOGGLE_REMOVE = 10;
 	

@@ -38,12 +38,12 @@ public class StructureGenerator extends StructureGeneratorBase
 {
 	/** List storing all structures currently available */
 	public static final List<Structure> structures = new LinkedList();
-	
+
 	int random_hole;
 	// a better way would be to pass World in to the constructors and set the random_hole
 	// value there, but I'm feeling lazy
 	boolean value_set = false;
-	
+
 	public StructureGenerator(Entity entity, int[][][][] blocks){
 		super(entity, blocks);
 	}
@@ -114,7 +114,7 @@ public class StructureGenerator extends StructureGeneratorBase
 		int meta = world.getBlockMetadata(x, y, z);
 		LogHelper.log(Level.FINE, "Setting custom block info for fake id " + fakeID + " and customData1 " + customData1);
 		LogHelper.log(Level.FINEST, "Custom block metadata from world = " + meta);
-		
+
 		switch(fakeID) {
 		case StructureArrays.CUSTOM_CHEST:
 			// Using the pre-made method addItemToTileInventory adds items to the first slot available
@@ -136,7 +136,7 @@ public class StructureGenerator extends StructureGeneratorBase
 
 				// Here we use customData to add a metadata block to the chest
 				addItemToTileInventory(world, new ItemStack(Block.cloth.blockID, 1, customData1), x, y, z);
-				
+
 				// Adding potions
 				addItemToTileInventory(world, new ItemStack(Item.potion,1,8206), x, y, z);
 				addItemToTileInventory(world, new ItemStack(Item.potion,1,8270), x, y, z);
@@ -170,13 +170,13 @@ public class StructureGenerator extends StructureGeneratorBase
 				// the following string is too long and will automatically be truncated to the correct length
 				text[2] = EnumChatFormatting.DARK_BLUE + "Enter at your abcdefghijklm";
 				text[3] = EnumChatFormatting.DARK_GRAY + "  own risk.";
-				text[4] = "Never prints!";
+				text[4] = "This never prints because its index is greater than signs can handle!";
 			}
 			else
 			{
 				// best to allocate only what is needed, here just one line
 				text = new String[1];
-				text[0] = EnumChatFormatting.BLACK + "Sign Post Text";
+				text[0] = EnumChatFormatting.BLACK + "A Sign Post";
 			}
 			// Use this easy method to add text to the sign's tile entity:
 			setSignText(world, text, x, y, z);
@@ -189,10 +189,10 @@ public class StructureGenerator extends StructureGeneratorBase
 			ItemStack frame = new ItemStack(Item.itemFrame);
 			// To save you lots of trouble, there are ready-made methods to handle placing
 			// hanging entities and set ItemFrame items (with or without rotation)
-			
+
 			// You need to store the returned facing from setHangingEntity to use later methods
 			int facing = setHangingEntity(world, frame, x, y, z);
-			
+
 			// Use this method for default rotation:
 			setItemFrameStack(world, new ItemStack(customData1,1,0), x, y, z, facing);
 
@@ -211,8 +211,8 @@ public class StructureGenerator extends StructureGeneratorBase
 			// One way to generate holes would be to set a random int once per structure,
 			// then remove only hole blocks with that value, allowing for custom patterns
 			//if (random_hole == customData2)
-				//world.setBlockToAir(x, y, z);
-			
+			//world.setBlockToAir(x, y, z);
+
 			// another way that doesn't use customData2 would be to use world.rand.nextFloat()
 			// use whatever value you want to check against, I used 0.25F so 25% will become holes
 			// this way is nice because we don't need to set customData2 for all these blocks
@@ -224,7 +224,7 @@ public class StructureGenerator extends StructureGeneratorBase
 			Entity bob = new EntityVillager(world, customData1);
 			//Entity X = new EntityHorse(world);
 			//((EntityHorse) X).func_110235_q(1026);
-			
+
 			// Now use the preset method to avoid spawning in walls
 			spawnEntityInStructure(world, bob, x, y, z);
 			break;
@@ -232,7 +232,7 @@ public class StructureGenerator extends StructureGeneratorBase
 			LogHelper.log(Level.WARNING, "No custom method defined for id " + fakeID);
 		}
 	}
-	
+
 	/**
 	 * Add all structures to the Structure List
 	 */
@@ -244,23 +244,24 @@ public class StructureGenerator extends StructureGeneratorBase
 		// has a buffer layer on the bottom in case no ground; spawn at y-1 for ground level
 		structure.setStructureOffset(0, -1, 0);
 		structures.add(structure);
-		
+
 		structure = new Structure("Blacksmith");
 		structure.addBlockArray(StructureArrays.blockArrayNPCBlackSmith);
-		structure.setFacing(StructureGeneratorBase.NORTH);
+		structure.setFacing(StructureGeneratorBase.EAST);
 		structures.add(structure);
-		
+
 		structure = new Structure("Viking Shop");
 		structure.addBlockArray(StructureArrays.blockArrayShop);
 		structure.setFacing(StructureGeneratorBase.WEST);
 		structures.add(structure);
-		
+
 		structure = new Structure("Redstone Dungeon");
 		structure.addBlockArray(StructureArrays.blockArrayRedstone);
-		//structure.setFacing(StructureGeneratorBase.EAST);
+		structure.setFacing(StructureGeneratorBase.WEST);
+		structure.setStructureOffset(0, -1, -5);
 		structures.add(structure);
-		
-		structure = new Structure("Offset Test");
+
+		structure = new Structure("Spawn Test");
 		structure.addBlockArray(StructureArrays.blockArraySpawnTest);
 		/*
 		structure.addBlockArray(StructureArrays.blockArrayOffsetTest1);
@@ -268,8 +269,16 @@ public class StructureGenerator extends StructureGeneratorBase
 		structure.addBlockArray(StructureArrays.blockArrayOffsetTest2);
 		structure.addBlockArray(StructureArrays.blockArrayOffsetTest2);
 		structure.addBlockArray(StructureArrays.blockArrayOffsetTest1);
-		*/
-		structure.setFacing(StructureGeneratorBase.NORTH);
+		 */
+		structure.setFacing(StructureGeneratorBase.EAST);
 		structures.add(structure);
+		
+		structure = new Structure("WaterMill");
+		structure.addBlockArray(WaterMillArray1.blockArrayWaterMill);
+		structure.addBlockArray(WaterMillArray2.blockArrayWaterMill);
+		structure.addBlockArray(WaterMillArray3.blockArrayWaterMill);
+		structure.setFacing(StructureGeneratorBase.EAST);
+		structures.add(structure);
+		 
 	}
 }

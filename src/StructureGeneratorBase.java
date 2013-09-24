@@ -566,7 +566,7 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 			}
 			skull.setSkullType(type, name);
 			if (rot > -1)
-				skull.setSkullRotation(rot);
+				skull.setSkullRotation(rot % 16);
 			return true;
 		}
 		LogHelper.log(Level.WARNING, "No TileEntitySkull found at " + x + "/" + y + "/" + z);
@@ -670,8 +670,7 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 	/**
 	 * Returns a string describing current facing of structure
 	 */
-	public final String currentStructureFacing()
-	{
+	public final String currentStructureFacing() {
 		return (this.structureFacing == EAST ? "East" : this.structureFacing == WEST ? "West" : this.structureFacing == NORTH ? "North" : "South");
 	}
 	
@@ -688,8 +687,7 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 	/**
 	 * Returns true if the generator has enough information to generate a structure
 	 */
-	public final boolean canGenerate()
-	{
+	public final boolean canGenerate() {
 		return this.blockArrayList.size() > 0 || this.blockArray != null;
 	}
 	
@@ -844,9 +842,9 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 	 */
 	private final boolean removeBlockAt(World world, int fakeID, int realID, int x, int y, int z, int rotations)
 	{
-		if ((world.isAirBlock(x, y, z) && Math.abs(fakeID) <= 4096) || (realID < 0 && Math.abs(realID) != world.getBlockId(x, y, z)))
-		{ }
-		else if (Math.abs(realID) == world.getBlockId(x, y, z) || Math.abs(fakeID) > 4096 ||
+		//if ((world.isAirBlock(x, y, z) && Math.abs(fakeID) <= 4096) || (realID < 0 && Math.abs(realID) != world.getBlockId(x, y, z)))
+		//{ }
+		if (Math.abs(realID) == world.getBlockId(x, y, z) || Math.abs(fakeID) > 4096 ||
 				(Block.blocksList[world.getBlockId(x, y, z)].blockMaterial.isLiquid() &&
 				(Block.blocksList[Math.abs(realID)].blockMaterial.isLiquid() || realID == 0)))
 		{
@@ -862,7 +860,7 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 			}
 		}
 		else {
-			LogHelper.log(Level.WARNING, "Incorrect location for structure removal, aborting. Last block id checked = " + realID);
+			LogHelper.log(Level.INFO, "Incorrect location for structure removal, aborting. Last block id checked = " + realID);
 			return false;
 		}
 		

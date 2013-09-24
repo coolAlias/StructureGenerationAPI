@@ -20,16 +20,13 @@ package coolalias.structuregen.handlers;
 import java.util.EnumSet;
 
 import coolalias.structuregen.ModInfo;
-import coolalias.structuregen.items.ItemStructureSpawner;
+import coolalias.structuregen.StructureGenMain;
 import coolalias.structuregen.lib.SGTKeyBindings;
-import coolalias.structuregen.util.SGTPacketKeyPress;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityClientPlayerMP;
 import net.minecraft.client.settings.KeyBinding;
-import cpw.mods.fml.client.FMLClientHandler;
 import cpw.mods.fml.client.registry.KeyBindingRegistry.KeyHandler;
-import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.TickType;
-import cpw.mods.fml.common.network.PacketDispatcher;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
@@ -40,13 +37,11 @@ public class SGTKeyHandler extends KeyHandler
 	
 	private EnumSet tickTypes = EnumSet.of(TickType.PLAYER);
 			
-	public SGTKeyHandler(KeyBinding[] keyBindings, boolean[] repeatings)
-	{
+	public SGTKeyHandler(KeyBinding[] keyBindings, boolean[] repeatings) {
 		super(keyBindings, repeatings);
 	}
 
-	public SGTKeyHandler(KeyBinding[] keyBindings)
-	{
+	public SGTKeyHandler(KeyBinding[] keyBindings) {
 		super(keyBindings);
 	}
 
@@ -58,12 +53,13 @@ public class SGTKeyHandler extends KeyHandler
 	@Override
 	public void keyDown(EnumSet<TickType> types, KeyBinding kb, boolean tickEnd, boolean isRepeat)
 	{
-		if (tickEnd && SGTKeyBindings.SGTKeyMap.containsKey(kb.keyCode) && FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT)
+		if (tickEnd && SGTKeyBindings.SGTKeyMap.containsKey(kb.keyCode))
 		{
-			EntityClientPlayerMP player = FMLClientHandler.instance().getClient().thePlayer;
+			EntityClientPlayerMP player = Minecraft.getMinecraft().thePlayer;
 			
-			if (player.getHeldItem() != null && player.getHeldItem().getItem() instanceof ItemStructureSpawner)
-				player.sendQueue.addToSendQueue(SGTPacketKeyPress.getPacket((byte) SGTKeyBindings.SGTKeyMap.get(kb.keyCode)));
+			if (player.getHeldItem() != null && player.getHeldItem().itemID == StructureGenMain.structureSpawner.itemID) {
+				SGTPacketHandler.sendPacketKeyPress(SGTKeyBindings.SGTKeyMap.get(kb.keyCode));
+			}
 		}
 	}
 

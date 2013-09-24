@@ -35,24 +35,21 @@ public class Structure
 	/** Stores default amount to offset structure's location in the world. */
 	private int offsetX = 0, offsetY = 0, offsetZ = 0;
 
-	public Structure(String name)
-	{
+	public Structure(String name) {
 		this.name = name;
 	}
 	
 	/**
 	 * Returns the blockArray List for this structure
 	 */
-	public final List<int[][][][]> blockArrayList()
-	{
+	public final List<int[][][][]> blockArrayList() {
 		return this.blockArrayList;
 	}
 	
 	/**
 	 * Returns the structure's default facing
 	 */
-	public final int getFacing()
-	{
+	public final int getFacing() {
 		return this.facing;
 	}
 	
@@ -60,40 +57,35 @@ public class Structure
 	 * Sets the default direction the structure is facing. This side will always face the player
 	 * unless you manually rotate the structure with the rotateStructureFacing() method.
 	 */
-	public final void setFacing(int facing)
-	{
+	public final void setFacing(int facing) {
 		this.facing = facing;
 	}
 	
 	/**
 	 * Adds a block array 'layer' to the list to be generated
 	 */
-	public final void addBlockArray(int blocks[][][][])
-	{
+	public final void addBlockArray(int blocks[][][][]) {
 		this.blockArrayList.add(blocks);
 	}
 	
 	/**
 	 * Adds all elements contained in the parameter list to the structure
 	 */
-	public final void addBlockArrayList(List<int[][][][]> list)
-	{
+	public final void addBlockArrayList(List<int[][][][]> list) {
 		this.blockArrayList.addAll(list);
 	}
 	
 	/**
 	 * Returns lowest structure layer's width along the x axis or 0 if no structure has been added
 	 */
-	public final int getWidthX()
-	{
+	public final int getWidthX() {
 		return blockArrayList.size() > 0 ? blockArrayList.get(0)[0].length : 0;
 	}
 	
 	/**
 	 * Returns lowest structure layer's width along the z axis or 0 if no structure has been set
 	 */
-	public final int getWidthZ()
-	{
+	public final int getWidthZ() {
 		return blockArrayList != null ? blockArrayList.get(0)[0][0].length : 0;
 	}
 	
@@ -117,24 +109,21 @@ public class Structure
 	/**
 	 * Returns the structure's offset for the x axis
 	 */
-	public final int getOffsetX()
-	{
+	public final int getOffsetX() {
 		return this.offsetX;
 	}
 	
 	/**
 	 * Returns the structure's offset for the y axis
 	 */
-	public final int getOffsetY()
-	{
+	public final int getOffsetY() {
 		return this.offsetY;
 	}
 	
 	/**
 	 * Returns the structure's offset for the z axis
 	 */
-	public final int getOffsetZ()
-	{
+	public final int getOffsetZ() {
 		return this.offsetZ;
 	}
 	
