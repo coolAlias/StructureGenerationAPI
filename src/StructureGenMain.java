@@ -39,7 +39,6 @@ import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.network.NetworkMod;
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.common.registry.LanguageRegistry;
-import cpw.mods.fml.relauncher.Side;
 
 @Mod(modid = ModInfo.MOD_ID, name = ModInfo.MOD_NAME, version = ModInfo.VERSION)
 @NetworkMod(clientSideRequired=true, serverSideRequired=false,
@@ -68,7 +67,7 @@ public class StructureGenMain
         
         modItemIndex = config.getItem("modItemIndex", MOD_ITEM_INDEX_DEFAULT).getInt() - 256;
         
-        if (FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT)
+        if (FMLCommonHandler.instance().getSide().isClient())
         	SGTKeyBindings.init(config);
         
         config.save();

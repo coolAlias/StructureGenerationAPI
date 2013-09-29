@@ -266,7 +266,7 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 	 * implements IInventory (and thus, by extension, ISidedInventory)
 	 * @return true if entire itemstack was added
 	 */
-	public final boolean addItemToTileInventory(World world, ItemStack itemstack, int x, int y, int z)
+	public static final boolean addItemToTileInventory(World world, ItemStack itemstack, int x, int y, int z)
 	{
 		TileEntity tile = world.getBlockTileEntity(x, y, z);
 		
@@ -324,7 +324,7 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 	 * Automatically removes placeholder block at coordinates x/y/z.
 	 * @return false if no suitable location found
 	 */
-	public final boolean setEntityInStructure(World world, Entity entity, int x, int y, int z)
+	public static final boolean setEntityInStructure(World world, Entity entity, int x, int y, int z)
 	{
 		if (entity == null) { return false; }
 		int i = 0, iMax = (entity.width > 1.0F ? 16 : 4), factor = 1;
@@ -381,7 +381,7 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 	 * Spawns an entity in the structure by using setEntityInStructure.
 	 * @return true if entity spawned without collision (entity will still spawn if false, but may be in a wall)
 	 */
-	public final boolean spawnEntityInStructure(World world, Entity entity, int x, int y, int z)
+	public static final boolean spawnEntityInStructure(World world, Entity entity, int x, int y, int z)
 	{
 		if (world.isRemote || entity == null) { return false; }
 		
@@ -405,7 +405,7 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 	 * @param hanging Must be an instance of ItemHangingEntity, such as Item.painting
 	 * @return Returns direction for further processing such as for ItemFrames, or -1 if no entity set
 	 */
-	public final int setHangingEntity(World world, ItemStack hanging, int x, int y, int z)
+	public static final int setHangingEntity(World world, ItemStack hanging, int x, int y, int z)
 	{
 		if (hanging.getItem() == null || !(hanging.getItem() instanceof ItemHangingEntity)) {
 			return -1;
@@ -446,7 +446,7 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 	 * Set's the itemstack contained in ItemFrame at x/y/z with default rotation.
 	 * @param direction Use the value returned from the setHangingEntity method
 	 */
-	public final void setItemFrameStack(World world, ItemStack itemstack, int x, int y, int z, int direction)
+	public static final void setItemFrameStack(World world, ItemStack itemstack, int x, int y, int z, int direction)
 	{
 		setItemFrameStack(world, itemstack, x, y, z, direction, 0);
 	}
@@ -456,7 +456,7 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 	 * @param direction Use the value returned from the setHangingEntity method
 	 * @param itemRotation 0,1,2,3 starting at default and rotating 90 degrees clockwise
 	 */
-	public final void setItemFrameStack(World world, ItemStack itemstack, int x, int y, int z, int direction, int itemRotation)
+	public static final void setItemFrameStack(World world, ItemStack itemstack, int x, int y, int z, int direction, int itemRotation)
 	{
 		List<EntityItemFrame> frames = world.getEntitiesWithinAABB(EntityItemFrame.class, getHangingEntityAxisAligned(x, y, z, direction));
 		if (frames != null && !frames.isEmpty())
@@ -477,7 +477,7 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 	 * @param direction Use the value returned from the setHangingEntity method
 	 * @return false if 'name' didn't match any EnumArt values.
 	 */
-	public final boolean setPaintingArt(World world, String name, int x, int y, int z, int direction)
+	public static final boolean setPaintingArt(World world, String name, int x, int y, int z, int direction)
 	{
 		List<EntityPainting> paintings = world.getEntitiesWithinAABB(EntityPainting.class, getHangingEntityAxisAligned(x, y, z, direction));
 		
@@ -515,7 +515,7 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 	 * @param text A String array of no more than 4 elements; additional elements will be ignored
 	 * @return false if no sign tile entity was found at x/y/z
 	 */
-	public final boolean setSignText(World world, String[] text, int x, int y, int z)
+	public static final boolean setSignText(World world, String[] text, int x, int y, int z)
 	{
 		TileEntitySign sign = (world.getBlockTileEntity(x, y, z) instanceof TileEntitySign ? (TileEntitySign) world.getBlockTileEntity(x, y, z) : null);
 		
@@ -542,7 +542,7 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 	/**
 	 * Method to set skulls not requiring extra rotation data (i.e. wall-mounted skulls whose rotation is determined by metadata)
 	 */
-	public final boolean setSkullData(World world, String name, int type, int x, int y, int z)
+	public static final boolean setSkullData(World world, String name, int type, int x, int y, int z)
 	{
 		return setSkullData(world, name, type, -1, x, y, z);
 	}
@@ -554,7 +554,7 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 	 * @param rot Sets the rotation for the skull if positive value is used
 	 * @return false if errors were encountered (i.e. incorrect tile entity at x/y/z)
 	 */
-	public final boolean setSkullData(World world, String name, int type, int rot, int x, int y, int z)
+	public static final boolean setSkullData(World world, String name, int type, int rot, int x, int y, int z)
 	{
 		TileEntitySkull skull = (world.getBlockTileEntity(x, y, z) instanceof TileEntitySkull ? (TileEntitySkull) world.getBlockTileEntity(x, y, z) : null);
 		if (skull != null)
@@ -844,9 +844,8 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 	{
 		//if ((world.isAirBlock(x, y, z) && Math.abs(fakeID) <= 4096) || (realID < 0 && Math.abs(realID) != world.getBlockId(x, y, z)))
 		//{ }
-		if (Math.abs(realID) == world.getBlockId(x, y, z) || Math.abs(fakeID) > 4096 ||
-				(Block.blocksList[world.getBlockId(x, y, z)].blockMaterial.isLiquid() &&
-				(Block.blocksList[Math.abs(realID)].blockMaterial.isLiquid() || realID == 0)))
+		if (Math.abs(realID) == world.getBlockId(x, y, z) || Math.abs(fakeID) > 4096 || (Block.blocksList[world.getBlockId(x, y, z)] == null ||
+			(Block.blocksList[world.getBlockId(x, y, z)].blockMaterial.isLiquid() && Block.blocksList[Math.abs(realID)].blockMaterial.isLiquid() || realID == 0)))
 		{
 			world.setBlockToAir(x, y, z);
 			List <Entity> list = world.getEntitiesWithinAABB(Entity.class, getHangingEntityAxisAligned(x, y, z, Direction.directionToFacing[rotations]).expand(1.5F, 1.0F, 1.5F));
@@ -1038,7 +1037,7 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 	/**
 	 * Returns an AxisAlignedBB suitable for a hanging entity at x/y/z facing direction
 	 */
-	private final AxisAlignedBB getHangingEntityAxisAligned(int x, int y, int z, int direction)
+	public static final AxisAlignedBB getHangingEntityAxisAligned(int x, int y, int z, int direction)
 	{
 		double minX = (double) x, minZ = (double) z, maxX = minX, maxZ =  minZ;
 		

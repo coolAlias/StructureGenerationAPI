@@ -17,21 +17,18 @@
 
 package coolalias.structuregen.items;
 
-import java.util.LinkedList;
-import java.util.List;
 import java.util.logging.Level;
 
-import coolalias.structuregen.StructureArrays;
-import coolalias.structuregen.StructureGeneratorBase;
-import coolalias.structuregen.StructureGenerator;
-import coolalias.structuregen.lib.LogHelper;
-import coolalias.structuregen.lib.SGTKeyBindings;
-import coolalias.structuregen.util.Structure;
+import net.minecraft.block.Block;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.World;
+import coolalias.structuregen.StructureGenerator;
+import coolalias.structuregen.lib.LogHelper;
+import coolalias.structuregen.lib.SGTKeyBindings;
+import coolalias.structuregen.util.Structure;
 
 public class ItemStructureSpawner extends BaseModItem
 {
@@ -219,6 +216,7 @@ public class ItemStructureSpawner extends BaseModItem
 
 		if (!world.isRemote && gen.structures.size() > 0)
 		{
+			if (world.getBlockId(x,y,z) == Block.snow.blockID) { --y; }
 			NBTTagCompound tag = itemstack.stackTagCompound;
 			gen.setPlayerFacing(player);
 			Structure structure = gen.structures.get(tag.getInteger(data[STRUCTURE_INDEX]));

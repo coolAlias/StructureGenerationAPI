@@ -25,16 +25,13 @@ import net.minecraft.item.Item;
 
 public class BaseModItem extends Item {
 
-	public BaseModItem(int par1)
-	{
+	public BaseModItem(int par1) {
 		super(par1);
 	}
 
 	@Override
 	@SideOnly(Side.CLIENT)
-	public void registerIcons(IconRegister iconRegister)
-	{
-		this.itemIcon = iconRegister.registerIcon(ModInfo.MOD_ID + ":" + this.getUnlocalizedName().substring(5));
+	public void registerIcons(IconRegister iconRegister) {
+		this.itemIcon = iconRegister.registerIcon(ModInfo.MOD_ID + ":" + this.getUnlocalizedName().substring(5).toLowerCase());
 	}
-
 }
