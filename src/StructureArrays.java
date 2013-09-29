@@ -197,7 +197,9 @@ public class StructureArrays
 	Left/right values given above are based on the player looking at the front face of the
 	structure in its default orientation.
 	
-	All directional blocks should be set in relation to your structure's default facing.
+	All directional blocks should be set in relation to your structure's default facing, although
+	this is only an aid for you in setting the correct value. Once you have the correct value, you
+	can give your structure any default facing and the metadata will still be correct.
 	
 	===============
 	THE BLOCK ARRAY
@@ -2490,17 +2492,17 @@ public class StructureArrays
 	};
 	
 	public static final int[][][][] blockArrayOffsetTest2 = 
-		{
-			{ // y = 0
-				{ // x = 0
-					{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
-				},
-				{ // x = 1
-					{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
-				},
-				{ // x = 2
-					{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
-				}
+	{
+		{ // y = 0
+			{ // x = 0
+				{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
+			},
+			{ // x = 1
+				{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
+			},
+			{ // x = 2
+				{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
 			}
-		};
+		}
+	};
 }
