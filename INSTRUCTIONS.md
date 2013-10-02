@@ -1,6 +1,6 @@
-=====================================================================================
-                HOW TO GENERATE YOUR CUSTOM STRUCTURES
-=====================================================================================
+======================================
+HOW TO GENERATE YOUR CUSTOM STRUCTURES
+======================================
 
 Note: With the addition of the Structure class (see below), I recommend using those
 instead as it entails all the same steps but gives extra benefits.
