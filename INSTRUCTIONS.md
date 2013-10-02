@@ -1,6 +1,7 @@
 =====================================================================================
                 HOW TO GENERATE YOUR CUSTOM STRUCTURES
 =====================================================================================
+
 Note: With the addition of the Structure class (see below), I recommend using those
 instead as it entails all the same steps but gives extra benefits.
 
@@ -8,9 +9,11 @@ Here I explain in detail how to generate and manipulate the position for your cu
 structure. Only steps 1 and 5 are absolutely required, and step 3 is pretty much also
 absolutely required, but you could skip it. Steps 2 and 4 just give you further
 control over exactly where and how the structure is generated.
+
 =======
-Step 1: ABSOLUTELY REQUIRED! Add your blockArray to the generator's list
+Step 1: Add your blockArray to the generator's list
 =======
+
 Once you have your blockArray(s) set up correctly (see below), you will need to add
 them to the WorldGenStructure generator's list of arrays to generate.
 
@@ -23,17 +26,21 @@ This is done with one of four methods:
 If you have more than one layer, they should be added from the bottom up, so first
 the base, then the layer on top of the base, and so on until the final topmost layer
 is added.
+
 =======
-Step 2: Set your structure's facing (defaults to EAST if not specifically set)
+Step 2: Set your structure's facing
 =======
+
 "setStructureFacing(StructureGeneratorBase.DIRECTION)"
  
 Valid DIRECTION values are NORTH, SOUTH, EAST, WEST, enumerated in StructureGeneratorBase.
 
 See below for more information on choosing a default facing for your structure.
+
 =======
-Step 3: REQUIRED! Set how much to offset the structure's position when generated
+Step 3: Set structure offset (optional)
 =======
+
 This can be done in one of three ways:
 
 - Automatically so structure always generates completely in front of player:
@@ -52,17 +59,21 @@ This can be done in one of three ways:
 
 Negative offX values place the structure further away from the player, +offX will move
 toward the player. Thinking about inverting this.
+
 =======
-Step 4: Set the player's facing (optional but generally recommended)
+Step 4: Set the player's facing (optional)
 =======
+
 "setPlayerFacing(Entity)"
 
 This will ensure the structure always orients itself toward the player; important if
 you put the front door on the structureFacing side, but not important if generating
 the structure during world gen.
+
 =======
-Step 5: ABSOLUTELY REQUIRED! Generate your structure
+Step 5: Generate your structure
 =======
+
 The final step is to call the generate method. This is a vanilla method signature used
 by all classes extending WorldGenerator:
 
@@ -129,6 +140,7 @@ use MCEdit first and use it as a template to manually convert the array.
 ================
 STRUCTURE FACING
 ================
+
 Structure facing determines which 'side' of the array faces the player when generated.
 
 Facing      Array Setup
@@ -162,6 +174,7 @@ can give your structure any default facing and the metadata will still be correc
 ===============
 THE BLOCK ARRAY
 ===============
+
 The first array [] stores y values, so we're building a structure one flat layer at
 a time because I personally feel it's easier to visualize that way.
 
@@ -231,6 +244,7 @@ z axis). blockArray[1]-[maxHeight] can all contain as few as 0 elements, but no 
 ====================
 BLOCK ARRAY TEMPLATE
 ====================
+
 /**
  * Here is an EMPTY template. Copy and paste as needed.
  * See 'StructureArrays.java' for samples.
@@ -252,6 +266,7 @@ public static final int[][][][] blockArrayTemplate =
 =====================================================================================
             GENERATING LARGE STRUCTURES: USING MULTIPLE ARRAYS
 =====================================================================================
+
 If you receive the error message "The code for the static initializer is exceeding
 the 65535 bytes limit", then you will need to break your structure up into multiple
 array 'layers'.
@@ -411,6 +426,7 @@ use one of the "setSkullData" methods below.
                     HOW TO USE CUSTOM HOOK METHOD:
 "onCustomBlockAdded(World world, int x, int y, int z, int fakeID, int customData)"
 =====================================================================================
+
 Step 1: Choose a block ID
 Custom block hooks require block ids greater than 4095. If you want to your block to
 soft-spawn, you can also use the negative value of your defined block id.
@@ -443,6 +459,7 @@ See WorldGenStructure's demo implementation of this method for concrete examples
 ===================
 SOME USEFUL METHODS
 ===================
+
 The following are methods designed to make handling onCustomBlockAdded cases easier:
 
 1. addItemToTileInventory(World world, ItemStack itemstack, int x, int y, int z)
