@@ -25,15 +25,9 @@ import java.util.Map;
 import java.util.Random;
 import java.util.logging.Level;
 
-import coolalias.structuregen.lib.LogHelper;
-import coolalias.structuregen.util.BlockData;
-import coolalias.structuregen.util.Structure;
-import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.network.PacketDispatcher;
-import cpw.mods.fml.relauncher.Side;
 import net.minecraft.block.Block;
+import net.minecraft.block.material.Material;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.item.EntityItemFrame;
 import net.minecraft.entity.item.EntityPainting;
 import net.minecraft.entity.player.EntityPlayer;
@@ -42,7 +36,6 @@ import net.minecraft.item.ItemHangingEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.packet.Packet25EntityPainting;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.tileentity.TileEntityChest;
 import net.minecraft.tileentity.TileEntitySign;
 import net.minecraft.tileentity.TileEntitySkull;
 import net.minecraft.util.AxisAlignedBB;
@@ -52,7 +45,12 @@ import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
 import net.minecraft.world.gen.feature.WorldGenerator;
 import net.minecraftforge.common.FakePlayer;
-import net.minecraftforge.transformers.ForgeAccessTransformer;
+import coolalias.structuregen.lib.LogHelper;
+import coolalias.structuregen.util.BlockData;
+import coolalias.structuregen.util.Structure;
+import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.common.network.PacketDispatcher;
+import cpw.mods.fml.relauncher.Side;
 
 public abstract class StructureGeneratorBase extends WorldGenerator
 {
@@ -214,10 +212,21 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 	}
 	
 	/**
-	 * Allows the use of block ids greater than 4096 as custom 'hooks' to trigger onCustomBlockAdded
-	 * @param fakeID ID you use to identify your 'event'. Absolute value must be greater than 4096
+	 * Overwrites current Structure information with passed in structure and rotates it
+	 * a number of times starting from its default facing
+	 */
+	public final void setStructureWithRotation(Structure structure, int rotations)
+	{
+		setStructure(structure);
+		for (int i = 0; i < rotations % 4; ++i)
+			rotateStructureFacing();
+	}
+	
+	/**
+	 * Allows the use of block ids greater than 4095 as custom 'hooks' to trigger onCustomBlockAdded
+	 * @param fakeID ID you use to identify your 'event'. Absolute value must be greater than 4095
 	 * @param customData1 Custom data may be used to subtype events for given fakeID
-	 * Returns the real id of the block to spawn in the world; must be <= 4096
+	 * Returns the real id of the block to spawn in the world; must be <= 4095
 	 */
 	public abstract int getRealBlockID(int fakeID, int customData1);
 	
@@ -231,7 +240,7 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 	
 	/**
 	 * Maps a block id to a specified rotation type. Allows custom blocks to rotate with structure.
-	 * @param blockID a valid block id, 0 to 4096
+	 * @param blockID a valid block id, 0 to 4095 (4096 total)
 	 * @param rotationType types predefined by enumerated type ROTATION
 	 * @return false if a rotation type has already been specified for the given blockID
 	 */
@@ -242,14 +251,14 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 	
 	/**
 	 * Maps a block id to a specified rotation type. Allows custom blocks to rotate with structure.
-	 * @param blockID a valid block id, 0 to 4096
+	 * @param blockID a valid block id, 0 to 4095 (4096 total)
 	 * @param rotationType types predefined by enumerated type ROTATION
 	 * @param override if true, will override the previously set rotation data for specified blockID
 	 * @return false if a rotation type has already been specified for the given blockID
 	 */
 	public static final boolean registerCustomBlockRotation(int blockID, ROTATION rotationType, boolean override)
 	{
-		if (blockID < 0 || blockID > 4096) {
+		if (blockID < 0 || blockID > 4095) {
 			throw new IllegalArgumentException("[" + ModInfo.LOGGER + "] Error setting custom block rotation. Provided id: " + blockID + ". Valid ids are (0-4095)");
 		}
 		if (blockRotationData.containsKey(blockID)) {
@@ -734,6 +743,7 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 		// int centerX, centerZ;
 
 		for (int y = (this.removeStructure ? blockArray.length - 1 : 0); (this.removeStructure ? y >= 0 : y < blockArray.length); y = (this.removeStructure ? --y : ++y))
+		//for (int y = 0; y < blockArray.length; ++y)
 		{
 			for (int x = 0; x < blockArray[y].length; ++x)
 			{
@@ -768,7 +778,7 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 					
 					int customData1 = (blockArray[y][x][z].length > 2 ? blockArray[y][x][z][2] : 0);
 					int fakeID = blockArray[y][x][z][0];
-					int realID = (Math.abs(fakeID) > 4096 ? getRealBlockID(fakeID, customData1) : fakeID);
+					int realID = (Math.abs(fakeID) > 4095 ? getRealBlockID(fakeID, customData1) : fakeID);
 
 					if (this.removeStructure)
 					{
@@ -777,7 +787,7 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 					}
 					else
 					{
-						if (Math.abs(realID) > 4096) {
+						if (Math.abs(realID) > 4095) {
 							LogHelper.log(Level.WARNING, "Invalid block ID. Initial ID: " + fakeID + ", returned id from getRealID: " + realID);
 							continue;
 						}
@@ -829,7 +839,7 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 					setMetadata(world, x, y, z, meta, facing);
 
 				// Call to custom block hooks
-				if (Math.abs(fakeID) > 4096) {
+				if (Math.abs(fakeID) > 4095) {
 					onCustomBlockAdded(world, x, y, z, fakeID, customData1, customData2);
 				}
 			}
@@ -842,10 +852,14 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 	 */
 	private final boolean removeBlockAt(World world, int fakeID, int realID, int x, int y, int z, int rotations)
 	{
-		//if ((world.isAirBlock(x, y, z) && Math.abs(fakeID) <= 4096) || (realID < 0 && Math.abs(realID) != world.getBlockId(x, y, z)))
-		//{ }
-		if (Math.abs(realID) == world.getBlockId(x, y, z) || Math.abs(fakeID) > 4096 || (Block.blocksList[world.getBlockId(x, y, z)] == null ||
-			(Block.blocksList[world.getBlockId(x, y, z)].blockMaterial.isLiquid() && Block.blocksList[Math.abs(realID)].blockMaterial.isLiquid() || realID == 0)))
+		int worldID = world.getBlockId(x, y, z);
+		
+		if (realID == 0 || Block.blocksList[worldID] == null) {
+			return true;
+		}
+		else if (Math.abs(realID) == worldID || Math.abs(fakeID) > 4095
+				|| (Block.blocksList[worldID].blockMaterial.isLiquid() && Block.blocksList[Math.abs(realID)].blockMaterial == Block.blocksList[worldID].blockMaterial)
+				|| (Block.blocksList[worldID].blockMaterial == Material.ice && Block.blocksList[Math.abs(realID)].blockMaterial == Material.water))
 		{
 			world.setBlockToAir(x, y, z);
 			List <Entity> list = world.getEntitiesWithinAABB(Entity.class, getHangingEntityAxisAligned(x, y, z, Direction.directionToFacing[rotations]).expand(1.5F, 1.0F, 1.5F));
@@ -859,7 +873,7 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 			}
 		}
 		else {
-			LogHelper.log(Level.INFO, "Incorrect location for structure removal, aborting. Last block id checked = " + realID);
+			LogHelper.log(Level.INFO, "Incorrect location for structure removal, aborting. Last block id checked: world " + worldID + ", real " + realID + ", fake " + fakeID);
 			return false;
 		}
 		
@@ -879,9 +893,9 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 		{
 			block = (BlockData) iterator.next();
 			fakeID = block.getBlockID();
-			realID = (Math.abs(fakeID) > 4096 ? getRealBlockID(fakeID, block.getCustomData1()) : fakeID);
+			realID = (Math.abs(fakeID) > 4095 ? getRealBlockID(fakeID, block.getCustomData1()) : fakeID);
 
-			if (Math.abs(realID) > 4096) {
+			if (Math.abs(realID) > 4095) {
 				LogHelper.log(Level.WARNING, "Invalid block ID. Initial ID: " + fakeID + ", returned id from getRealID: " + realID);
 				continue;
 			}
@@ -898,7 +912,7 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 					LogHelper.log(Level.WARNING, "Mismatched metadata. Meta from world: " + world.getBlockMetadata(block.getPosX(), block.getPosY(), block.getPosZ()) + ", original: " + block.getMetaData());
 				}
 				
-				if (Math.abs(fakeID) > 4096) {
+				if (Math.abs(fakeID) > 4095) {
 					onCustomBlockAdded(world, block.getPosX(), block.getPosY(), block.getPosZ(), fakeID, block.getCustomData1(), block.getCustomData2());
 				}
 			}

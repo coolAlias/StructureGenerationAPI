@@ -25,7 +25,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.World;
-import coolalias.structuregen.StructureGenerator;
+import coolalias.structuregen.StructureGenMain;
 import coolalias.structuregen.lib.LogHelper;
 import coolalias.structuregen.lib.SGTKeyBindings;
 import coolalias.structuregen.util.Structure;
@@ -34,10 +34,7 @@ public class ItemStructureSpawner extends BaseModItem
 {
 	/** Enumerates valid values for increment / decrement offset methods */
 	public static enum Offset { OFFSET_X, OFFSET_Y, OFFSET_Z }
-
-	/** WorldGenStructure contains all the structures and methods needed */
-	private static final StructureGenerator gen = new StructureGenerator();
-
+	
 	/** String identifiers for NBT storage and retrieval */
 	private static final String[] data = {"Structure", "Rotations", "OffsetX", "OffsetY", "OffsetZ", "InvertY"};
 
@@ -163,7 +160,7 @@ public class ItemStructureSpawner extends BaseModItem
 		if (itemstack.stackTagCompound == null)
 			initNBTCompound(itemstack);
 		int index = itemstack.stackTagCompound.getInteger(data[STRUCTURE_INDEX]) + 1;
-		if (index == gen.structures.size()) index = 0;
+		if (index == StructureGenMain.gen.structures.size()) index = 0;
 		itemstack.stackTagCompound.setInteger(data[STRUCTURE_INDEX], index);
 		return index;
 	}
@@ -175,7 +172,7 @@ public class ItemStructureSpawner extends BaseModItem
 		if (itemstack.stackTagCompound == null)
 			initNBTCompound(itemstack);
 		int index = itemstack.stackTagCompound.getInteger(data[STRUCTURE_INDEX]) - 1;
-		if (index < 0) index = gen.structures.size() - 1;
+		if (index < 0) index = StructureGenMain.gen.structures.size() - 1;
 		itemstack.stackTagCompound.setInteger(data[STRUCTURE_INDEX], index);
 		return index;
 	}
@@ -184,7 +181,7 @@ public class ItemStructureSpawner extends BaseModItem
 	 * Returns the name of the structure at provided index, or "" if index out of bounds
 	 */
 	public String getStructureName(int index) {
-		return (index < gen.structures.size() ? gen.structures.get(index).name : "");
+		return (index < StructureGenMain.gen.structures.size() ? StructureGenMain.gen.structures.get(index).name : "");
 	}
 
 	/**
@@ -200,7 +197,7 @@ public class ItemStructureSpawner extends BaseModItem
 	 * Toggles between generate and remove structure setting. Returns new value for convenience.
 	 */
 	public boolean toggleRemove() {
-		return gen.toggleRemoveStructure();
+		return StructureGenMain.gen.toggleRemoveStructure();
 	}
 
 	@Override
@@ -214,16 +211,15 @@ public class ItemStructureSpawner extends BaseModItem
 		if (itemstack.stackTagCompound == null)
 			initNBTCompound(itemstack);
 
-		if (!world.isRemote && gen.structures.size() > 0)
+		if (!world.isRemote && StructureGenMain.gen.structures.size() > 0)
 		{
 			if (world.getBlockId(x,y,z) == Block.snow.blockID) { --y; }
 			NBTTagCompound tag = itemstack.stackTagCompound;
-			gen.setPlayerFacing(player);
-			Structure structure = gen.structures.get(tag.getInteger(data[STRUCTURE_INDEX]));
-			gen.setBlockArrayList(structure.blockArrayList());
-			gen.setStructureFacing(structure.getFacing() + tag.getInteger(data[ROTATIONS]));
-			gen.setDefaultOffset(structure.getOffsetX() + tag.getInteger(data[OFFSET_X]), structure.getOffsetY() + tag.getInteger(data[OFFSET_Y]), structure.getOffsetZ() + tag.getInteger(data[OFFSET_Z]));
-			gen.generate(world, world.rand, x, y, z);
+			StructureGenMain.gen.setPlayerFacing(player);
+			Structure structure = StructureGenMain.gen.structures.get(tag.getInteger(data[STRUCTURE_INDEX]));
+			StructureGenMain.gen.setStructureWithRotation(structure, tag.getInteger(data[ROTATIONS]));
+			StructureGenMain.gen.setDefaultOffset(structure.getOffsetX() + tag.getInteger(data[OFFSET_X]), structure.getOffsetY() + tag.getInteger(data[OFFSET_Y]), structure.getOffsetZ() + tag.getInteger(data[OFFSET_Z]));
+			StructureGenMain.gen.generate(world, world.rand, x, y, z);
 		}
 
 		return true;

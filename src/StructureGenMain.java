@@ -52,6 +52,13 @@ public class StructureGenMain
 	@SidedProxy(clientSide = ModInfo.CLIENT_PROXY, serverSide = ModInfo.COMMON_PROXY)
 	public static CommonProxy proxy;
 	
+	/**
+	 * StructureGenerator contains all the structures and methods needed;
+	 * you should only need one instance of it for your mod, IF you add all of your
+	 * structures to a static list
+	 */
+	public static final StructureGenerator gen = new StructureGenerator();
+	
 	public static final int MOD_ITEM_INDEX_DEFAULT = 8888;
 	private int modItemIndex;
 	

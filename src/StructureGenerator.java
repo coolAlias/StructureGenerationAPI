@@ -19,20 +19,18 @@ package coolalias.structuregen;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Random;
 import java.util.logging.Level;
 
-import coolalias.structuregen.lib.LogHelper;
-import coolalias.structuregen.util.Structure;
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.passive.EntityVillager;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumChatFormatting;
-import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
-import net.minecraft.world.chunk.IChunkProvider;
+import coolalias.structuregen.lib.CustomHooks;
+import coolalias.structuregen.lib.LogHelper;
+import coolalias.structuregen.util.Structure;
 
 public class StructureGenerator extends StructureGeneratorBase
 {
@@ -52,8 +50,7 @@ public class StructureGenerator extends StructureGeneratorBase
 		super(entity, blocks, structureFacing);
 	}
 
-	public StructureGenerator(Entity entity, int[][][][] blocks,
-			int structureFacing, int offX, int offY, int offZ) {
+	public StructureGenerator(Entity entity, int[][][][] blocks, int structureFacing, int offX, int offY, int offZ) {
 		super(entity, blocks, structureFacing, offX, offY, offZ);
 	}
 
@@ -68,31 +65,24 @@ public class StructureGenerator extends StructureGeneratorBase
 	 * @return Returns the real id of the block to spawn in the world; must be <= 4096
 	 */
 	@Override
-	public int getRealBlockID(int fakeID, int customData1) {
+	public int getRealBlockID(int fakeID, int customData1)
+	{
 		LogHelper.log(Level.FINE, "Getting real id from fake id: " + fakeID);
 		switch(fakeID) {
-		case StructureArrays.CUSTOM_CHEST:
-			return Block.chest.blockID;
-		case StructureArrays.CUSTOM_DISPENSER:
-			return Block.dispenser.blockID;
-		case StructureArrays.ITEM_FRAME: // same as PAINTING
-			return Block.torchWood.blockID;
-		case StructureArrays.PAINTING:
-			return Block.torchWood.blockID; // need to do post-generation setting of this entity
-		case StructureArrays.SPAWN_VILLAGER:
-			return Block.torchWood.blockID; // using this, the villager will be spawned post-generation
-		case StructureArrays.CUSTOM_SKULL:
-			return Block.skull.blockID;
-		case StructureArrays.CUSTOM_SIGNWALL:
-			return Block.signWall.blockID;
-		case StructureArrays.CUSTOM_SIGNPOST:
-			return Block.signPost.blockID;
-		case StructureArrays.RANDOM_HOLE: // Used customData1 to store the real block id
-			return customData1;
-		default:
-			// note that SPAWN_VILLAGER would return 0 by default if we didn't set a custom id above,
-			// which is what we would want for 'air' if we didn't care about post-gen spawning
-			return 0;
+		case CustomHooks.CUSTOM_CHEST: return Block.chest.blockID;
+		case CustomHooks.CUSTOM_DISPENSER: return Block.dispenser.blockID;
+		// Since item frames and paintings both have rotational metadata, we need to
+		// return a block id that uses the same rotation algorithm. Torches will work fine.
+		case CustomHooks.ITEM_FRAME: return Block.torchWood.blockID;
+		case CustomHooks.PAINTING: return Block.torchWood.blockID;
+		// using torch block id will spawn the villager post-generation
+		case CustomHooks.SPAWN_VILLAGER: return Block.torchWood.blockID;
+		case CustomHooks.CUSTOM_SKULL: return Block.skull.blockID;
+		case CustomHooks.CUSTOM_SIGNWALL: return Block.signWall.blockID;
+		case CustomHooks.CUSTOM_SIGNPOST: return Block.signPost.blockID;
+		// For RANDOM_HOLE, we used customData1 to store the real block id
+		case CustomHooks.RANDOM_HOLE: return customData1;
+		default: return 0;
 		}
 	}
 
@@ -116,35 +106,39 @@ public class StructureGenerator extends StructureGeneratorBase
 		LogHelper.log(Level.FINEST, "Custom block metadata from world = " + meta);
 
 		switch(fakeID) {
-		case StructureArrays.CUSTOM_CHEST:
+		case CustomHooks.CUSTOM_CHEST:
 			// Using the pre-made method addItemToTileInventory adds items to the first slot available
 
-			// Here we use customData to subtype custom_chest:
-			if (customData1 == StructureArrays.CUSTOM_CHEST_1)
+			// Here we use customData1 to subtype our custom chest hook:
+			if (customData1 == CustomHooks.CUSTOM_CHEST_1)
 			{
-				// Let's load it with goodies; don't worry about over-filling, the method will take care of it
-				for (int i = 0; i < 30; ++i) {
-					addItemToTileInventory(world, new ItemStack(Item.diamond, 64), x, y, z);
-					addItemToTileInventory(world, new ItemStack(Item.emerald, 64), x, y, z);
-				}
+				boolean canAdd;
+				// This takes advantage of the method's return value to determine when it's full
+				do {
+					canAdd = addItemToTileInventory(world, new ItemStack(Item.diamond, 64), x, y, z);
+					if (canAdd) canAdd = addItemToTileInventory(world, new ItemStack(Item.emerald, 64), x, y, z);
+				} while (canAdd);
 			}
 			// Not our specific chest, so we'll do some generic stuff
 			else
 			{
-				// Here we're using customData for stack size to add
+				// Here we're using customData1 for stack size to add
 				addItemToTileInventory(world, new ItemStack(Item.diamond, customData1), x, y, z);
 
-				// Here we use customData to add a metadata block to the chest
-				addItemToTileInventory(world, new ItemStack(Block.cloth.blockID, 1, customData1), x, y, z);
+				// Here we use customData1 to add a metadata block to the chest
+				addItemToTileInventory(world, new ItemStack(Block.cloth.blockID, 4, customData1), x, y, z);
 
-				// Adding potions
+				// Here we use both customData1 and customData2 to determine item id and stack size
+				addItemToTileInventory(world, new ItemStack(customData1, customData2, 0), x, y, z);
+
+				// Adding potions; check the wiki 'data values' for potion ids
 				addItemToTileInventory(world, new ItemStack(Item.potion,1,8206), x, y, z);
 				addItemToTileInventory(world, new ItemStack(Item.potion,1,8270), x, y, z);
 				addItemToTileInventory(world, new ItemStack(Item.potion,1,8193), x, y, z);
 				addItemToTileInventory(world, new ItemStack(Item.potion,1,16385), x, y, z);
 			}
 			break;
-		case StructureArrays.CUSTOM_DISPENSER:
+		case CustomHooks.CUSTOM_DISPENSER:
 			// We're going to take advantage of addItemToTileInventory's return value to fill
 			// the container to the brim; note that this way is better than the for loop from
 			// above because it doesn't waste processing time - it stops as soon as it is full
@@ -155,13 +149,16 @@ public class StructureGenerator extends StructureGeneratorBase
 				addmore = addItemToTileInventory(world, new ItemStack(customData1, 64, 0), x, y, z);
 			}
 			break;
-		case StructureArrays.CUSTOM_SIGNWALL: // no 'break' so it goes into the next case
-		case StructureArrays.CUSTOM_SIGNPOST:
+		case CustomHooks.CUSTOM_SIGNWALL:
+			// SignWall and SignPost are handled in the same way, but we need two custom
+			// hook ids to return the different real block ids
+			// no 'break' and no 'return', so it gets handled in the next case
+		case CustomHooks.CUSTOM_SIGNPOST:
 			// An array that stores up to 4 Strings, the max capacity of a sign
 			// Best to allocate the array to the size you need
 			String[] text;
 			// Set different text for each custom sign, using different colors
-			if (customData1 == StructureArrays.CUSTOM_SIGN_1)
+			if (customData1 == CustomHooks.CUSTOM_SIGN_1)
 			{
 				// max number of lines is 4; any more than that will be ignored
 				text = new String[5];
@@ -181,11 +178,11 @@ public class StructureGenerator extends StructureGeneratorBase
 			// Use this easy method to add text to the sign's tile entity:
 			setSignText(world, text, x, y, z);
 			break;
-		case StructureArrays.CUSTOM_SKULL:
+		case CustomHooks.CUSTOM_SKULL:
 			// Easily set the skull type or player name if you know it:
 			setSkullData(world, "", customData1, x, y, z);
 			break;
-		case StructureArrays.ITEM_FRAME:
+		case CustomHooks.ITEM_FRAME:
 			ItemStack frame = new ItemStack(Item.itemFrame);
 			// To save you lots of trouble, there are ready-made methods to handle placing
 			// hanging entities and set ItemFrame items (with or without rotation)
@@ -199,7 +196,7 @@ public class StructureGenerator extends StructureGeneratorBase
 			// or this one if you want to specify rotation:
 			// setItemFrameStack(world, x, y, z, facing, new ItemStack(customData,1,0),2);
 			break;
-		case StructureArrays.PAINTING:
+		case CustomHooks.PAINTING:
 			ItemStack painting = new ItemStack(Item.painting);
 			facing = setHangingEntity(world, painting, x, y, z);
 			// choose painting you want based on custom data; look at EnumArt for painting names
@@ -207,7 +204,7 @@ public class StructureGenerator extends StructureGeneratorBase
 			// use following method to set painting and update client automatically
 			setPaintingArt(world, custom, x, y, z, facing);
 			break;
-		case StructureArrays.RANDOM_HOLE:
+		case CustomHooks.RANDOM_HOLE:
 			// One way to generate holes would be to set a random int once per structure,
 			// then remove only hole blocks with that value, allowing for custom patterns
 			//if (random_hole == customData2)
@@ -219,11 +216,9 @@ public class StructureGenerator extends StructureGeneratorBase
 			if (world.rand.nextFloat() < 0.25F)
 				world.setBlockToAir(x, y, z);
 			break;
-		case StructureArrays.SPAWN_VILLAGER:
+		case CustomHooks.SPAWN_VILLAGER:
 			// here I'm using customData as the villagerID
 			Entity bob = new EntityVillager(world, customData1);
-			//Entity X = new EntityHorse(world);
-			//((EntityHorse) X).func_110235_q(1026);
 
 			// Now use the preset method to avoid spawning in walls
 			spawnEntityInStructure(world, bob, x, y, z);
@@ -245,6 +240,11 @@ public class StructureGenerator extends StructureGeneratorBase
 		structure.setStructureOffset(0, -1, 0);
 		structures.add(structure);
 
+		structure = new Structure("Tutorial Home");
+		structure.addBlockArray(StructureArrayTutorial.blockArrayTutorial);
+		structure.setFacing(StructureGeneratorBase.WEST);
+		structures.add(structure);
+
 		structure = new Structure("Blacksmith");
 		structure.addBlockArray(StructureArrays.blockArrayNPCBlackSmith);
 		structure.setFacing(StructureGeneratorBase.EAST);
@@ -257,7 +257,7 @@ public class StructureGenerator extends StructureGeneratorBase
 
 		structure = new Structure("Redstone Dungeon");
 		structure.addBlockArray(StructureArrays.blockArrayRedstone);
-		structure.setFacing(StructureGeneratorBase.WEST);
+		structure.setFacing(StructureGeneratorBase.NORTH);
 		structure.setStructureOffset(0, -1, -5);
 		structures.add(structure);
 
@@ -272,13 +272,13 @@ public class StructureGenerator extends StructureGeneratorBase
 		 */
 		structure.setFacing(StructureGeneratorBase.EAST);
 		structures.add(structure);
-		
+
 		structure = new Structure("WaterMill");
 		structure.addBlockArray(WaterMillArray1.blockArrayWaterMill);
 		structure.addBlockArray(WaterMillArray2.blockArrayWaterMill);
 		structure.addBlockArray(WaterMillArray3.blockArrayWaterMill);
 		structure.setFacing(StructureGeneratorBase.EAST);
 		structures.add(structure);
-		 
+
 	}
 }

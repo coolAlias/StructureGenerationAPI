@@ -17,21 +17,12 @@
 
 package coolalias.structuregen;
 
+import coolalias.structuregen.lib.CustomHooks;
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 
 public class StructureArrays
 {
-	/** Some predefined values for custom hooks that I use in the demo structure */
-	public static final int CUSTOM_CHEST = 4097, CUSTOM_DISPENSER = 4098, ITEM_FRAME = 4099, PAINTING = 4100,
-			SPAWN_VILLAGER = 4101, CUSTOM_SKULL = 4102, CUSTOM_SIGNWALL = 4103, CUSTOM_SIGNPOST = 4104, RANDOM_HOLE = 4105;
-	
-	/** Start of specific chests; I'll use negative values so as not to conflict with item types and such */
-	public static final int CUSTOM_CHEST_1 = -1;
-	
-	/** Custom signs */
-	public static final int CUSTOM_SIGN_1 = 1;
-	
 	/**
 	This file contains several sample structures as well as a template structure array
 	to illustrate how to go about creating your own. Use this in conjunction with the
@@ -230,7 +221,7 @@ public class StructureArrays
 	A quick example: Block.cobblestone.blockID will only spawn a cobblestone block if its
 	spawn location is air or occupied by a block such as grass that doesn't block movement.
 	
-	Values above 4096 are used to trigger a hook that allows custom manipulation of the block
+	Values above 4095 are used to trigger a hook that allows custom manipulation of the block
 	via the method onCustomBlockAdded in WorldGenStructure. See below for details.
 	
 	NOTE: If your mod has custom blocks, you can use YourMod.yourBlock.blockID to spawn it
@@ -249,15 +240,15 @@ public class StructureArrays
 	
 	{custom data 2}
 	Passed along with customData1 to the onCustomBlockAdded method. One could use this to subtype a block
-	ID, such as CUSTOM_CHEST with subtypes VILLAGE_BLACKSMITH, VILLAGE_LIBRARY, etc., to
+	ID, such as CustomHooks.CUSTOM_CHEST with subtypes VILLAGE_BLACKSMITH, VILLAGE_LIBRARY, etc., to
 	set the number of random items to generate, to set villager type to spawn... you get
 	the idea. See below for more information on how to use custom data.
 	
 	!!!IMPORTANT!!!
-	The first element [0] of each y / x array MUST contain an array that
-	defines the maximum area of your structure, such that blockArray[0] contains the max
-	number of x arrays at any given point and blockArray[0][0] contains the max number of
-	z arrays at any given point. After this, you can have fewer as needed.
+	The first element [0] of each y / x array MUST contain an array that defines the maximum
+	area of your structure, such that blockArray[0] contains the max number of x arrays at
+	any given point and blockArray[0][0] contains the max number of z arrays at any given
+	point. After this, you can have fewer as needed.
 	
 	This is because I use the first index to determine the structure's center, saving myself
 	the trouble and processing time of iterating through the entire structure array to find
@@ -436,7 +427,7 @@ public class StructureArrays
 	"onCustomBlockAdded(World world, int x, int y, int z, int fakeID, int customData)"
 	=====================================================================================
 	Step 1: Choose a block ID
-	Custom block hooks require block ids greater than 4096. If you want to your block to
+	Custom block hooks require block ids greater than 4095. If you want to your block to
 	soft-spawn, you can also use the negative value of your defined block id.
 	
 	This value is what will be used by you to determine how to handle the case in the
@@ -445,7 +436,7 @@ public class StructureArrays
 	Best practice is to define it as "public static final int CUSTOM_BLOCK_NAME = value"
 	
 	Step 2: Set the real block id
-	Since values > 4096 are not real blocks, you must use the special method
+	Since values > 4095 are not real blocks, you must use the special method
 	
 	"getRealBlockID(int fakeID, int customData)"
 	
@@ -453,9 +444,9 @@ public class StructureArrays
 	value. The parameter customData could also allow you to subtype a single fakeID.
 	
 	For example, if you wanted to generate random holes in your structure, you could use a
-	single id RANDOM_HOLE, each subtype of which would be a different block id in the structure.
+	single id CustomHooks.RANDOM_HOLE, each subtype of which would be a different block id in the structure.
 	It would then be simple to randomly remove blocks of this type from within the case
-	'RANDOM_HOLE' in onCustomBlockAdded, even if the blocks were in fact different kinds.
+	'CustomHooks.RANDOM_HOLE' in onCustomBlockAdded, even if the blocks were in fact different kinds.
 	
 	If you forget this step, no block will be set and the hook will not trigger.
 	
@@ -495,7 +486,8 @@ public class StructureArrays
 		will be determined automatically based on the dummy blocks data, so a WALL_MOUNTED
 		block id (such as Block.torchWood.blockID) must be returned from getRealBlockID().
 		
-		This method returns the direction in which the entity faces for use with the following.
+		This method returns the direction in which the entity faces for use with the methods
+		'setItemFrameStack' and 'setPaintingArt'. It is not needed for wall signs.
 	
 	4. setItemFrameStack(World world, ItemStack itemstack, int x, int y, int z, int direction,
 		int itemRotation)
@@ -591,7 +583,7 @@ public class StructureArrays
 				{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
 			},
 			{ // x = 2
-				{Block.cobblestone.blockID},{SPAWN_VILLAGER},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
+				{Block.cobblestone.blockID},{CustomHooks.SPAWN_VILLAGER},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
 			},
 			{ // x = 3
 				{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
@@ -721,10 +713,10 @@ public class StructureArrays
 			},
 			{ // x = 5 z values:
 				{Block.fence.blockID},
-				{CUSTOM_SIGNPOST,14},
+				{CustomHooks.CUSTOM_SIGNPOST,14},
 				{Block.railPowered.blockID,11},
 				{Block.stairsCobblestone.blockID,1}, // ascending to west
-				{SPAWN_VILLAGER,1,2},
+				{CustomHooks.SPAWN_VILLAGER,1,2},
 				// we'll spawn him outside just so there's more room inside for stuff
 				// however, this way the villager will not move inside at night
 				// you should ALWAYS spawn villagers inside a valid 'home' if possible
@@ -741,15 +733,15 @@ public class StructureArrays
 		},
 		{ // y = 2
 			{ // x = 0 z values:
-				{PAINTING,2}, // faces west, but because it has no block to attach to, it doesn't get placed
+				{CustomHooks.PAINTING,2}, // faces west, but because it has no block to attach to, it doesn't get placed
 				{Block.wood.blockID},
 				{Block.planks.blockID},
 				{Block.planks.blockID},
 				{Block.cloth.blockID,1,14}, // cloth is odd in that the color value is stored in the flag, which here we store as customData
-				{PAINTING,3} // facing south (since default structure faces EAST, this is the left-hand side)
+				{CustomHooks.PAINTING,3} // facing south (since default structure faces EAST, this is the left-hand side)
 			},
 			{ // x = 1 z values:
-				{PAINTING,4}, // facing north (since default structure faces EAST, this is the right-hand side)
+				{CustomHooks.PAINTING,4}, // facing north (since default structure faces EAST, this is the right-hand side)
 				// if you change the above block to wood, the painting at y=2,x=0,z=0 will work fine
 				{Block.planks.blockID},
 				{Block.bed.blockID,10},
@@ -762,14 +754,14 @@ public class StructureArrays
 				{0},
 				{Block.planks.blockID},
 				{Block.cobblestone.blockID},
-				{CUSTOM_DISPENSER,5,Item.arrow.itemID}, // Using custom data to define item id
+				{CustomHooks.CUSTOM_DISPENSER,5,Item.arrow.itemID}, // Using custom data to define item id
 				{Block.planks.blockID},
 				{0}
 			},
 			{ // x = 3 z values:
 				{0},
 				{Block.planks.blockID},
-				{CUSTOM_CHEST,3,4}, // a custom chest, facing south, with custom data of 4
+				{CustomHooks.CUSTOM_CHEST,3,4}, // a custom chest, facing south, with custom data of 4
 				{0},
 				{Block.planks.blockID},
 				{0}
@@ -783,7 +775,7 @@ public class StructureArrays
 				{0}
 			},
 			{ // x = 5 z values:
-				{0},{PAINTING,1},{PAINTING,1},{0},{CUSTOM_SIGNWALL,5,CUSTOM_SIGN_1},{0}
+				{0},{CustomHooks.PAINTING,1},{CustomHooks.PAINTING,1},{0},{CustomHooks.CUSTOM_SIGNWALL,5,CustomHooks.CUSTOM_SIGN_1},{0}
 			}
 			// note that since we don't spawn anything at x = 6 from here on, we don't need to include it
 			// excluding x=0, however, would cause this entire layer to be out of place
@@ -854,27 +846,27 @@ public class StructureArrays
 				{Block.cocoaPlant.blockID,8},{Block.wood.blockID,3},{Block.planks.blockID},{Block.planks.blockID},{Block.wood.blockID},{0}
 			},
 			{ // x = 5 z values:
-				{0},{Block.torchWood.blockID,1},{0},{CUSTOM_SKULL,5,3},{Block.torchWood.blockID,1},{0}
+				{0},{Block.torchWood.blockID,1},{0},{CustomHooks.CUSTOM_SKULL,5,3},{Block.torchWood.blockID,1},{0}
 			}
 		},
 		{ // y = 5
 			{ // x = 0 z values:
-				{0},{ITEM_FRAME,4,Item.diamond.itemID},{Block.wood.blockID},{Block.wood.blockID},{ITEM_FRAME,3,Item.diamond.itemID},{0}
+				{0},{CustomHooks.ITEM_FRAME,4,Item.diamond.itemID},{Block.wood.blockID},{Block.wood.blockID},{CustomHooks.ITEM_FRAME,3,Item.diamond.itemID},{0}
 			},
 			{ // x = 1 z values:
-				{ITEM_FRAME,4,Item.emerald.itemID},{Block.wood.blockID},{Block.wood.blockID},{Block.wood.blockID},{Block.wood.blockID},{ITEM_FRAME,3,Item.emerald.itemID}
+				{CustomHooks.ITEM_FRAME,4,Item.emerald.itemID},{Block.wood.blockID},{Block.wood.blockID},{Block.wood.blockID},{Block.wood.blockID},{CustomHooks.ITEM_FRAME,3,Item.emerald.itemID}
 			},
 			{ // x = 2 z values:
-				{ITEM_FRAME,4,Item.diamond.itemID},{Block.wood.blockID},{Block.wood.blockID},{Block.wood.blockID},{Block.wood.blockID},{ITEM_FRAME,3,Item.diamond.itemID}
+				{CustomHooks.ITEM_FRAME,4,Item.diamond.itemID},{Block.wood.blockID},{Block.wood.blockID},{Block.wood.blockID},{Block.wood.blockID},{CustomHooks.ITEM_FRAME,3,Item.diamond.itemID}
 			},
 			{ // x = 3 z values:
-				{ITEM_FRAME,4,Item.emerald.itemID},{Block.wood.blockID},{Block.wood.blockID},{Block.wood.blockID},{Block.wood.blockID},{ITEM_FRAME,3,Item.emerald.itemID}
+				{CustomHooks.ITEM_FRAME,4,Item.emerald.itemID},{Block.wood.blockID},{Block.wood.blockID},{Block.wood.blockID},{Block.wood.blockID},{CustomHooks.ITEM_FRAME,3,Item.emerald.itemID}
 			},
 			{ // x = 4 z values:
-				{0},{ITEM_FRAME,4,Item.diamond.itemID},{Block.wood.blockID},{Block.wood.blockID},{ITEM_FRAME,3,Item.diamond.itemID},{0}
+				{0},{CustomHooks.ITEM_FRAME,4,Item.diamond.itemID},{Block.wood.blockID},{Block.wood.blockID},{CustomHooks.ITEM_FRAME,3,Item.diamond.itemID},{0}
 			},
 			{ // x = 5 z values:
-				{0},{0},{ITEM_FRAME,1,Item.pickaxeDiamond.itemID},{ITEM_FRAME,1,Item.swordDiamond.itemID},{0},{0}
+				{0},{0},{CustomHooks.ITEM_FRAME,1,Item.pickaxeDiamond.itemID},{CustomHooks.ITEM_FRAME,1,Item.swordDiamond.itemID},{0},{0}
 			}
 		},
 		{ // y = 6
@@ -1561,7 +1553,7 @@ public class StructureArrays
 				{Block.grass.blockID},
 				{Block.grass.blockID},
 				{Block.grass.blockID},
-				{RANDOM_HOLE,0,Block.wood.blockID},
+				{CustomHooks.RANDOM_HOLE,0,Block.wood.blockID},
 				{Block.grass.blockID},
 				{Block.grass.blockID},
 				{Block.grass.blockID}
@@ -1582,65 +1574,65 @@ public class StructureArrays
 			{ //x = 2
 				{Block.dirt.blockID},
 				{Block.dirt.blockID},
-				{RANDOM_HOLE,1,Block.wood.blockID},
-				{RANDOM_HOLE,1,Block.wood.blockID},
-				{RANDOM_HOLE,1,Block.wood.blockID},
-				{RANDOM_HOLE,1,Block.wood.blockID},
-				{RANDOM_HOLE,1,Block.wood.blockID},
-				{RANDOM_HOLE,1,Block.wood.blockID},
-				{RANDOM_HOLE,1,Block.wood.blockID},
+				{CustomHooks.RANDOM_HOLE,1,Block.wood.blockID},
+				{CustomHooks.RANDOM_HOLE,1,Block.wood.blockID},
+				{CustomHooks.RANDOM_HOLE,1,Block.wood.blockID},
+				{CustomHooks.RANDOM_HOLE,1,Block.wood.blockID},
+				{CustomHooks.RANDOM_HOLE,1,Block.wood.blockID},
+				{CustomHooks.RANDOM_HOLE,1,Block.wood.blockID},
+				{CustomHooks.RANDOM_HOLE,1,Block.wood.blockID},
 				{Block.dirt.blockID},
 				{Block.dirt.blockID}
 			},
 			{ //x = 3
-				{RANDOM_HOLE,0,Block.wood.blockID},
+				{CustomHooks.RANDOM_HOLE,0,Block.wood.blockID},
 				{Block.dirt.blockID},
-				{RANDOM_HOLE,1,Block.wood.blockID},
-				{RANDOM_HOLE,0,Block.planks.blockID,0},
-				{RANDOM_HOLE,0,Block.planks.blockID,2},
-				{RANDOM_HOLE,0,Block.planks.blockID,3},
-				{RANDOM_HOLE,0,Block.planks.blockID,4},
-				{RANDOM_HOLE,0,Block.planks.blockID,1},
-				{RANDOM_HOLE,1,Block.wood.blockID},
+				{CustomHooks.RANDOM_HOLE,1,Block.wood.blockID},
+				{CustomHooks.RANDOM_HOLE,0,Block.planks.blockID,0},
+				{CustomHooks.RANDOM_HOLE,0,Block.planks.blockID,2},
+				{CustomHooks.RANDOM_HOLE,0,Block.planks.blockID,3},
+				{CustomHooks.RANDOM_HOLE,0,Block.planks.blockID,4},
+				{CustomHooks.RANDOM_HOLE,0,Block.planks.blockID,1},
+				{CustomHooks.RANDOM_HOLE,1,Block.wood.blockID},
 				{Block.dirt.blockID},
-				{RANDOM_HOLE,0,Block.wood.blockID}
+				{CustomHooks.RANDOM_HOLE,0,Block.wood.blockID}
 			},
 			{ //x = 4
-				{RANDOM_HOLE,0,Block.wood.blockID},
+				{CustomHooks.RANDOM_HOLE,0,Block.wood.blockID},
 				{Block.dirt.blockID},
-				{RANDOM_HOLE,1,Block.wood.blockID},
-				{RANDOM_HOLE,0,Block.planks.blockID,2},
-				{RANDOM_HOLE,0,Block.planks.blockID,1},
-				{RANDOM_HOLE,0,Block.planks.blockID,4},
-				{RANDOM_HOLE,0,Block.planks.blockID,3},
-				{RANDOM_HOLE,0,Block.planks.blockID,0},
-				{RANDOM_HOLE,1,Block.wood.blockID},
-				{RANDOM_HOLE,0,Block.cobblestone.blockID,3},
-				{RANDOM_HOLE,0,Block.wood.blockID}
+				{CustomHooks.RANDOM_HOLE,1,Block.wood.blockID},
+				{CustomHooks.RANDOM_HOLE,0,Block.planks.blockID,2},
+				{CustomHooks.RANDOM_HOLE,0,Block.planks.blockID,1},
+				{CustomHooks.RANDOM_HOLE,0,Block.planks.blockID,4},
+				{CustomHooks.RANDOM_HOLE,0,Block.planks.blockID,3},
+				{CustomHooks.RANDOM_HOLE,0,Block.planks.blockID,0},
+				{CustomHooks.RANDOM_HOLE,1,Block.wood.blockID},
+				{CustomHooks.RANDOM_HOLE,0,Block.cobblestone.blockID,3},
+				{CustomHooks.RANDOM_HOLE,0,Block.wood.blockID}
 			},
 			{ //x = 5
-				{RANDOM_HOLE,0,Block.wood.blockID},
+				{CustomHooks.RANDOM_HOLE,0,Block.wood.blockID},
 				{Block.dirt.blockID},
-				{RANDOM_HOLE,1,Block.wood.blockID},
-				{RANDOM_HOLE,0,Block.planks.blockID,4},
-				{RANDOM_HOLE,0,Block.planks.blockID,3},
-				{RANDOM_HOLE,0,Block.planks.blockID,0},
-				{RANDOM_HOLE,0,Block.planks.blockID,2},
-				{RANDOM_HOLE,0,Block.planks.blockID,1},
-				{RANDOM_HOLE,1,Block.wood.blockID},
+				{CustomHooks.RANDOM_HOLE,1,Block.wood.blockID},
+				{CustomHooks.RANDOM_HOLE,0,Block.planks.blockID,4},
+				{CustomHooks.RANDOM_HOLE,0,Block.planks.blockID,3},
+				{CustomHooks.RANDOM_HOLE,0,Block.planks.blockID,0},
+				{CustomHooks.RANDOM_HOLE,0,Block.planks.blockID,2},
+				{CustomHooks.RANDOM_HOLE,0,Block.planks.blockID,1},
+				{CustomHooks.RANDOM_HOLE,1,Block.wood.blockID},
 				{Block.dirt.blockID},
-				{RANDOM_HOLE,0,Block.wood.blockID}
+				{CustomHooks.RANDOM_HOLE,0,Block.wood.blockID}
 			},
 			{ //x = 6
 				{Block.dirt.blockID},
 				{Block.dirt.blockID},
-				{RANDOM_HOLE,1,Block.wood.blockID},
-				{RANDOM_HOLE,1,Block.wood.blockID},
-				{RANDOM_HOLE,1,Block.wood.blockID},
-				{RANDOM_HOLE,1,Block.wood.blockID},
-				{RANDOM_HOLE,1,Block.wood.blockID},
-				{RANDOM_HOLE,1,Block.wood.blockID},
-				{RANDOM_HOLE,1,Block.wood.blockID},
+				{CustomHooks.RANDOM_HOLE,1,Block.wood.blockID},
+				{CustomHooks.RANDOM_HOLE,1,Block.wood.blockID},
+				{CustomHooks.RANDOM_HOLE,1,Block.wood.blockID},
+				{CustomHooks.RANDOM_HOLE,1,Block.wood.blockID},
+				{CustomHooks.RANDOM_HOLE,1,Block.wood.blockID},
+				{CustomHooks.RANDOM_HOLE,1,Block.wood.blockID},
+				{CustomHooks.RANDOM_HOLE,1,Block.wood.blockID},
 				{Block.dirt.blockID},
 				{Block.dirt.blockID}
 			},
@@ -1674,32 +1666,32 @@ public class StructureArrays
 		{ //y = 1
 			{ //x = 0
 				{0},
-				{RANDOM_HOLE,0,Block.stairsWoodSpruce.blockID,0},
-				{RANDOM_HOLE,0,Block.stairsWoodSpruce.blockID,4},
-				{RANDOM_HOLE,0,Block.stairsWoodSpruce.blockID,2},
-				{RANDOM_HOLE,0,Block.stairsWoodSpruce.blockID,3},
-				{RANDOM_HOLE,0,Block.stairsWoodSpruce.blockID,1},
-				{RANDOM_HOLE,0,Block.stairsWoodSpruce.blockID,1},
+				{CustomHooks.RANDOM_HOLE,0,Block.stairsWoodSpruce.blockID,0},
+				{CustomHooks.RANDOM_HOLE,0,Block.stairsWoodSpruce.blockID,4},
+				{CustomHooks.RANDOM_HOLE,0,Block.stairsWoodSpruce.blockID,2},
+				{CustomHooks.RANDOM_HOLE,0,Block.stairsWoodSpruce.blockID,3},
+				{CustomHooks.RANDOM_HOLE,0,Block.stairsWoodSpruce.blockID,1},
+				{CustomHooks.RANDOM_HOLE,0,Block.stairsWoodSpruce.blockID,1},
 				{0},
-				{RANDOM_HOLE,0,Block.stairsWoodSpruce.blockID,4},
-				{RANDOM_HOLE,0,Block.stairsWoodSpruce.blockID,2},
+				{CustomHooks.RANDOM_HOLE,0,Block.stairsWoodSpruce.blockID,4},
+				{CustomHooks.RANDOM_HOLE,0,Block.stairsWoodSpruce.blockID,2},
 				{0}
 			},
 			{//x = 1
-				{RANDOM_HOLE,0,Block.stairsWoodSpruce.blockID,4},
-				{RANDOM_HOLE,0,Block.stoneBrick.blockID,3},
-				{RANDOM_HOLE,0,Block.stoneBrick.blockID,0},
-				{RANDOM_HOLE,0,Block.stoneBrick.blockID,2},
-				{RANDOM_HOLE,0,Block.stoneBrick.blockID,4},
-				{RANDOM_HOLE,0,Block.stoneBrick.blockID,0},
-				{RANDOM_HOLE,0,Block.stoneBrick.blockID,1},
+				{CustomHooks.RANDOM_HOLE,0,Block.stairsWoodSpruce.blockID,4},
+				{CustomHooks.RANDOM_HOLE,0,Block.stoneBrick.blockID,3},
+				{CustomHooks.RANDOM_HOLE,0,Block.stoneBrick.blockID,0},
+				{CustomHooks.RANDOM_HOLE,0,Block.stoneBrick.blockID,2},
+				{CustomHooks.RANDOM_HOLE,0,Block.stoneBrick.blockID,4},
+				{CustomHooks.RANDOM_HOLE,0,Block.stoneBrick.blockID,0},
+				{CustomHooks.RANDOM_HOLE,0,Block.stoneBrick.blockID,1},
 				{Block.doorWood.blockID, 2},
-				{RANDOM_HOLE,0,Block.stoneBrick.blockID,2},
-				{RANDOM_HOLE,0,Block.stoneBrick.blockID,1},
-				{RANDOM_HOLE,0,Block.stairsWoodSpruce.blockID,2}
+				{CustomHooks.RANDOM_HOLE,0,Block.stoneBrick.blockID,2},
+				{CustomHooks.RANDOM_HOLE,0,Block.stoneBrick.blockID,1},
+				{CustomHooks.RANDOM_HOLE,0,Block.stairsWoodSpruce.blockID,2}
 			},
 			{//x = 2
-				{RANDOM_HOLE,0,Block.wood.blockID},
+				{CustomHooks.RANDOM_HOLE,0,Block.wood.blockID},
 				{Block.planks.blockID},
 				{0},
 				{0},
@@ -1709,11 +1701,11 @@ public class StructureArrays
 				{0},
 				{0},
 				{Block.planks.blockID},
-				{RANDOM_HOLE,0,Block.wood.blockID}
+				{CustomHooks.RANDOM_HOLE,0,Block.wood.blockID}
 			},
 			{//x = 3
 				{0},
-				{RANDOM_HOLE,1,Block.wood.blockID},
+				{CustomHooks.RANDOM_HOLE,1,Block.wood.blockID},
 				{0},
 				{0},
 				{0},
@@ -1721,12 +1713,12 @@ public class StructureArrays
 				{0},
 				{0},
 				{0},
-				{RANDOM_HOLE,1,Block.wood.blockID},
+				{CustomHooks.RANDOM_HOLE,1,Block.wood.blockID},
 				{0}
 			},
 			{//x = 4
 				{0},
-				{RANDOM_HOLE,0,Block.cobblestone.blockID,3},
+				{CustomHooks.RANDOM_HOLE,0,Block.cobblestone.blockID,3},
 				{0},
 				{0},
 				{0},
@@ -1734,12 +1726,12 @@ public class StructureArrays
 				{0},
 				{0},
 				{0},
-				{RANDOM_HOLE,0,Block.cobblestone.blockID,3},
+				{CustomHooks.RANDOM_HOLE,0,Block.cobblestone.blockID,3},
 				{0}
 			},
 			{//x = 5
 				{0},
-				{RANDOM_HOLE,1,Block.wood.blockID},
+				{CustomHooks.RANDOM_HOLE,1,Block.wood.blockID},
 				{0},
 				{0},
 				{0},
@@ -1747,7 +1739,7 @@ public class StructureArrays
 				{0},
 				{0},
 				{0},
-				{RANDOM_HOLE,1,Block.wood.blockID},
+				{CustomHooks.RANDOM_HOLE,1,Block.wood.blockID},
 				{0}
 			},
 			{//x = 6
@@ -1764,29 +1756,29 @@ public class StructureArrays
 				{Block.wood.blockID}
 			},
 			{//x = 7
-				{RANDOM_HOLE,1,Block.stairsWoodSpruce.blockID,0},
-				{RANDOM_HOLE,0,Block.stoneBrick.blockID,1},
-				{RANDOM_HOLE,0,Block.stoneBrick.blockID,4},
-				{RANDOM_HOLE,0,Block.stoneBrick.blockID,2},
-				{RANDOM_HOLE,0,Block.stoneBrick.blockID,3},
-				{RANDOM_HOLE,0,Block.stoneBrick.blockID,0},
-				{RANDOM_HOLE,0,Block.stoneBrick.blockID,2},
-				{RANDOM_HOLE,0,Block.stoneBrick.blockID,1},
-				{RANDOM_HOLE,0,Block.stoneBrick.blockID,0},
-				{RANDOM_HOLE,0,Block.stoneBrick.blockID,4},
-				{RANDOM_HOLE,1,Block.stairsWoodSpruce.blockID,0}
+				{CustomHooks.RANDOM_HOLE,1,Block.stairsWoodSpruce.blockID,0},
+				{CustomHooks.RANDOM_HOLE,0,Block.stoneBrick.blockID,1},
+				{CustomHooks.RANDOM_HOLE,0,Block.stoneBrick.blockID,4},
+				{CustomHooks.RANDOM_HOLE,0,Block.stoneBrick.blockID,2},
+				{CustomHooks.RANDOM_HOLE,0,Block.stoneBrick.blockID,3},
+				{CustomHooks.RANDOM_HOLE,0,Block.stoneBrick.blockID,0},
+				{CustomHooks.RANDOM_HOLE,0,Block.stoneBrick.blockID,2},
+				{CustomHooks.RANDOM_HOLE,0,Block.stoneBrick.blockID,1},
+				{CustomHooks.RANDOM_HOLE,0,Block.stoneBrick.blockID,0},
+				{CustomHooks.RANDOM_HOLE,0,Block.stoneBrick.blockID,4},
+				{CustomHooks.RANDOM_HOLE,1,Block.stairsWoodSpruce.blockID,0}
 			},
 			{//x = 8
 				{0},
-				{RANDOM_HOLE,1,Block.stairsWoodSpruce.blockID,0},
-				{RANDOM_HOLE,1,Block.stairsWoodSpruce.blockID,0},
-				{RANDOM_HOLE,1,Block.stairsWoodSpruce.blockID,0},
-				{RANDOM_HOLE,1,Block.stairsWoodSpruce.blockID,0},
-				{RANDOM_HOLE,1,Block.stairsWoodSpruce.blockID,0},
-				{RANDOM_HOLE,1,Block.stairsWoodSpruce.blockID,0},
-				{RANDOM_HOLE,1,Block.stairsWoodSpruce.blockID,0},
-				{RANDOM_HOLE,1,Block.stairsWoodSpruce.blockID,0},
-				{RANDOM_HOLE,1,Block.stairsWoodSpruce.blockID,0},
+				{CustomHooks.RANDOM_HOLE,1,Block.stairsWoodSpruce.blockID,0},
+				{CustomHooks.RANDOM_HOLE,1,Block.stairsWoodSpruce.blockID,0},
+				{CustomHooks.RANDOM_HOLE,1,Block.stairsWoodSpruce.blockID,0},
+				{CustomHooks.RANDOM_HOLE,1,Block.stairsWoodSpruce.blockID,0},
+				{CustomHooks.RANDOM_HOLE,1,Block.stairsWoodSpruce.blockID,0},
+				{CustomHooks.RANDOM_HOLE,1,Block.stairsWoodSpruce.blockID,0},
+				{CustomHooks.RANDOM_HOLE,1,Block.stairsWoodSpruce.blockID,0},
+				{CustomHooks.RANDOM_HOLE,1,Block.stairsWoodSpruce.blockID,0},
+				{CustomHooks.RANDOM_HOLE,1,Block.stairsWoodSpruce.blockID,0},
 				{0}
 			}
 		},
@@ -1796,20 +1788,20 @@ public class StructureArrays
 			},
 			{//x = 1
 				{0},
-				{RANDOM_HOLE,0,Block.stairsWoodSpruce.blockID,0},
+				{CustomHooks.RANDOM_HOLE,0,Block.stairsWoodSpruce.blockID,0},
 				{Block.fence.blockID},
 				{0},
 				{Block.fence.blockID},
-				{RANDOM_HOLE,0,Block.stairsWoodSpruce.blockID,0},
-				{RANDOM_HOLE,0,Block.stairsWoodSpruce.blockID,0},
+				{CustomHooks.RANDOM_HOLE,0,Block.stairsWoodSpruce.blockID,0},
+				{CustomHooks.RANDOM_HOLE,0,Block.stairsWoodSpruce.blockID,0},
 				{Block.doorWood.blockID, 10},
-				{RANDOM_HOLE,0,Block.stairsWoodSpruce.blockID,0},
-				{RANDOM_HOLE,0,Block.stairsWoodSpruce.blockID,0},
+				{CustomHooks.RANDOM_HOLE,0,Block.stairsWoodSpruce.blockID,0},
+				{CustomHooks.RANDOM_HOLE,0,Block.stairsWoodSpruce.blockID,0},
 				{0}
 			},
 			{//x = 2
-				{RANDOM_HOLE,0,Block.stairsWoodSpruce.blockID,0},
-				{RANDOM_HOLE,1,Block.wood.blockID},
+				{CustomHooks.RANDOM_HOLE,0,Block.stairsWoodSpruce.blockID,0},
+				{CustomHooks.RANDOM_HOLE,1,Block.wood.blockID},
 				{0},
 				{0},
 				{0},
@@ -1817,11 +1809,11 @@ public class StructureArrays
 				{0},
 				{0},
 				{0},
-				{RANDOM_HOLE,1,Block.wood.blockID},
-				{RANDOM_HOLE,0,Block.stairsWoodSpruce.blockID,00}
+				{CustomHooks.RANDOM_HOLE,1,Block.wood.blockID},
+				{CustomHooks.RANDOM_HOLE,0,Block.stairsWoodSpruce.blockID,00}
 			},
 			{//x = 3
-				{RANDOM_HOLE,0,Block.wood.blockID},
+				{CustomHooks.RANDOM_HOLE,0,Block.wood.blockID},
 				{Block.torchWood.blockID, 3},
 				{0},
 				{0},
@@ -1831,11 +1823,11 @@ public class StructureArrays
 				{0},
 				{0},
 				{Block.torchWood.blockID, 4},
-				{RANDOM_HOLE,0,Block.wood.blockID}
+				{CustomHooks.RANDOM_HOLE,0,Block.wood.blockID}
 			},
 			{//x = 4
 				{0},
-				{RANDOM_HOLE,1,Block.wood.blockID},
+				{CustomHooks.RANDOM_HOLE,1,Block.wood.blockID},
 				{0},
 				{0},
 				{0},
@@ -1843,11 +1835,11 @@ public class StructureArrays
 				{0},
 				{0},
 				{0},
-				{RANDOM_HOLE,1,Block.wood.blockID},
+				{CustomHooks.RANDOM_HOLE,1,Block.wood.blockID},
 				{0}
 			},
 			{//x = 5
-				{RANDOM_HOLE,0,Block.wood.blockID},
+				{CustomHooks.RANDOM_HOLE,0,Block.wood.blockID},
 				{Block.torchWood.blockID, 3},
 				{0},
 				{0},
@@ -1857,11 +1849,11 @@ public class StructureArrays
 				{0},
 				{0},
 				{Block.torchWood.blockID, 4},
-				{RANDOM_HOLE,0,Block.wood.blockID}
+				{CustomHooks.RANDOM_HOLE,0,Block.wood.blockID}
 			},
 			{//x = 6
-				{RANDOM_HOLE,1,Block.stairsWoodSpruce.blockID,0},
-				{RANDOM_HOLE,1,Block.wood.blockID},
+				{CustomHooks.RANDOM_HOLE,1,Block.stairsWoodSpruce.blockID,0},
+				{CustomHooks.RANDOM_HOLE,1,Block.wood.blockID},
 				{0},
 				{0},
 				{0},
@@ -1869,20 +1861,20 @@ public class StructureArrays
 				{0},
 				{0},
 				{0},
-				{RANDOM_HOLE,1,Block.wood.blockID},
-				{RANDOM_HOLE,1,Block.stairsWoodSpruce.blockID,0},
+				{CustomHooks.RANDOM_HOLE,1,Block.wood.blockID},
+				{CustomHooks.RANDOM_HOLE,1,Block.stairsWoodSpruce.blockID,0},
 			},
 			{//x = 7
 				{0},
-				{RANDOM_HOLE,1,Block.stairsWoodSpruce.blockID,0},
-				{RANDOM_HOLE,1,Block.stairsWoodSpruce.blockID,0},
-				{RANDOM_HOLE,1,Block.wood.blockID},
-				{RANDOM_HOLE,1,Block.stairsWoodSpruce.blockID,0},
-				{RANDOM_HOLE,1,Block.stairsWoodSpruce.blockID,0},
-				{RANDOM_HOLE,1,Block.stairsWoodSpruce.blockID,0},
-				{RANDOM_HOLE,1,Block.wood.blockID},
-				{RANDOM_HOLE,1,Block.stairsWoodSpruce.blockID,0},
-				{RANDOM_HOLE,1,Block.stairsWoodSpruce.blockID,0},
+				{CustomHooks.RANDOM_HOLE,1,Block.stairsWoodSpruce.blockID,0},
+				{CustomHooks.RANDOM_HOLE,1,Block.stairsWoodSpruce.blockID,0},
+				{CustomHooks.RANDOM_HOLE,1,Block.wood.blockID},
+				{CustomHooks.RANDOM_HOLE,1,Block.stairsWoodSpruce.blockID,0},
+				{CustomHooks.RANDOM_HOLE,1,Block.stairsWoodSpruce.blockID,0},
+				{CustomHooks.RANDOM_HOLE,1,Block.stairsWoodSpruce.blockID,0},
+				{CustomHooks.RANDOM_HOLE,1,Block.wood.blockID},
+				{CustomHooks.RANDOM_HOLE,1,Block.stairsWoodSpruce.blockID,0},
+				{CustomHooks.RANDOM_HOLE,1,Block.stairsWoodSpruce.blockID,0},
 				{0}
 			},
 			{//x = 8
@@ -1906,32 +1898,32 @@ public class StructureArrays
 			{//x = 1
 				{0},
 				{0},
-				{RANDOM_HOLE,3,Block.stoneSingleSlab.blockID},
-				{RANDOM_HOLE,3,Block.stoneSingleSlab.blockID},
-				{RANDOM_HOLE,3,Block.stoneSingleSlab.blockID},
+				{CustomHooks.RANDOM_HOLE,3,Block.stoneSingleSlab.blockID},
+				{CustomHooks.RANDOM_HOLE,3,Block.stoneSingleSlab.blockID},
+				{CustomHooks.RANDOM_HOLE,3,Block.stoneSingleSlab.blockID},
 				{0},
 				{0},
-				{RANDOM_HOLE,3,Block.stoneSingleSlab.blockID},
+				{CustomHooks.RANDOM_HOLE,3,Block.stoneSingleSlab.blockID},
 				{0},
 				{0},
 				{0}
 			},
 			{//x = 2
 				{0},
-				{RANDOM_HOLE,0,Block.stairsWoodSpruce.blockID,2},
-				{RANDOM_HOLE,0,Block.cobblestone.blockID,3},
-				{RANDOM_HOLE,0,Block.cobblestone.blockID,3},
-				{RANDOM_HOLE,0,Block.cobblestone.blockID,3},
-				{RANDOM_HOLE,0,Block.stairsWoodSpruce.blockID,3},
-				{RANDOM_HOLE,0,Block.stairsWoodSpruce.blockID,3},
+				{CustomHooks.RANDOM_HOLE,0,Block.stairsWoodSpruce.blockID,2},
+				{CustomHooks.RANDOM_HOLE,0,Block.cobblestone.blockID,3},
+				{CustomHooks.RANDOM_HOLE,0,Block.cobblestone.blockID,3},
+				{CustomHooks.RANDOM_HOLE,0,Block.cobblestone.blockID,3},
+				{CustomHooks.RANDOM_HOLE,0,Block.stairsWoodSpruce.blockID,3},
+				{CustomHooks.RANDOM_HOLE,0,Block.stairsWoodSpruce.blockID,3},
 				{Block.stairsCobblestone.blockID,0},
-				{RANDOM_HOLE,0,Block.stairsWoodSpruce.blockID,2},
-				{RANDOM_HOLE,0,Block.stairsWoodSpruce.blockID,2},
+				{CustomHooks.RANDOM_HOLE,0,Block.stairsWoodSpruce.blockID,2},
+				{CustomHooks.RANDOM_HOLE,0,Block.stairsWoodSpruce.blockID,2},
 				{0}
 			},
 			{//x = 3
-				{RANDOM_HOLE,0,Block.stairsWoodSpruce.blockID},
-				{RANDOM_HOLE,1,Block.wood.blockID},
+				{CustomHooks.RANDOM_HOLE,0,Block.stairsWoodSpruce.blockID},
+				{CustomHooks.RANDOM_HOLE,1,Block.wood.blockID},
 				{0},
 				{0},
 				{0},
@@ -1939,11 +1931,11 @@ public class StructureArrays
 				{0},
 				{0},
 				{0},
-				{RANDOM_HOLE,1,Block.wood.blockID},
-				{RANDOM_HOLE,0,Block.stairsWoodSpruce.blockID}
+				{CustomHooks.RANDOM_HOLE,1,Block.wood.blockID},
+				{CustomHooks.RANDOM_HOLE,0,Block.stairsWoodSpruce.blockID}
 			},
 			{//x = 4
-				{RANDOM_HOLE,0,Block.wood.blockID},
+				{CustomHooks.RANDOM_HOLE,0,Block.wood.blockID},
 				{Block.planks.blockID},
 				{0},
 				{0},
@@ -1953,11 +1945,11 @@ public class StructureArrays
 				{0},
 				{0},
 				{Block.planks.blockID},
-				{RANDOM_HOLE,0,Block.wood.blockID}
+				{CustomHooks.RANDOM_HOLE,0,Block.wood.blockID}
 			},
 			{//x = 5
-				{RANDOM_HOLE,1,Block.stairsWoodSpruce.blockID,2},
-				{RANDOM_HOLE,1,Block.wood.blockID},
+				{CustomHooks.RANDOM_HOLE,1,Block.stairsWoodSpruce.blockID,2},
+				{CustomHooks.RANDOM_HOLE,1,Block.wood.blockID},
 				{0},
 				{0},
 				{0},
@@ -1965,31 +1957,31 @@ public class StructureArrays
 				{0},
 				{0},
 				{0},
-				{RANDOM_HOLE,1,Block.wood.blockID},
-				{RANDOM_HOLE,1,Block.stairsWoodSpruce.blockID,0},
+				{CustomHooks.RANDOM_HOLE,1,Block.wood.blockID},
+				{CustomHooks.RANDOM_HOLE,1,Block.stairsWoodSpruce.blockID,0},
 			},
 			{//x = 6
 				{0},
-				{RANDOM_HOLE,1,Block.stairsWoodSpruce.blockID,1},
-				{RANDOM_HOLE,1,Block.stairsWoodSpruce.blockID,3},
-				{RANDOM_HOLE,1,Block.stairsCobblestone.blockID},
-				{RANDOM_HOLE,1,Block.stairsWoodSpruce.blockID,0},
-				{RANDOM_HOLE,1,Block.stairsWoodSpruce.blockID,3},
-				{RANDOM_HOLE,1,Block.stairsWoodSpruce.blockID,1},
-				{RANDOM_HOLE,1,Block.stairsCobblestone.blockID},
-				{RANDOM_HOLE,1,Block.stairsWoodSpruce.blockID,4},
-				{RANDOM_HOLE,1,Block.stairsWoodSpruce.blockID,4},
+				{CustomHooks.RANDOM_HOLE,1,Block.stairsWoodSpruce.blockID,1},
+				{CustomHooks.RANDOM_HOLE,1,Block.stairsWoodSpruce.blockID,3},
+				{CustomHooks.RANDOM_HOLE,1,Block.stairsCobblestone.blockID},
+				{CustomHooks.RANDOM_HOLE,1,Block.stairsWoodSpruce.blockID,0},
+				{CustomHooks.RANDOM_HOLE,1,Block.stairsWoodSpruce.blockID,3},
+				{CustomHooks.RANDOM_HOLE,1,Block.stairsWoodSpruce.blockID,1},
+				{CustomHooks.RANDOM_HOLE,1,Block.stairsCobblestone.blockID},
+				{CustomHooks.RANDOM_HOLE,1,Block.stairsWoodSpruce.blockID,4},
+				{CustomHooks.RANDOM_HOLE,1,Block.stairsWoodSpruce.blockID,4},
 				{0}
 			},
 			{//x = 7
 				{0},
 				{0},
 				{0},
-				{RANDOM_HOLE,3,Block.stoneSingleSlab.blockID},
+				{CustomHooks.RANDOM_HOLE,3,Block.stoneSingleSlab.blockID},
 				{0},
 				{0},
 				{0},
-				{RANDOM_HOLE,3,Block.stoneSingleSlab.blockID},
+				{CustomHooks.RANDOM_HOLE,3,Block.stoneSingleSlab.blockID},
 				{0},
 				{0},
 				{0}
@@ -1998,11 +1990,11 @@ public class StructureArrays
 				{0},
 				{0},
 				{0},
-				{RANDOM_HOLE,3,Block.stoneSingleSlab.blockID},
+				{CustomHooks.RANDOM_HOLE,3,Block.stoneSingleSlab.blockID},
 				{0},
 				{0},
 				{0},
-				{RANDOM_HOLE,3,Block.stoneSingleSlab.blockID},
+				{CustomHooks.RANDOM_HOLE,3,Block.stoneSingleSlab.blockID},
 				{0},
 				{0},
 				{0}
@@ -2020,41 +2012,41 @@ public class StructureArrays
 			},
 			{//x = 3
 				{0},
-				{RANDOM_HOLE,0,Block.stairsWoodSpruce.blockID},
-				{RANDOM_HOLE,0,Block.stairsCobblestone.blockID},
-				{RANDOM_HOLE,0,Block.stairsCobblestone.blockID},
-				{RANDOM_HOLE,0,Block.stairsCobblestone.blockID},
-				{RANDOM_HOLE,0,Block.stairsWoodSpruce.blockID},
-				{RANDOM_HOLE,0,Block.stairsWoodSpruce.blockID},
-				{RANDOM_HOLE,0,Block.stairsCobblestone.blockID},
-				{RANDOM_HOLE,0,Block.stairsWoodSpruce.blockID},
-				{RANDOM_HOLE,0,Block.stairsWoodSpruce.blockID},
+				{CustomHooks.RANDOM_HOLE,0,Block.stairsWoodSpruce.blockID},
+				{CustomHooks.RANDOM_HOLE,0,Block.stairsCobblestone.blockID},
+				{CustomHooks.RANDOM_HOLE,0,Block.stairsCobblestone.blockID},
+				{CustomHooks.RANDOM_HOLE,0,Block.stairsCobblestone.blockID},
+				{CustomHooks.RANDOM_HOLE,0,Block.stairsWoodSpruce.blockID},
+				{CustomHooks.RANDOM_HOLE,0,Block.stairsWoodSpruce.blockID},
+				{CustomHooks.RANDOM_HOLE,0,Block.stairsCobblestone.blockID},
+				{CustomHooks.RANDOM_HOLE,0,Block.stairsWoodSpruce.blockID},
+				{CustomHooks.RANDOM_HOLE,0,Block.stairsWoodSpruce.blockID},
 				{0}
 			},
 			{//x = 4
-				{RANDOM_HOLE,2,Block.stairsCobblestone.blockID},
-				{RANDOM_HOLE,1,Block.wood.blockID},
-				{RANDOM_HOLE,1,Block.wood.blockID},
-				{RANDOM_HOLE,1,Block.wood.blockID},
-				{RANDOM_HOLE,1,Block.wood.blockID},
-				{RANDOM_HOLE,1,Block.wood.blockID},
-				{RANDOM_HOLE,1,Block.wood.blockID},
-				{RANDOM_HOLE,1,Block.wood.blockID},
-				{RANDOM_HOLE,1,Block.wood.blockID},
-				{RANDOM_HOLE,1,Block.wood.blockID},
-				{RANDOM_HOLE,3,Block.stairsCobblestone.blockID}
+				{CustomHooks.RANDOM_HOLE,2,Block.stairsCobblestone.blockID},
+				{CustomHooks.RANDOM_HOLE,1,Block.wood.blockID},
+				{CustomHooks.RANDOM_HOLE,1,Block.wood.blockID},
+				{CustomHooks.RANDOM_HOLE,1,Block.wood.blockID},
+				{CustomHooks.RANDOM_HOLE,1,Block.wood.blockID},
+				{CustomHooks.RANDOM_HOLE,1,Block.wood.blockID},
+				{CustomHooks.RANDOM_HOLE,1,Block.wood.blockID},
+				{CustomHooks.RANDOM_HOLE,1,Block.wood.blockID},
+				{CustomHooks.RANDOM_HOLE,1,Block.wood.blockID},
+				{CustomHooks.RANDOM_HOLE,1,Block.wood.blockID},
+				{CustomHooks.RANDOM_HOLE,3,Block.stairsCobblestone.blockID}
 			},
 			{//x = 5
 				{0},
-				{RANDOM_HOLE,1,Block.stairsWoodSpruce.blockID,2},
-				{RANDOM_HOLE,1,Block.stairsWoodSpruce.blockID,1},
-				{RANDOM_HOLE,1,Block.stairsCobblestone.blockID},
-				{RANDOM_HOLE,1,Block.stairsWoodSpruce.blockID,0},
-				{RANDOM_HOLE,1,Block.stairsWoodSpruce.blockID,4},
-				{RANDOM_HOLE,1,Block.stairsWoodSpruce.blockID,0},
-				{RANDOM_HOLE,1,Block.stairsCobblestone.blockID},
-				{RANDOM_HOLE,1,Block.stairsWoodSpruce.blockID,3},
-				{RANDOM_HOLE,1,Block.stairsWoodSpruce.blockID,1},
+				{CustomHooks.RANDOM_HOLE,1,Block.stairsWoodSpruce.blockID,2},
+				{CustomHooks.RANDOM_HOLE,1,Block.stairsWoodSpruce.blockID,1},
+				{CustomHooks.RANDOM_HOLE,1,Block.stairsCobblestone.blockID},
+				{CustomHooks.RANDOM_HOLE,1,Block.stairsWoodSpruce.blockID,0},
+				{CustomHooks.RANDOM_HOLE,1,Block.stairsWoodSpruce.blockID,4},
+				{CustomHooks.RANDOM_HOLE,1,Block.stairsWoodSpruce.blockID,0},
+				{CustomHooks.RANDOM_HOLE,1,Block.stairsCobblestone.blockID},
+				{CustomHooks.RANDOM_HOLE,1,Block.stairsWoodSpruce.blockID,3},
+				{CustomHooks.RANDOM_HOLE,1,Block.stairsWoodSpruce.blockID,1},
 				{0}
 			}
 		},
@@ -2072,17 +2064,17 @@ public class StructureArrays
 				{0},{0},{0},{0},{0},{0},{0},{0},{0},{0},{0}
 			},
 			{//x = 4
-				{RANDOM_HOLE,2,Block.stairsCobblestone.blockID},
-				{RANDOM_HOLE,3,Block.stoneSingleSlab.blockID},
-				{RANDOM_HOLE,3,Block.stoneSingleSlab.blockID},
-				{RANDOM_HOLE,3,Block.stoneSingleSlab.blockID},
-				{RANDOM_HOLE,3,Block.stoneSingleSlab.blockID},
-				{RANDOM_HOLE,3,Block.stoneSingleSlab.blockID},
-				{RANDOM_HOLE,3,Block.stoneSingleSlab.blockID},
-				{RANDOM_HOLE,3,Block.stoneSingleSlab.blockID},
-				{RANDOM_HOLE,3,Block.stoneSingleSlab.blockID},
-				{RANDOM_HOLE,3,Block.stoneSingleSlab.blockID},
-				{RANDOM_HOLE,3,Block.stairsCobblestone.blockID}
+				{CustomHooks.RANDOM_HOLE,2,Block.stairsCobblestone.blockID},
+				{CustomHooks.RANDOM_HOLE,3,Block.stoneSingleSlab.blockID},
+				{CustomHooks.RANDOM_HOLE,3,Block.stoneSingleSlab.blockID},
+				{CustomHooks.RANDOM_HOLE,3,Block.stoneSingleSlab.blockID},
+				{CustomHooks.RANDOM_HOLE,3,Block.stoneSingleSlab.blockID},
+				{CustomHooks.RANDOM_HOLE,3,Block.stoneSingleSlab.blockID},
+				{CustomHooks.RANDOM_HOLE,3,Block.stoneSingleSlab.blockID},
+				{CustomHooks.RANDOM_HOLE,3,Block.stoneSingleSlab.blockID},
+				{CustomHooks.RANDOM_HOLE,3,Block.stoneSingleSlab.blockID},
+				{CustomHooks.RANDOM_HOLE,3,Block.stoneSingleSlab.blockID},
+				{CustomHooks.RANDOM_HOLE,3,Block.stairsCobblestone.blockID}
 			}
 		}
 	};
@@ -2351,7 +2343,7 @@ public class StructureArrays
 			},
 			{ // x = 7
 				{Block.redstoneWire.blockID},{Block.redstoneWire.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},
-				{0},{0},{CUSTOM_CHEST,2,CUSTOM_CHEST_1},{Block.cobblestone.blockID}
+				{0},{0},{CustomHooks.CUSTOM_CHEST,2,CustomHooks.CUSTOM_CHEST_1},{Block.cobblestone.blockID}
 			},
 			{ // x = 8
 				{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},

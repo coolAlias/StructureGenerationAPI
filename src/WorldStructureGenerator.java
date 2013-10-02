@@ -13,7 +13,6 @@ import net.minecraft.world.chunk.IChunkProvider;
 
 public class WorldStructureGenerator implements IWorldGenerator
 {
-
 	@Override
 	public void generate(Random random, int chunkX, int chunkZ, World world,
 			IChunkProvider chunkGenerator, IChunkProvider chunkProvider)
