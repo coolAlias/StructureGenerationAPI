@@ -11,24 +11,26 @@ absolutely required, but you could skip it. Steps 2 and 4 just give you further
 control over exactly where and how the structure is generated.
 
 =======
-Step 1: Add your blockArray to the generator's list
+Step 1: Add your blockArrays
 =======
 
 Once you have your blockArray(s) set up correctly (see below), you will need to add
 them to the WorldGenStructure generator's list of arrays to generate.
 
-This is done with one of four methods:
+This is done with one of six methods:
 "addBlockArray(int[][][][])" - adds a blockArray to current list
 "setBlockArray(int[][][][])" - overwrites current list with provided blockArray
 "addBlockArrayList(List<int[][][][]>)" - adds a list of blockArrays to current list
 "setBlockArrayList(List<int[][][][]>)" - overwrites current list with provided list
+"setStructure(Structure)" - overwrites current blockArray list with list from structure
+"setStructureWithRotation(Structure, int)" - as above, but also rotates the structure
 
 If you have more than one layer, they should be added from the bottom up, so first
 the base, then the layer on top of the base, and so on until the final topmost layer
 is added.
 
 =======
-Step 2: Set your structure's facing
+Step 2: Set structure facing
 =======
 
 "setStructureFacing(StructureGeneratorBase.DIRECTION)"
@@ -61,7 +63,7 @@ Negative offX values place the structure further away from the player, +offX wil
 toward the player. Thinking about inverting this.
 
 =======
-Step 4: Set the player's facing (optional)
+Step 4: Set player facing (optional)
 =======
 
 "setPlayerFacing(Entity)"
@@ -79,9 +81,9 @@ by all classes extending WorldGenerator:
 
 "generate(World world, Random random, int x, int y, int z)"
 
-=====================================================================================
-                    USING THE NEW STRUCTURE CLASS (Optional)
-=====================================================================================
+=========================
+USING THE STRUCTURE CLASS
+=========================
 The Structure class is a simple utility class that stores all information needed to
 properly generate a structure. Its use is not required, but convenient for several
 reasons:
@@ -129,9 +131,9 @@ Step 5: (Optional) Add the new structure to your List<Structure>, if you have on
 That's it! Basically the same steps as needed for generating your structure in the first
 place, but now you can have all the benefits above for the same amount of work.
 
-=====================================================================================
-                SETTING UP A STRUCTURE'S BLOCK ARRAY
-=====================================================================================
+========================
+SETTING UP A BLOCK ARRAY
+========================
 TIP: You can use MCEdit first and convert the 'generate' methods from that to a block
 array much more easily than building one from scratch. This has the added benefit of
 providing all the correct metadata values for block facing - I highly recommend you
@@ -263,9 +265,10 @@ public static final int[][][][] blockArrayTemplate =
     }
 };
 
-=====================================================================================
-            GENERATING LARGE STRUCTURES: USING MULTIPLE ARRAYS
-=====================================================================================
+============================
+GENERATING LARGE STRUCTURES:
+  USING MULTIPLE ARRAYS
+============================
 
 If you receive the error message "The code for the static initializer is exceeding
 the 65535 bytes limit", then you will need to break your structure up into multiple
@@ -291,10 +294,11 @@ it and add it multiple times to the generator. For instance, if you're making a 
 tower with 10 identical floor layouts, you only need to create an array for a single
 floor and then addBlockArray(floorWizardTower) 10 times.
 
-=====================================================================================
-                    IMPORTANT: NOTES ON SETTING METADATA
-        Read this or your directional blocks WILL face the wrong direction!
-=====================================================================================
+======================
+SETTING BLOCK METADATA
+======================
+
+Read this or your directional blocks WILL face the wrong direction!
 
 Set metadata value in relation to player facing opposite your structure's facing.
 Default structure facing is EAST, so I set all my metadata based on a player looking
@@ -422,10 +426,11 @@ Associated tile entity will determine skull type, as well as rotation if on floo
 you must make a CUSTOM_BLOCK case to get anything other than skeleton skulls and then
 use one of the "setSkullData" methods below.
 
-=====================================================================================
-                    HOW TO USE CUSTOM HOOK METHOD:
+==================
+USING CUSTOM HOOKS
+==================
+
 "onCustomBlockAdded(World world, int x, int y, int z, int fakeID, int customData)"
-=====================================================================================
 
 Step 1: Choose a block ID
 Custom block hooks require block ids greater than 4095. If you want to your block to
@@ -520,6 +525,6 @@ The following are methods designed to make handling onCustomBlockAdded cases eas
     As above but with additional rotation data (rot). This only applies to skulls sitting
     on the floor, not mounted to walls.
 
-=====================================================================================
-            CONGRATULATIONS! YOU'VE REACHED THE END!
-=====================================================================================
+=========================
+CONGRATULATIONS! THE END!
+=========================
