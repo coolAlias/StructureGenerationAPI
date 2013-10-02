@@ -239,12 +239,12 @@ public class StructureGenerator extends StructureGeneratorBase
 		// has a buffer layer on the bottom in case no ground; spawn at y-1 for ground level
 		structure.setStructureOffset(0, -1, 0);
 		structures.add(structure);
-
+		/*
 		structure = new Structure("Tutorial Home");
 		structure.addBlockArray(StructureArrayTutorial.blockArrayTutorial);
 		structure.setFacing(StructureGeneratorBase.WEST);
 		structures.add(structure);
-
+		 */
 		structure = new Structure("Blacksmith");
 		structure.addBlockArray(StructureArrays.blockArrayNPCBlackSmith);
 		structure.setFacing(StructureGeneratorBase.EAST);
