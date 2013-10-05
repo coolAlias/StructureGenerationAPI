@@ -17,7 +17,13 @@
 
 package coolalias.structuregen.proxy;
 
+import net.minecraftforge.common.MinecraftForge;
+import coolalias.structuregen.handlers.SGTBlockHighlightHandler;
+
 public class ClientProxy extends CommonProxy
 {
-	public ClientProxy() {}
+	@Override
+	public void registerRenderers() {
+		MinecraftForge.EVENT_BUS.register(new SGTBlockHighlightHandler());
+	}
 }

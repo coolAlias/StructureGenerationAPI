@@ -39,7 +39,7 @@ public class ItemStructureSpawner extends BaseModItem
 	private static final String[] data = {"Structure", "Rotations", "OffsetX", "OffsetY", "OffsetZ", "InvertY"};
 
 	/** Indices for data variables */
-	private static final int STRUCTURE_INDEX = 0, ROTATIONS = 1, OFFSET_X = 2, OFFSET_Y = 3, OFFSET_Z = 4, INVERT_Y = 5;
+	public static final int STRUCTURE_INDEX = 0, ROTATIONS = 1, OFFSET_X = 2, OFFSET_Y = 3, OFFSET_Z = 4, INVERT_Y = 5;
 
 	public ItemStructureSpawner(int par1)
 	{
@@ -60,7 +60,7 @@ public class ItemStructureSpawner extends BaseModItem
 	/**
 	 * Increments the appropriate Offset and returns the new value for convenience.
 	 */
-	public int incrementOffset(ItemStack itemstack, Offset type)
+	public static final int incrementOffset(ItemStack itemstack, Offset type)
 	{
 		if (itemstack.stackTagCompound == null)
 			initNBTCompound(itemstack);
@@ -87,7 +87,7 @@ public class ItemStructureSpawner extends BaseModItem
 	/**
 	 * Decrements the appropriate Offset and returns the new value for convenience.
 	 */
-	public int decrementOffset(ItemStack itemstack, Offset type)
+	public static final int decrementOffset(ItemStack itemstack, Offset type)
 	{
 		if (itemstack.stackTagCompound == null)
 			initNBTCompound(itemstack);
@@ -114,7 +114,7 @@ public class ItemStructureSpawner extends BaseModItem
 	/**
 	 * Returns true if y offset is inverted (i.e. y will decrement)
 	 */
-	public boolean isInverted(ItemStack itemstack) {
+	public static final boolean isInverted(ItemStack itemstack) {
 		if (itemstack.stackTagCompound == null)
 			initNBTCompound(itemstack);
 		return itemstack.stackTagCompound.getBoolean(data[INVERT_Y]);
@@ -123,7 +123,7 @@ public class ItemStructureSpawner extends BaseModItem
 	/**
 	 * Inverts Y axis for offset adjustments; returns new value for convenience.
 	 */
-	public boolean invertY(ItemStack itemstack) {
+	public static final boolean invertY(ItemStack itemstack) {
 		if (itemstack.stackTagCompound == null)
 			initNBTCompound(itemstack);
 		boolean invert = !itemstack.stackTagCompound.getBoolean(data[INVERT_Y]);
@@ -134,7 +134,7 @@ public class ItemStructureSpawner extends BaseModItem
 	/**
 	 * Resets all manual offsets to 0.
 	 */
-	public void resetOffset(ItemStack itemstack) {
+	public static final void resetOffset(ItemStack itemstack) {
 		if (itemstack.stackTagCompound == null)
 			initNBTCompound(itemstack);
 		itemstack.stackTagCompound.setInteger(data[OFFSET_X], 0);
@@ -145,7 +145,7 @@ public class ItemStructureSpawner extends BaseModItem
 	/**
 	 * Rotates structure's facing by 90 degrees clockwise; returns number of rotations for convenience.
 	 */
-	public int rotate(ItemStack itemstack) {
+	public static final int rotate(ItemStack itemstack) {
 		if (itemstack.stackTagCompound == null)
 			initNBTCompound(itemstack);
 		int rotations = (itemstack.stackTagCompound.getInteger(data[ROTATIONS]) + 1) % 4;
@@ -156,7 +156,7 @@ public class ItemStructureSpawner extends BaseModItem
 	/**
 	 * Increments the structure index and returns the new value for convenience.
 	 */
-	public int nextStructure(ItemStack itemstack) {
+	public static final int nextStructure(ItemStack itemstack) {
 		if (itemstack.stackTagCompound == null)
 			initNBTCompound(itemstack);
 		int index = itemstack.stackTagCompound.getInteger(data[STRUCTURE_INDEX]) + 1;
@@ -168,7 +168,7 @@ public class ItemStructureSpawner extends BaseModItem
 	/**
 	 * Decrements the structure index and returns the new value for convenience.
 	 */
-	public int prevStructure(ItemStack itemstack) {
+	public static final int prevStructure(ItemStack itemstack) {
 		if (itemstack.stackTagCompound == null)
 			initNBTCompound(itemstack);
 		int index = itemstack.stackTagCompound.getInteger(data[STRUCTURE_INDEX]) - 1;
@@ -180,28 +180,44 @@ public class ItemStructureSpawner extends BaseModItem
 	/**
 	 * Returns the name of the structure at provided index, or "" if index out of bounds
 	 */
-	public String getStructureName(int index) {
+	public static final String getStructureName(int index) {
 		return (index < StructureGenMain.gen.structures.size() ? StructureGenMain.gen.structures.get(index).name : "");
 	}
 
 	/**
 	 * Returns index of currently selected structure
 	 */
-	public int getCurrentStructureIndex(ItemStack itemstack) {
+	public static final int getCurrentStructureIndex(ItemStack itemstack) {
 		if (itemstack.stackTagCompound == null)
 			initNBTCompound(itemstack);
 		return itemstack.stackTagCompound.getInteger(data[STRUCTURE_INDEX]);
+	}
+	
+	/**
+	 * Returns currently selected structure
+	 */
+	public static final Structure getCurrentStructure(ItemStack itemstack) {
+		return StructureGenMain.gen.structures.get(getCurrentStructureIndex(itemstack));
+	}
+	
+	/**
+	 * Returns data field at index
+	 */
+	public static final int getData(ItemStack itemstack, int index) {
+		if (itemstack.stackTagCompound == null)
+			initNBTCompound(itemstack);
+		return itemstack.stackTagCompound.getInteger(data[index]);
 	}
 
 	/**
 	 * Toggles between generate and remove structure setting. Returns new value for convenience.
 	 */
-	public boolean toggleRemove() {
+	public static final boolean toggleRemove() {
 		return StructureGenMain.gen.toggleRemoveStructure();
 	}
 
 	@Override
-	public int getMaxItemUseDuration(ItemStack par1ItemStack) {
+	public int getMaxItemUseDuration(ItemStack itemstack) {
 		return 1;
 	}
 
@@ -216,7 +232,13 @@ public class ItemStructureSpawner extends BaseModItem
 			if (world.getBlockId(x,y,z) == Block.snow.blockID) { --y; }
 			NBTTagCompound tag = itemstack.stackTagCompound;
 			StructureGenMain.gen.setPlayerFacing(player);
-			Structure structure = StructureGenMain.gen.structures.get(tag.getInteger(data[STRUCTURE_INDEX]));
+			Structure structure = getCurrentStructure(itemstack);
+			
+			if (structure == null) {
+				LogHelper.log(Level.WARNING, "Current structure is null.");
+				return false;
+			}
+			
 			StructureGenMain.gen.setStructureWithRotation(structure, tag.getInteger(data[ROTATIONS]));
 			StructureGenMain.gen.setDefaultOffset(structure.getOffsetX() + tag.getInteger(data[OFFSET_X]), structure.getOffsetY() + tag.getInteger(data[OFFSET_Y]), structure.getOffsetZ() + tag.getInteger(data[OFFSET_Z]));
 			StructureGenMain.gen.generate(world, world.rand, x, y, z);
@@ -228,7 +250,7 @@ public class ItemStructureSpawner extends BaseModItem
 	/**
 	 * Creates a new NBTTagCompound for the itemstack if none exists
 	 */
-	private final void initNBTCompound(ItemStack itemstack)
+	private static final void initNBTCompound(ItemStack itemstack)
 	{
 		if (itemstack.stackTagCompound == null)
 			itemstack.stackTagCompound = new NBTTagCompound();

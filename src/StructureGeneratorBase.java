@@ -197,7 +197,8 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 	
 	/**
 	 * Overwrites current Structure information with passed in structure
-	 * Sets structure facing, but not offset
+	 * Sets structure facing to the default facing of the structure
+	 * Does NOT set offset
 	 */
 	public final void setStructure(Structure structure)
 	{
@@ -205,7 +206,6 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 			reset();
 			setBlockArrayList(structure.blockArrayList());
 			setStructureFacing(structure.getFacing());
-			// setOffset(structure.getOffsetX(), structure.getOffsetY(), structure.getOffsetZ());
 		}
 		else
 			LogHelper.log(Level.SEVERE, "NULL Structure cannot be set!");
@@ -218,6 +218,7 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 	public final void setStructureWithRotation(Structure structure, int rotations)
 	{
 		setStructure(structure);
+		this.manualRotations = 0;
 		for (int i = 0; i < rotations % 4; ++i)
 			rotateStructureFacing();
 	}
@@ -738,9 +739,6 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 	private final boolean generateLayer(World world, Random random, int posX, int posY, int posZ, int rotations)
 	{
 		int centerX = blockArray[0].length / 2, centerZ = blockArray[0][0].length / 2;
-		// does center need to be calculated each time? What if first index isn't true size of structure?
-		// It seems to work both ways, so for now, use the one with fewest computations
-		// int centerX, centerZ;
 
 		for (int y = (this.removeStructure ? blockArray.length - 1 : 0); (this.removeStructure ? y >= 0 : y < blockArray.length); y = (this.removeStructure ? --y : ++y))
 		//for (int y = 0; y < blockArray.length; ++y)
@@ -857,12 +855,10 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 		if (realID == 0 || Block.blocksList[worldID] == null) {
 			return true;
 		}
-		else if (Math.abs(realID) == worldID || Math.abs(fakeID) > 4095
-				|| (Block.blocksList[worldID].blockMaterial.isLiquid() && Block.blocksList[Math.abs(realID)].blockMaterial == Block.blocksList[worldID].blockMaterial)
-				|| (Block.blocksList[worldID].blockMaterial == Material.ice && Block.blocksList[Math.abs(realID)].blockMaterial == Material.water))
+		else if (Math.abs(realID) == worldID || materialsMatch(realID, worldID)) // || Math.abs(fakeID) > 4095
 		{
 			world.setBlockToAir(x, y, z);
-			List <Entity> list = world.getEntitiesWithinAABB(Entity.class, getHangingEntityAxisAligned(x, y, z, Direction.directionToFacing[rotations]).expand(1.5F, 1.0F, 1.5F));
+			List <Entity> list = world.getEntitiesWithinAABB(Entity.class, getHangingEntityAxisAligned(x, y, z, Direction.directionToFacing[rotations]).expand(1.0F, 1.0F, 1.0F));
 			Iterator<Entity> iterator = list.iterator();
 			
 			while (iterator.hasNext())
@@ -878,6 +874,16 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 		}
 		
 		return true;
+	}
+	
+	/**
+	 * Returns true if material for realID matches or is compatible with worldID material
+	 */
+	private final boolean materialsMatch(int realID, int worldID)
+	{
+		return (Block.blocksList[worldID].blockMaterial == Material.grass && Block.blocksList[Math.abs(realID)].blockMaterial == Material.ground) ||
+				(Block.blocksList[worldID].blockMaterial.isLiquid() && Block.blocksList[Math.abs(realID)].blockMaterial == Block.blocksList[worldID].blockMaterial) ||
+				(Block.blocksList[worldID].blockMaterial == Material.ice && Block.blocksList[Math.abs(realID)].blockMaterial == Material.water);
 	}
 	
 	/**
