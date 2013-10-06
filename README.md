@@ -7,7 +7,8 @@ entities or whatever else you can imagine.
 
 FEATURES
 ========
-- NEW: Add custom structures to the world during world generation
+- NEW: Preview mode let's you see where the structure will generate
+- Add custom structures to the world during world generation
 - Generate custom structures in the world with the click of a button
 - Auto-rotation of structures ensures it will always face the player
 - Default offset will place the structure so it never spawns on top of the player
@@ -73,6 +74,8 @@ Several structures are included and can be easily toggled between in-game:
 - "Viking Shop" - A cool viking-style shop, but riddled with holes from disuse. Credit again to Microjunk.
 
 These are the default controls:
+
+Sneak to highlight area in which structure will generate
 
 'Arrow Keys' - up: moves structure away from player; down: moves structure towards/behind player; left / right
 
