@@ -258,7 +258,7 @@ public class StructureGenerator extends StructureGeneratorBase
 		structure = new Structure("Redstone Dungeon");
 		structure.addBlockArray(StructureArrays.blockArrayRedstone);
 		structure.setFacing(StructureGeneratorBase.NORTH);
-		structure.setStructureOffset(0, -1, -5);
+		structure.setStructureOffset(0, -2, -2);
 		structures.add(structure);
 
 		structure = new Structure("Spawn Test");
@@ -279,6 +279,5 @@ public class StructureGenerator extends StructureGeneratorBase
 		structure.addBlockArray(WaterMillArray3.blockArrayWaterMill);
 		structure.setFacing(StructureGeneratorBase.EAST);
 		structures.add(structure);
-
 	}
 }

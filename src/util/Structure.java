@@ -136,8 +136,8 @@ public class Structure
 	 */
 	public final void setStructureOffset(int x, int y, int z)
 	{
-		this.offsetX = x;
-		this.offsetY = y;
-		this.offsetZ = z;
+		offsetX = x;
+		offsetZ = z;
+		offsetY = y;
 	}
 }

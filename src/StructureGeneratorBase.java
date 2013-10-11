@@ -88,7 +88,7 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 	/** Stores the data for current layer. See StructureArray.java for information on how create a blockArray. */
 	private int[][][][] blockArray;
 	
-	/** Stores a list of the structure to build, in 'layers' of up to the limit set by static array initialization. */
+	/** Stores a list of the structure to build, in 'layers' made up of individual blockArrays. */
 	private final List<int[][][][]> blockArrayList = new LinkedList();
 	
 	/** Stores blocks that need to be set post-generation, such as torches */
@@ -128,99 +128,10 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 	public StructureGeneratorBase(Entity entity, int[][][][] blocks, int structureFacing, int offX, int offY, int offZ)
 	{
 		super(true);
-		this.setPlayerFacing(entity);
-		this.setBlockArray(blocks);
-		this.setStructureFacing(structureFacing);
-		this.setOffset(offX, offY, offZ);
-	}
-	
-	/**
-	 * Sets the direction in which the player is facing. The structure will be generated
-	 * opposite of player view (so player will be looking at front when finished)
-	 */
-	public final void setPlayerFacing(Entity entity) {
-		if (entity == null)
-			LogHelper.log(Level.WARNING, "Null Pointer Exception! Cannot set facing from a null entity.");
-		else
-			this.facing = MathHelper.floor_double((double)((entity.rotationYaw * 4F) / 360f) + 0.5D) &3;
-	}
-	
-	/**
-	 * Sets the default direction the structure is facing. This side will always face the player
-	 * unless you manually rotate the structure with the rotateStructureFacing() method.
-	 */
-	public final void setStructureFacing(int facing) {
-		this.structureFacing = facing % 4;
-	}
-	
-	/**
-	 * Adds a block array 'layer' to the list to be generated
-	 */
-	public final void addBlockArray(int blocks[][][][]) {
-		if (FMLCommonHandler.instance().getEffectiveSide() == Side.SERVER) {
-			this.blockArrayList.add(blocks);
-			if (this.blockArray == null)
-				this.blockArray = blocks;
-		}
-	}
-	
-	/**
-	 * Overwrites current list with the provided blockArray
-	 */
-	public final void setBlockArray(int blocks[][][][]) {
-		if (FMLCommonHandler.instance().getEffectiveSide() == Side.SERVER) {
-			this.blockArrayList.clear();
-			this.blockArrayList.add(blocks);
-			this.blockArray = blocks;
-		}
-	}
-	
-	/**
-	 * Adds all elements contained in the parameter list to the structure
-	 */
-	public final void addBlockArrayList(List<int[][][][]> list)
-	{
-		this.blockArrayList.addAll(list);
-		if (this.blockArray == null && list.size() > 0)
-			this.blockArray = list.get(0);
-	}
-	
-	/**
-	 * Overwrites current blockArrayList with list provided
-	 */
-	public final void setBlockArrayList(List<int[][][][]> list)
-	{
-		this.blockArrayList.clear();
-		this.blockArrayList.addAll(list);
-		this.blockArray = (list.size() > 0 ? list.get(0) : null);
-	}
-	
-	/**
-	 * Overwrites current Structure information with passed in structure
-	 * Sets structure facing to the default facing of the structure
-	 * Does NOT set offset
-	 */
-	public final void setStructure(Structure structure)
-	{
-		if (structure != null) {
-			reset();
-			setBlockArrayList(structure.blockArrayList());
-			setStructureFacing(structure.getFacing());
-		}
-		else
-			LogHelper.log(Level.SEVERE, "NULL Structure cannot be set!");
-	}
-	
-	/**
-	 * Overwrites current Structure information with passed in structure and rotates it
-	 * a number of times starting from its default facing
-	 */
-	public final void setStructureWithRotation(Structure structure, int rotations)
-	{
-		setStructure(structure);
-		this.manualRotations = 0;
-		for (int i = 0; i < rotations % 4; ++i)
-			rotateStructureFacing();
+		setPlayerFacing(entity);
+		setBlockArray(blocks);
+		setStructureFacing(structureFacing);
+		setOffset(offX, offY, offZ);
 	}
 	
 	/**
@@ -245,8 +156,7 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 	 * @param rotationType types predefined by enumerated type ROTATION
 	 * @return false if a rotation type has already been specified for the given blockID
 	 */
-	public static final boolean registerCustomBlockRotation(int blockID, ROTATION rotationType)
-	{
+	public static final boolean registerCustomBlockRotation(int blockID, ROTATION rotationType) {
 		return registerCustomBlockRotation(blockID, rotationType, false);
 	}
 	
@@ -433,18 +343,10 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 		world.setBlockToAir(x, y, z);
 		
 		switch(direction) {
-		case 2: // frame facing NORTH
-			++z;
-			break;
-		case 3: // frame facing SOUTH
-			--z;
-			break;
-		case 4: // frame facing WEST
-			++x;
-			break;
-		case 5: // frame facing EAST
-			--x;
-			break;
+		case 2: ++z; break; // frame facing NORTH
+		case 3: --z; break; // frame facing SOUTH
+		case 4: ++x; break; // frame facing WEST
+		case 5: --x; break; // frame facing EAST
 		}
 		
 		((ItemHangingEntity) hanging.getItem()).onItemUse(hanging, player, world, x, y, z, direction, 0, 0, 0);
@@ -456,8 +358,7 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 	 * Set's the itemstack contained in ItemFrame at x/y/z with default rotation.
 	 * @param direction Use the value returned from the setHangingEntity method
 	 */
-	public static final void setItemFrameStack(World world, ItemStack itemstack, int x, int y, int z, int direction)
-	{
+	public static final void setItemFrameStack(World world, ItemStack itemstack, int x, int y, int z, int direction) {
 		setItemFrameStack(world, itemstack, x, y, z, direction, 0);
 	}
 	
@@ -531,7 +432,8 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 		
 		if (sign != null)
 		{
-			for (int i = 0; i < sign.signText.length && i < text.length; ++i) {
+			for (int i = 0; i < sign.signText.length && i < text.length; ++i)
+			{
 				if (text[i] == null) {
 					LogHelper.log(Level.WARNING, "Uninitialized String element while setting sign text at index " + i);
 					continue;
@@ -540,11 +442,12 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 					LogHelper.log(Level.WARNING, text[i] + " is too long to fit on a sign; maximum length is 15 characters.");
 					sign.signText[i] = text[i].substring(0, 15);
 				}
-				else
-					sign.signText[i] = text[i];
+				else sign.signText[i] = text[i];
 			}
+			
 			return true;
 		}
+		
 		LogHelper.log(Level.WARNING, "No TileEntitySign was found at " + x + "/" + y + "/" + z);
 		return false;
 	}
@@ -552,8 +455,7 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 	/**
 	 * Method to set skulls not requiring extra rotation data (i.e. wall-mounted skulls whose rotation is determined by metadata)
 	 */
-	public static final boolean setSkullData(World world, String name, int type, int x, int y, int z)
-	{
+	public static final boolean setSkullData(World world, String name, int type, int x, int y, int z) {
 		return setSkullData(world, name, type, -1, x, y, z);
 	}
 	
@@ -579,59 +481,167 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 				skull.setSkullRotation(rot % 16);
 			return true;
 		}
+		
 		LogHelper.log(Level.WARNING, "No TileEntitySkull found at " + x + "/" + y + "/" + z);
 		return false;
+	}
+	
+	/**
+	 * Sets the direction in which the player is facing. The structure will be generated
+	 * opposite of player view (so player will be looking at front when finished)
+	 */
+	public final void setPlayerFacing(Entity entity) {
+		if (entity == null) LogHelper.log(Level.WARNING, "Null Pointer Exception! Cannot set facing from a null entity.");
+		else facing = MathHelper.floor_double((double)((entity.rotationYaw * 4F) / 360f) + 0.5D) &3;
+	}
+	
+	/**
+	 * Sets the default direction the structure is facing. This side will always face the player
+	 * unless you manually rotate the structure with the rotateStructureFacing() method.
+	 */
+	public final void setStructureFacing(int facing) {
+		structureFacing = facing % 4;
+	}
+	
+	/**
+	 * This will manually rotate the structure's default facing 90 degrees clockwise.
+	 * Note that a different side will now face the player when generated.
+	 */
+	public final void rotateStructureFacing() {
+		structureFacing = (structureFacing == EAST ? SOUTH : structureFacing + 1);
+		manualRotations = manualRotations == 3 ? 0 : manualRotations + 1;
+	}
+	
+	/**
+	 * Returns a string describing current facing of structure
+	 */
+	public final String currentStructureFacing() {
+		return (structureFacing == EAST ? "East" : structureFacing == WEST ? "West" : structureFacing == NORTH ? "North" : "South");
+	}
+	
+	/**
+	 * Adds a block array 'layer' to the list to be generated
+	 */
+	public final void addBlockArray(int blocks[][][][]) {
+		if (FMLCommonHandler.instance().getEffectiveSide() == Side.SERVER) {
+			this.blockArrayList.add(blocks);
+			if (this.blockArray == null)
+				this.blockArray = blocks;
+		}
+	}
+	
+	/**
+	 * Overwrites current list with the provided blockArray
+	 */
+	public final void setBlockArray(int blocks[][][][])
+	{
+		if (FMLCommonHandler.instance().getEffectiveSide() == Side.SERVER)
+		{
+			blockArrayList.clear();
+			blockArrayList.add(blocks);
+			blockArray = blocks;
+		}
+	}
+	
+	/**
+	 * Adds all elements contained in the parameter list to the structure
+	 */
+	public final void addBlockArrayList(List<int[][][][]> list)
+	{
+		blockArrayList.addAll(list);
+		
+		if (blockArray == null && list.size() > 0)
+			blockArray = list.get(0);
+	}
+	
+	/**
+	 * Overwrites current blockArrayList with list provided
+	 */
+	public final void setBlockArrayList(List<int[][][][]> list)
+	{
+		blockArrayList.clear();
+		blockArrayList.addAll(list);
+		blockArray = (list.size() > 0 ? list.get(0) : null);
+	}
+	
+	/**
+	 * Overwrites current Structure information with passed in structure
+	 * Sets structure facing to the default facing of the structure
+	 * Does NOT set offset
+	 */
+	public final void setStructure(Structure structure)
+	{
+		if (structure != null) {
+			reset();
+			setBlockArrayList(structure.blockArrayList());
+			setStructureFacing(structure.getFacing());
+		}
+		else
+			LogHelper.log(Level.SEVERE, "NULL Structure cannot be set!");
+	}
+	
+	/**
+	 * Overwrites current Structure information with passed in structure and rotates it
+	 * a number of times starting from its default facing
+	 */
+	public final void setStructureWithRotation(Structure structure, int rotations)
+	{
+		setStructure(structure);
+		manualRotations = 0;
+		for (int i = 0; i < rotations % 4; ++i)
+			rotateStructureFacing();
 	}
 	
 	/**
 	 * Returns lowest structure layer's width along the x axis or 0 if no structure has been added
 	 */
 	public final int getWidthX() {
-		return this.blockArray != null ? this.blockArray[0].length : 0;
+		return blockArray != null ? blockArray[0].length : 0;
 	}
 	
 	/**
 	 * Returns lowest structure layer's width along the z axis or 0 if no structure has been set
 	 */
 	public final int getWidthZ() {
-		return this.blockArray != null ? this.blockArray[0][0].length : 0;
+		return blockArray != null ? blockArray[0][0].length : 0;
 	}
 	
 	/**
 	 * Returns current structure layer's height or 0 if no structure has been set
 	 */
 	public final int getHeight() {
-		return this.blockArray != null ? this.blockArray.length : 0;
+		return blockArray != null ? blockArray.length : 0;
 	}
 	
 	/**
 	 * Returns the original facing for the structure
 	 */
 	public final int getOriginalFacing() {
-		return (this.structureFacing + (4 - this.manualRotations)) % 4;
+		return (structureFacing + (4 - manualRotations)) % 4;
 	}
 	
 	/**
 	 * Returns true if the structure has been rotated onto the opposite axis from original
 	 */
 	public final boolean isOppositeAxis() {
-		return getOriginalFacing() % 2 != this.structureFacing % 2;
+		return getOriginalFacing() % 2 != structureFacing % 2;
 	}
 	
 	/**
 	 * Sets the amount by which to offset the structure's generated location in the world.
 	 * For advanced users only. Recommended to use setDefaultOffset() methods instead.
 	 */
-	public final void setOffset(int offX, int offY, int offZ) {
-		this.offsetX = offX;
-		this.offsetY = offY;
-		this.offsetZ = offZ;
+	public final void setOffset(int offX, int offY, int offZ)
+	{
+		offsetX = offX;
+		offsetY = offY;
+		offsetZ = offZ;
 	}
 	
 	/**
-	 * Call this only after setting the blockArray. Set a default offset amount
-	 * that will keep the entire structure's boundaries from overlapping with
-	 * the position spawned at, so it will never spawn on the player.
+	 * Call this only after setting the blockArray and immediately before generation.
+	 * Sets a default offset amount that will keep the entire structure's boundaries
+	 * from overlapping with the position spawned at, so it will never spawn on the player.
 	 */
 	public final void setDefaultOffset() {
 		setDefaultOffset(0,0,0);
@@ -640,48 +650,40 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 	/**
 	 * Sets offsets such that the structure always generates in front of the player,
 	 * regardless of structure facing, offset by parameters x/y/z.
+	 * Only call this method immediately before generation.
 	 * NOTE: If your structures y=0 layer has an area smaller than another part of the structure,
 	 * setting default offset will not work correctly.
 	 * @param x Positive value spawns structure further away from player, negative closer to or behind
 	 * @param z Positive value spawns structure more to the right, negative to the left
 	 */
-	public final void setDefaultOffset(int x, int y, int z) {
-		switch(this.getOriginalFacing()) {
+	public final void setDefaultOffset(int x, int y, int z)
+	{
+		int length = getOriginalFacing() % 2 == 0 ? getWidthX() : getWidthZ();
+		int adj1 = length - (getOriginalFacing() % 2 == 0 ? getWidthZ() : getWidthX());
+		int adj2 = (length+1) % 2;
+		int adj3 = adj1 % 2;
+		int adj4 = adj1 / 2 + adj3;
+		
+		switch(getOriginalFacing()) {
 		case SOUTH:
-			this.offsetZ = (getWidthZ() / 2) + x;
-			this.offsetX = -z;
+			offsetZ = x + length / 2 - (manualRotations == 0 ? adj1 / 2 + (adj3 == 0 ? 0 : adj2) : manualRotations == 1 ? (adj3 == 0 ? adj2 : 0) : manualRotations == 2 ? adj1 / 2 + (adj3 == 0 ? adj2 : adj3) : 0);
+			offsetX = -z + (manualRotations == 0 ? adj2 + (adj1 > 0 ? adj4 : 0) : manualRotations == 1 ? (adj3 == 0 ? adj2 : adj3) : manualRotations == 2 ? (adj1 > 0 ? adj4 : 0) : 0);
 			break;
 		case WEST:
-			this.offsetX = (getWidthX() / 2) + x;
-			this.offsetZ = z;
+			offsetX = x + length / 2 - (manualRotations == 0 ? adj1 / 2 : manualRotations == 2 ? adj1 / 2 + (adj3 == 0 ? adj2 : 0) : manualRotations == 3 ? (adj3 == 0 ? adj2 : -adj3) : 0);
+			offsetZ = z + (manualRotations == 1 ? (adj1 < 0 ? adj4 : 0) + (adj3 == 0 ? -adj2 : 0) : manualRotations == 2 ? (adj3 == 0 ? -adj2 : adj3) : manualRotations == 3 ? (adj1 < 0 ? adj4 : 0) : 0);
 			break;
 		case NORTH:
-			this.offsetZ = -(getWidthZ() / 2) - x;
-			this.offsetX = z;
+			offsetZ = -x - length / 2 + (manualRotations == 0 ? adj1 / 2 + (adj3 == 0 ? adj2 : adj3) : manualRotations == 2 ? adj1 / 2 : manualRotations == 3 ? (adj3 == 0 ? adj2 : 0) : 0);
+			offsetX = z - (manualRotations == 0 ? (adj1 > 0 ? adj4 : 0) : manualRotations == 2 ? (adj3 == 0 ? adj2 : 0) + (adj1 > 0 ? adj4 : 0) : manualRotations == 3 ? (adj3 == 0 ? adj2 : adj3) : 0);
 			break;
 		case EAST:
-			this.offsetX = -(getWidthX() / 2) - x;
-			this.offsetZ = -z;
+			offsetX = -x - length / 2 + (manualRotations == 0 ? adj1 / 2 + (adj3 == 0 ? adj2 : 0) : manualRotations == 1 ? (adj3 == 0 ? adj2 : -adj3) : manualRotations == 2 ? adj1 / 2 : 0);
+			offsetZ = -z - (manualRotations == 0 ? (adj3 == 0 ? -adj2 : adj3) : manualRotations == 1 ? (adj1 < 0 ? adj4 : 0) : manualRotations == 3 ? (adj1 < 0 ? adj4 : 0) + (adj3 == 0 ? -adj2 : 0) : 0);
 			break;
 		}
-		this.offsetY = 1 + y;
-		// LogHelper.log(Level.INFO, "Default offsetX " + this.offsetX + " for width " + getWidthX());
-	}
-	
-	/**
-	 * This will manually rotate the structure's default facing 90 degrees clockwise.
-	 * Note that a different side will now face the player when generated.
-	 */
-	public final void rotateStructureFacing() {
-		this.structureFacing = (this.structureFacing == EAST ? SOUTH : this.structureFacing + 1);
-		this.manualRotations = this.manualRotations == 3 ? 0 : this.manualRotations + 1;
-	}
-	
-	/**
-	 * Returns a string describing current facing of structure
-	 */
-	public final String currentStructureFacing() {
-		return (this.structureFacing == EAST ? "East" : this.structureFacing == WEST ? "West" : this.structureFacing == NORTH ? "North" : "South");
+		
+		offsetY = 1 + y;
 	}
 	
 	/**
@@ -690,15 +692,15 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 	 */
 	public final boolean toggleRemoveStructure()
 	{
-		this.removeStructure = !this.removeStructure;
-		return this.removeStructure;
+		removeStructure = !removeStructure;
+		return removeStructure;
 	}
 	
 	/**
 	 * Returns true if the generator has enough information to generate a structure
 	 */
 	public final boolean canGenerate() {
-		return this.blockArrayList.size() > 0 || this.blockArray != null;
+		return blockArrayList.size() > 0 || blockArray != null;
 	}
 	
 	/**
@@ -713,16 +715,16 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 		if (world.isRemote || !canGenerate()) { return false; }
 		// only time generated = false is if removing structure at incorrect location
 		boolean generated = true;
-		int rotations = ((this.isOppositeAxis() ? this.structureFacing + 2 : this.structureFacing) + this.facing) % 4;
+		int rotations = ((isOppositeAxis() ? structureFacing + 2 : structureFacing) + facing) % 4;
 		
 		setOffsetFromRotation();
 		
 		Iterator iterator = blockArrayList.iterator();
 		while (iterator.hasNext() && generated)
 		{
-			this.blockArray = (int[][][][]) iterator.next();
+			blockArray = (int[][][][]) iterator.next();
 			generated = generateLayer(world, random, posX, posY, posZ, rotations);
-			this.offsetY += this.blockArray.length;
+			offsetY += blockArray.length;
 		}
 		
 		if (generated)
@@ -740,7 +742,7 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 	{
 		int centerX = blockArray[0].length / 2, centerZ = blockArray[0][0].length / 2;
 
-		for (int y = (this.removeStructure ? blockArray.length - 1 : 0); (this.removeStructure ? y >= 0 : y < blockArray.length); y = (this.removeStructure ? --y : ++y))
+		for (int y = (removeStructure ? blockArray.length - 1 : 0); (removeStructure ? y >= 0 : y < blockArray.length); y = (removeStructure ? --y : ++y))
 		//for (int y = 0; y < blockArray.length; ++y)
 		{
 			for (int x = 0; x < blockArray[y].length; ++x)
@@ -778,7 +780,7 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 					int fakeID = blockArray[y][x][z][0];
 					int realID = (Math.abs(fakeID) > 4095 ? getRealBlockID(fakeID, customData1) : fakeID);
 
-					if (this.removeStructure)
+					if (removeStructure)
 					{
 						if (!removeBlockAt(world, fakeID, realID, rotX, rotY, rotZ, rotations))
 							return false;
@@ -825,7 +827,7 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 			if (blockRotationData.get(realID) != null && blockRotationData.get(realID) == ROTATION.WALL_MOUNTED)
 			{
 				LogHelper.log(Level.FINE, "Block " + realID + " requires post-processing. Adding to list. Meta = " + meta);
-				this.postGenBlocks.add(new BlockData(x, y, z, fakeID, meta, customData1, customData2));
+				postGenBlocks.add(new BlockData(x, y, z, fakeID, meta, customData1, customData2));
 			}
 			// set all other blocks here
 			else
@@ -852,7 +854,7 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 	{
 		int worldID = world.getBlockId(x, y, z);
 		
-		if (realID == 0 || Block.blocksList[worldID] == null) {
+		if (realID == 0 || Block.blocksList[worldID] == null || (realID < 0 && worldID != Math.abs(realID))) {
 			return true;
 		}
 		else if (Math.abs(realID) == worldID || materialsMatch(realID, worldID)) // || Math.abs(fakeID) > 4095
@@ -893,7 +895,7 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 	{
 		int fakeID, realID;
 		BlockData block;
-		Iterator iterator = this.postGenBlocks.iterator();
+		Iterator iterator = postGenBlocks.iterator();
 
 		while (iterator.hasNext())
 		{
@@ -913,7 +915,7 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 			{
 				// occasionally doesn't set metadata correctly, such as for certain ItemFrames - notification flag 3 allows redstone torches to update circuits when placed
 				world.setBlock(block.getPosX(), block.getPosY(), block.getPosZ(), Math.abs(realID), block.getMetaData(), 3);
-				// print warning for mismatched metadata
+				
 				if (world.getBlockMetadata(block.getPosX(), block.getPosY(), block.getPosZ()) != block.getMetaData()) {
 					LogHelper.log(Level.WARNING, "Mismatched metadata. Meta from world: " + world.getBlockMetadata(block.getPosX(), block.getPosY(), block.getPosZ()) + ", original: " + block.getMetaData());
 				}
@@ -924,7 +926,7 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 			}
 		}
 		
-		this.postGenBlocks.clear();
+		postGenBlocks.clear();
 	}
 	
 	/**
@@ -934,18 +936,14 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 	 */
 	private final void setMetadata(World world, int x, int y, int z, int origMeta, int facing)
 	{
-		int meta = world.getBlockMetadata(x, y, z), id = world.getBlockId(x, y, z);
+		int id = world.getBlockId(x, y, z); // meta = world.getBlockMetadata(x, y, z), 
 		
 		if (blockRotationData.get(id) == null) return;
+		
 		switch(blockRotationData.get(id)) {
-		case PISTON_CONTAINER:
-			world.setBlockMetadataWithNotify(x, y, z, origMeta, 2);
-			break;
-		case RAIL:
-			world.setBlockMetadataWithNotify(x, y, z, origMeta, 2);
-			break;
-		default:
-			break;
+		case PISTON_CONTAINER: world.setBlockMetadataWithNotify(x, y, z, origMeta, 2); break;
+		case RAIL: world.setBlockMetadataWithNotify(x, y, z, origMeta, 2); break;
+		default: break;
 		}
 	}
 	
@@ -966,13 +964,13 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 		// No rotational metadata value associated with this block, return
 		if (blockRotationData.get(id) == null) return 0;
 		
-		int rotation = ((this.isOppositeAxis() ? this.structureFacing + 2 : this.structureFacing) + this.facing) % 4;
+		int rotations = ((isOppositeAxis() ? structureFacing + 2 : structureFacing) + facing) % 4;
 		
 		int meta = origMeta, bitface, tickDelay = meta >> 2, bit9 = meta >> 3,
 			bit4 = meta & 4, bit8 = meta & 8, extra = meta & ~3;
 		// meta & ~3 gets all that extra information for doors and possibly other stuff
 		
-		for (int i = 0; i < rotation; ++i)
+		for (int i = 0; i < rotations; ++i)
 		{
 			bitface = meta % 4;
 			
@@ -1045,12 +1043,12 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 	{
 		int x, z;
 		
-		for (int i = 0; i < this.manualRotations; ++i)
+		for (int i = 0; i < manualRotations; ++i)
 		{
-			x = -this.offsetZ;
-			z = this.offsetX;
-			this.offsetX = x;
-			this.offsetZ = z;
+			x = -offsetZ;
+			z = offsetX;
+			offsetX = x;
+			offsetZ = z;
 		}
 	}
 	
@@ -1096,8 +1094,8 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 	 */
 	private final void reset()
 	{
-		this.blockArrayList.clear();
-		this.blockArray = null;
+		blockArrayList.clear();
+		blockArray = null;
 		//this.offsetX = this.offsetY = this.offsetZ = 0;
 		// this.manualRotations = 0; // will need to save this for multiple structure generation
 	}

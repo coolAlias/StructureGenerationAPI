@@ -170,26 +170,32 @@ public class SGTBlockHighlightHandler
 	
 	private final void setDefaultOffset(ItemStack itemstack)
 	{
-		Structure structure = ((ItemStructureSpawner) itemstack.getItem()).getCurrentStructure(itemstack);
+		Structure structure = ItemStructureSpawner.getCurrentStructure(itemstack);
 		int offX = structure.getOffsetX() + ItemStructureSpawner.getData(itemstack, ItemStructureSpawner.OFFSET_X);
 		int offZ = structure.getOffsetZ() + ItemStructureSpawner.getData(itemstack, ItemStructureSpawner.OFFSET_Z);
+		int length = structure.getFacing() % 2 == 0 ? structure.getWidthX() : structure.getWidthZ();
+		int adj1 = length - (structure.getFacing() % 2 == 0 ? structure.getWidthZ() : structure.getWidthX());
+		int adj2 = (length+1) % 2;
+		int adj3 = adj1 % 2;
+		int adj4 = adj1 / 2 + adj3;
+		int man = ItemStructureSpawner.getData(itemstack, ItemStructureSpawner.ROTATIONS);
 		
 		switch(structure.getFacing()) {
 		case 0: // SOUTH
-			offsetZ = offX + structure.getWidthZ() / 2;
-			offsetX = -offZ;
+			offsetZ = offX + length / 2 - (man == 0 ? adj1 / 2 + (adj3 == 0 ? 0 : adj2) : man == 1 ? (adj3 == 0 ? adj2 : 0) : man == 2 ? adj1 / 2 + (adj3 == 0 ? adj2 : adj3) : 0);
+			offsetX = -offZ + (man == 0 ? adj2 + (adj1 > 0 ? adj4 : 0) : man == 1 ? (adj3 == 0 ? adj2 : adj3) : man == 2 ? (adj1 > 0 ? adj4 : 0) : 0);
 			break;
 		case 1: // WEST
-			offsetX = offX + structure.getWidthX() / 2;
-			offsetZ = offZ;
+			offsetX = offX + length / 2 - (man == 0 ? adj1 / 2 : man == 2 ? adj1 / 2 + (adj3 == 0 ? adj2 : 0) : man == 3 ? (adj3 == 0 ? adj2 : -adj3) : 0);
+			offsetZ = offZ + (man == 1 ? (adj1 < 0 ? adj4 : 0) + (adj3 == 0 ? -adj2 : 0) : man == 2 ? (adj3 == 0 ? -adj2 : adj3) : man == 3 ? (adj1 < 0 ? adj4 : 0) : 0);
 			break;
 		case 2: // NORTH
-			offsetZ = -offX - structure.getWidthZ() / 2;
-			offsetX = offZ;
+			offsetZ = -offX - length / 2 + (man == 0 ? adj1 / 2 + (adj3 == 0 ? adj2 : adj3) : man == 2 ? adj1 / 2 : man == 3 ? (adj3 == 0 ? adj2 : 0) : 0);
+			offsetX = offZ - (man == 0 ? (adj1 > 0 ? adj4 : 0) : man == 2 ? (adj3 == 0 ? adj2 : 0) + (adj1 > 0 ? adj4 : 0) : man == 3 ? (adj3 == 0 ? adj2 : adj3) : 0);
 			break;
 		case 3: // EAST
-			offsetX = -offX - structure.getWidthX() / 2;
-			offsetZ = -offZ;
+			offsetX = -offX - length / 2 + (man == 0 ? adj1 / 2 + (adj3 == 0 ? adj2 : 0) : man == 1 ? (adj3 == 0 ? adj2 : -adj3) : man == 2 ? adj1 / 2 : 0);
+			offsetZ = -offZ - (man == 0 ? (adj3 == 0 ? -adj2 : adj3) : man == 1 ? (adj1 < 0 ? adj4 : 0) : man == 3 ? (adj1 < 0 ? adj4 : 0) + (adj3 == 0 ? -adj2 : 0) : 0);
 			break;
 		}
 		
