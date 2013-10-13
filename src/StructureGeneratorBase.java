@@ -46,6 +46,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.gen.feature.WorldGenerator;
 import net.minecraftforge.common.FakePlayer;
 import coolalias.structuregen.lib.LogHelper;
+import coolalias.structuregen.lib.ModInfo;
 import coolalias.structuregen.util.BlockData;
 import coolalias.structuregen.util.Structure;
 import cpw.mods.fml.common.FMLCommonHandler;
@@ -63,12 +64,6 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 	/** Valid rotation types. Each type is handled like vanilla blocks of this kind. */
 	public static enum ROTATION {ANVIL, DOOR, GENERIC, PISTON_CONTAINER, QUARTZ, RAIL, REPEATER,
 		SIGNPOST, SKULL, STAIRS, TRAPDOOR, VINE, WALL_MOUNTED, WOOD};
-	
-	/**
-	 * Used to distinguish blocks with metadata value of 0 versus no metadata at all. 
-	 * Really more of an internal check. Users don't really need this.
-	 */
-	private static final int NO_METADATA = Integer.MIN_VALUE;
 	
 	/** Stores the direction this structure faces. Default is EAST.*/
 	private int structureFacing = EAST, manualRotations = 0;
@@ -174,7 +169,7 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 		}
 		if (blockRotationData.containsKey(blockID)) {
 			LogHelper.log(Level.WARNING, "Block " + blockID + " already has a rotation type." + (override ? " Overriding previous data." : ""));
-			if (override) blockRotationData.put(blockID, rotationType);
+			if (override) blockRotationData.remove(blockID);
 			else return false;
 		}
 		blockRotationData.put(blockID, rotationType);
@@ -252,7 +247,6 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 		// remove place-holder block
 		world.setBlockToAir(x, y, z);
 		
-		// entity.setLocationAndAngles(x, y, z, MathHelper.wrapAngleTo180_float(world.rand.nextFloat() * 360.0F), 0.0F);
 		entity.setLocationAndAngles(x, y, z, 0.0F, 0.0F);
 		
 		while (entity.isEntityInsideOpaqueBlock() && i < iMax)
@@ -508,8 +502,8 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 	 * Note that a different side will now face the player when generated.
 	 */
 	public final void rotateStructureFacing() {
-		structureFacing = (structureFacing == EAST ? SOUTH : structureFacing + 1);
-		manualRotations = manualRotations == 3 ? 0 : manualRotations + 1;
+		structureFacing = ++structureFacing % 4;
+		manualRotations = ++manualRotations % 4;
 	}
 	
 	/**
@@ -522,11 +516,12 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 	/**
 	 * Adds a block array 'layer' to the list to be generated
 	 */
-	public final void addBlockArray(int blocks[][][][]) {
+	public final void addBlockArray(int blocks[][][][])
+	{
 		if (FMLCommonHandler.instance().getEffectiveSide() == Side.SERVER) {
-			this.blockArrayList.add(blocks);
-			if (this.blockArray == null)
-				this.blockArray = blocks;
+			blockArrayList.add(blocks);
+			if (blockArray == null)
+				blockArray = blocks;
 		}
 	}
 	
@@ -567,7 +562,7 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 	/**
 	 * Overwrites current Structure information with passed in structure
 	 * Sets structure facing to the default facing of the structure
-	 * Does NOT set offset
+	 * Does NOT set offset for the structure
 	 */
 	public final void setStructure(Structure structure)
 	{
@@ -575,6 +570,7 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 			reset();
 			setBlockArrayList(structure.blockArrayList());
 			setStructureFacing(structure.getFacing());
+			//setOffset(structure.getOffsetX(), structure.getOffsetY(), structure.getOffsetZ());
 		}
 		else
 			LogHelper.log(Level.SEVERE, "NULL Structure cannot be set!");
@@ -687,13 +683,19 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 	}
 	
 	/**
-	 * Toggles between generate and remove structure setting.
-	 * Returns value for ease of reference.
+	 * Toggles between generate and remove structure setting. Returns value for ease of reference.
 	 */
 	public final boolean toggleRemoveStructure()
 	{
 		removeStructure = !removeStructure;
 		return removeStructure;
+	}
+	
+	/**
+	 * Sets remove structure to true or false
+	 */
+	public final void setRemoveStructure(boolean value) {
+		removeStructure = value;
 	}
 	
 	/**
@@ -704,16 +706,14 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 	}
 	
 	/**
-	 * IMPORTANT!!! Before calling WorldGenStructure generate method, you MUST set the player
-	 * facing with setFacing(Entity) and addBlockArray(int[][][][]) either with the constructor
-	 * or individual methods. If you want the structure's location offset by an amount, be
-	 * sure to setOffset as well.
+	 * Generates each consecutive blockArray in the current list at location posX, posZ,
+	 * with posY incremented by the height of each previously generated blockArray.
 	 */
 	@Override
 	public final boolean generate(World world, Random random, int posX, int posY, int posZ)
 	{
 		if (world.isRemote || !canGenerate()) { return false; }
-		// only time generated = false is if removing structure at incorrect location
+		
 		boolean generated = true;
 		int rotations = ((isOppositeAxis() ? structureFacing + 2 : structureFacing) + facing) % 4;
 		
@@ -793,7 +793,7 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 						}
 						
 						int customData2 = (blockArray[y][x][z].length > 3 ? blockArray[y][x][z][3] : 0);
-						int meta = (blockArray[y][x][z].length > 1 ? blockArray[y][x][z][1] : blockRotationData.containsKey(Math.abs(realID)) ? 0 : NO_METADATA);
+						int meta = (blockArray[y][x][z].length > 1 ? blockArray[y][x][z][1] : 0);
 						
 						setBlockAt(world, fakeID, realID, meta, customData1, customData2, rotX, rotY, rotZ);
 					}
@@ -810,18 +810,15 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 	 */
 	private final void setBlockAt(World world, int fakeID, int realID, int meta, int customData1, int customData2, int x, int y, int z)
 	{
-		// Allows 'soft-spawning' blocks to be spawned only in air or on blocks that allow movement, such as air or grass
+		// Allows 'soft-spawning' blocks to be spawned only in air or on blocks that allow movement, such as grass
 		if (realID >= 0 || world.isAirBlock(x, y, z) || (Block.blocksList[world.getBlockId(x, y, z)] != null
 				&& !Block.blocksList[world.getBlockId(x, y, z)].blockMaterial.blocksMovement()))
 		{
-			if (meta == NO_METADATA)
-				meta = 0;
-			else if (blockRotationData.containsKey(realID))
+			if (blockRotationData.containsKey(realID))
 				meta = getMetadata(Math.abs(realID), meta, facing);
-			//else {} // leave metadata alone
-
+			
 			// Get color data for wool blocks; maybe set flag to 3 for notify?
-			int flag = (Math.abs(realID) == Block.cloth.blockID ? customData1 : 2);
+			int flag = 2;//(Math.abs(realID) == Block.cloth.blockID ? meta : 2);
 			
 			// add torches and such to a list for after-generation setBlock calls
 			if (blockRotationData.get(realID) != null && blockRotationData.get(realID) == ROTATION.WALL_MOUNTED)
@@ -1090,14 +1087,13 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 	}
 	
 	/**
-	 * Resets data for next structure: blockArray, blockArrayList, offsets
+	 * Clears blockArray, blockArrayList and offsets for next structure
 	 */
 	private final void reset()
 	{
 		blockArrayList.clear();
 		blockArray = null;
-		//this.offsetX = this.offsetY = this.offsetZ = 0;
-		// this.manualRotations = 0; // will need to save this for multiple structure generation
+		offsetX = offsetY = offsetZ = 0;
 	}
 	
 	/** Set rotation data for vanilla blocks */

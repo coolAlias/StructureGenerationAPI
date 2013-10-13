@@ -17,7 +17,7 @@
 
 package coolalias.structuregen.items;
 
-import coolalias.structuregen.ModInfo;
+import coolalias.structuregen.lib.ModInfo;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.client.renderer.texture.IconRegister;

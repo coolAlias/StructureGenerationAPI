@@ -21,6 +21,7 @@ import java.io.File;
 
 import coolalias.structuregen.handlers.SGTPacketHandler;
 import coolalias.structuregen.items.ItemStructureSpawner;
+import coolalias.structuregen.lib.ModInfo;
 import coolalias.structuregen.lib.SGTKeyBindings;
 import coolalias.structuregen.lib.LogHelper;
 import coolalias.structuregen.proxy.CommonProxy;
@@ -51,13 +52,6 @@ public class StructureGenMain
 	
 	@SidedProxy(clientSide = ModInfo.CLIENT_PROXY, serverSide = ModInfo.COMMON_PROXY)
 	public static CommonProxy proxy;
-	
-	/**
-	 * StructureGenerator contains all the structures and methods needed;
-	 * you should only need one instance of it for your mod, IF you add all of your
-	 * structures to a static list
-	 */
-	public static final StructureGenerator gen = new StructureGenerator();
 	
 	public static final int MOD_ITEM_INDEX_DEFAULT = 8888;
 	private int modItemIndex;

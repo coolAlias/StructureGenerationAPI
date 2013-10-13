@@ -15,7 +15,7 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package coolalias.structuregen;
+package coolalias.structuregen.lib;
 
 public class ModInfo
 {

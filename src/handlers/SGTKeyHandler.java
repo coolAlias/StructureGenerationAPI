@@ -19,12 +19,12 @@ package coolalias.structuregen.handlers;
 
 import java.util.EnumSet;
 
-import coolalias.structuregen.ModInfo;
-import coolalias.structuregen.StructureGenMain;
-import coolalias.structuregen.lib.SGTKeyBindings;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityClientPlayerMP;
 import net.minecraft.client.settings.KeyBinding;
+import coolalias.structuregen.items.ItemStructureSpawner;
+import coolalias.structuregen.lib.ModInfo;
+import coolalias.structuregen.lib.SGTKeyBindings;
 import cpw.mods.fml.client.registry.KeyBindingRegistry.KeyHandler;
 import cpw.mods.fml.common.TickType;
 import cpw.mods.fml.relauncher.Side;
@@ -57,7 +57,7 @@ public class SGTKeyHandler extends KeyHandler
 		{
 			EntityClientPlayerMP player = Minecraft.getMinecraft().thePlayer;
 			
-			if (player.getHeldItem() != null && player.getHeldItem().itemID == StructureGenMain.structureSpawner.itemID) {
+			if (player.getHeldItem() != null && player.getHeldItem().getItem() instanceof ItemStructureSpawner) {
 				SGTPacketHandler.sendPacketKeyPress(SGTKeyBindings.SGTKeyMap.get(kb.keyCode));
 			}
 		}

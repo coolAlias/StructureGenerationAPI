@@ -25,7 +25,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.World;
-import coolalias.structuregen.StructureGenMain;
+import coolalias.structuregen.StructureGenerator;
 import coolalias.structuregen.lib.LogHelper;
 import coolalias.structuregen.lib.SGTKeyBindings;
 import coolalias.structuregen.util.Structure;
@@ -36,10 +36,10 @@ public class ItemStructureSpawner extends BaseModItem
 	public static enum Offset { OFFSET_X, OFFSET_Y, OFFSET_Z }
 	
 	/** String identifiers for NBT storage and retrieval */
-	private static final String[] data = {"Structure", "Rotations", "OffsetX", "OffsetY", "OffsetZ", "InvertY"};
+	private static final String[] data = {"Structure", "Rotations", "OffsetX", "OffsetY", "OffsetZ", "InvertY", "Remove"};
 
 	/** Indices for data variables */
-	public static final int STRUCTURE_INDEX = 0, ROTATIONS = 1, OFFSET_X = 2, OFFSET_Y = 3, OFFSET_Z = 4, INVERT_Y = 5;
+	public static final int STRUCTURE_INDEX = 0, ROTATIONS = 1, OFFSET_X = 2, OFFSET_Y = 3, OFFSET_Z = 4, INVERT_Y = 5, REMOVE = 6;
 
 	public ItemStructureSpawner(int par1)
 	{
@@ -160,7 +160,7 @@ public class ItemStructureSpawner extends BaseModItem
 		if (itemstack.stackTagCompound == null)
 			initNBTCompound(itemstack);
 		int index = itemstack.stackTagCompound.getInteger(data[STRUCTURE_INDEX]) + 1;
-		if (index == StructureGenMain.gen.structures.size()) index = 0;
+		if (index == StructureGenerator.structures.size()) index = 0;
 		itemstack.stackTagCompound.setInteger(data[STRUCTURE_INDEX], index);
 		return index;
 	}
@@ -172,7 +172,7 @@ public class ItemStructureSpawner extends BaseModItem
 		if (itemstack.stackTagCompound == null)
 			initNBTCompound(itemstack);
 		int index = itemstack.stackTagCompound.getInteger(data[STRUCTURE_INDEX]) - 1;
-		if (index < 0) index = StructureGenMain.gen.structures.size() - 1;
+		if (index < 0) index = StructureGenerator.structures.size() - 1;
 		itemstack.stackTagCompound.setInteger(data[STRUCTURE_INDEX], index);
 		return index;
 	}
@@ -181,7 +181,7 @@ public class ItemStructureSpawner extends BaseModItem
 	 * Returns the name of the structure at provided index, or "" if index out of bounds
 	 */
 	public static final String getStructureName(int index) {
-		return (index < StructureGenMain.gen.structures.size() ? StructureGenMain.gen.structures.get(index).name : "");
+		return (index < StructureGenerator.structures.size() ? StructureGenerator.structures.get(index).name : "");
 	}
 
 	/**
@@ -197,7 +197,7 @@ public class ItemStructureSpawner extends BaseModItem
 	 * Returns currently selected structure
 	 */
 	public static final Structure getCurrentStructure(ItemStack itemstack) {
-		return StructureGenMain.gen.structures.get(getCurrentStructureIndex(itemstack));
+		return StructureGenerator.structures.get(getCurrentStructureIndex(itemstack));
 	}
 	
 	/**
@@ -212,8 +212,11 @@ public class ItemStructureSpawner extends BaseModItem
 	/**
 	 * Toggles between generate and remove structure setting. Returns new value for convenience.
 	 */
-	public static final boolean toggleRemove() {
-		return StructureGenMain.gen.toggleRemoveStructure();
+	public static final boolean toggleRemove(ItemStack itemstack) {
+		if (itemstack.stackTagCompound == null)
+			initNBTCompound(itemstack);
+		itemstack.stackTagCompound.setInteger(data[REMOVE], (itemstack.stackTagCompound.getInteger(data[REMOVE]) + 1) % 2);
+		return itemstack.stackTagCompound.getInteger(data[REMOVE]) == 1;
 	}
 
 	@Override
@@ -227,11 +230,11 @@ public class ItemStructureSpawner extends BaseModItem
 		if (itemstack.stackTagCompound == null)
 			initNBTCompound(itemstack);
 
-		if (!world.isRemote && StructureGenMain.gen.structures.size() > 0)
+		if (!world.isRemote && StructureGenerator.structures.size() > 0)
 		{
-			if (world.getBlockId(x,y,z) == Block.snow.blockID) { --y; }
+			// Necessary for SMP compatibility, as using static variables will fail
+			StructureGenerator gen = new StructureGenerator();
 			NBTTagCompound tag = itemstack.stackTagCompound;
-			StructureGenMain.gen.setPlayerFacing(player);
 			Structure structure = getCurrentStructure(itemstack);
 			
 			if (structure == null) {
@@ -239,9 +242,14 @@ public class ItemStructureSpawner extends BaseModItem
 				return false;
 			}
 			
-			StructureGenMain.gen.setStructureWithRotation(structure, tag.getInteger(data[ROTATIONS]));
-			StructureGenMain.gen.setDefaultOffset(structure.getOffsetX() + tag.getInteger(data[OFFSET_X]), structure.getOffsetY() + tag.getInteger(data[OFFSET_Y]), structure.getOffsetZ() + tag.getInteger(data[OFFSET_Z]));
-			StructureGenMain.gen.generate(world, world.rand, x, y, z);
+			if (world.getBlockId(x,y,z) == Block.snow.blockID) { --y; }
+			
+			gen.setPlayerFacing(player);
+			gen.setRemoveStructure(tag.getInteger(data[REMOVE]) == 1);
+			gen.setStructureWithRotation(structure, tag.getInteger(data[ROTATIONS]));
+			gen.setDefaultOffset(structure.getOffsetX() + tag.getInteger(data[OFFSET_X]), structure.getOffsetY() + tag.getInteger(data[OFFSET_Y]), structure.getOffsetZ() + tag.getInteger(data[OFFSET_Z]));
+			gen.generate(world, world.rand, x, y, z);
+			
 		}
 
 		return true;
@@ -290,7 +298,7 @@ public class ItemStructureSpawner extends BaseModItem
 		case SGTKeyBindings.ROTATE: player.addChatMessage("[STRUCTURE GEN] Structure orientation rotated by " + (spawner.rotate(itemstack) * 90) + " degrees."); break;
 		case SGTKeyBindings.PREV_STRUCT: player.addChatMessage("[STRUCTURE GEN] Selected structure: " + spawner.getStructureName(spawner.prevStructure(itemstack)) + " at index " + (spawner.getCurrentStructureIndex(itemstack) + 1)); break;
 		case SGTKeyBindings.NEXT_STRUCT: player.addChatMessage("[STRUCTURE GEN] Selected structure: " + spawner.getStructureName(spawner.nextStructure(itemstack)) + " at index " + (spawner.getCurrentStructureIndex(itemstack) + 1)); break;
-		case SGTKeyBindings.TOGGLE_REMOVE: player.addChatMessage("[STRUCTURE GEN] Structure will " + (spawner.toggleRemove() ? "be removed" : "generate") + " on right click."); break;
+		case SGTKeyBindings.TOGGLE_REMOVE: player.addChatMessage("[STRUCTURE GEN] Structure will " + (spawner.toggleRemove(itemstack) ? "be removed" : "generate") + " on right click."); break;
 		default: LogHelper.log(Level.WARNING, "ItemStructureSpawner received an invalid key id, unable to process.");
 		}
 	}

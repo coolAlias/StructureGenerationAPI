@@ -15,7 +15,7 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package coolalias.structuregen;
+package coolalias.structuregen.structures;
 
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
@@ -78,44 +78,44 @@ public class StructureArrays
 	{
 		{ // y = 0
 			{ // x = 0
-				{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
+				{Block.cloth.blockID,4},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
 			},
 			{ // x = 1
-				{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
+				{Block.stainedClay.blockID,5},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
 			},
 			{ // x = 2
-				{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
+				{Block.cloth.blockID,6},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
 			},
 			{ // x = 3
-				{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
+				{Block.stainedClay.blockID,7},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
 			}
 		},
 		{ // y = 1
 			{ // x = 0
-				{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
+				{Block.stainedClay.blockID,0},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
 			},
 			{ // x = 1
-				{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
+				{Block.cloth.blockID,1},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
 			},
 			{ // x = 2
-				{Block.cobblestone.blockID},{CustomHooks.SPAWN_VILLAGER},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
+				{Block.stainedClay.blockID,2},{CustomHooks.SPAWN_VILLAGER},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
 			},
 			{ // x = 3
-				{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
+				{Block.cloth.blockID,3},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
 			}
 		},
 		{ // y = 2
 			{ // x = 0
-				{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
+				{Block.cloth.blockID,8},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
 			},
 			{ // x = 1
-				{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
+				{Block.stainedClay.blockID,9},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
 			},
 			{ // x = 2
-				{Block.cobblestone.blockID},{0},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
+				{Block.cloth.blockID,10},{0},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
 			},
 			{ // x = 3
-				{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
+				{Block.stainedClay.blockID,11},{Block.cobblestone.blockID},{Block.cobblestone.blockID},{Block.cobblestone.blockID}
 			}
 		}
 	};
@@ -252,7 +252,7 @@ public class StructureArrays
 				{Block.wood.blockID},
 				{Block.planks.blockID},
 				{Block.planks.blockID},
-				{Block.cloth.blockID,1,14}, // cloth is odd in that the color value is stored in the flag, which here we store as customData
+				{Block.cloth.blockID,14},
 				{CustomHooks.PAINTING,3} // facing south (since default structure faces EAST, this is the left-hand side)
 			},
 			{ // x = 1 z values:

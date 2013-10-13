@@ -30,6 +30,10 @@ import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.world.World;
 import coolalias.structuregen.lib.CustomHooks;
 import coolalias.structuregen.lib.LogHelper;
+import coolalias.structuregen.structures.StructureArrays;
+import coolalias.structuregen.structures.WaterMillArray1;
+import coolalias.structuregen.structures.WaterMillArray2;
+import coolalias.structuregen.structures.WaterMillArray3;
 import coolalias.structuregen.util.Structure;
 
 public class StructureGenerator extends StructureGeneratorBase

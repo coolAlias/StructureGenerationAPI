@@ -20,7 +20,6 @@ package coolalias.structuregen.lib;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import coolalias.structuregen.ModInfo;
 import cpw.mods.fml.common.FMLLog;
 
 public class LogHelper

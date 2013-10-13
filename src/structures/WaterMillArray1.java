@@ -1,4 +1,4 @@
-package coolalias.structuregen;
+package coolalias.structuregen.structures;
 
 import net.minecraft.block.Block;
 
