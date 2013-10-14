@@ -7,7 +7,8 @@ entities or whatever else you can imagine.
 
 FEATURES
 ========
-- NEW: Preview mode let's you see where the structure will generate
+- NEW: Linked Structure Generator let's you generate multiple structures at a time with specified location and rotation
+- Preview mode let's you see where the structure will generate
 - Add custom structures to the world during world generation
 - Generate custom structures in the world with the click of a button
 - Auto-rotation of structures ensures it will always face the player
@@ -69,9 +70,10 @@ Tool. There is currently no recipe for the item that spawns structures, so try i
 
 Several structures are included and can be easily toggled between in-game:
 - "Hut" - A highly modified village hut. Enter at your own risk.
-- "Redstone Dungeon" - Can you find the treasure and live to tell about it?
 - "Blacksmith" - Vanilla blacksmith shop. Thanks to Microjunk for this one!
 - "Viking Shop" - A cool viking-style shop, but riddled with holes from disuse. Credit again to Microjunk.
+- "Redstone Dungeon" - Can you find the treasure and live to tell about it?
+- "Watermill" - An awesomely impressive water/windmill, courtesy of Microjunk.
 
 These are the default controls:
 
