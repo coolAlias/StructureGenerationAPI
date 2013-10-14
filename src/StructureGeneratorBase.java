@@ -481,6 +481,13 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 	}
 	
 	/**
+	 * Returns facing value as set from player, or 0 if no facing was specified
+	 */
+	public final int getPlayerFacing() {
+		return facing;
+	}
+	
+	/**
 	 * Sets the direction in which the player is facing. The structure will be generated
 	 * opposite of player view (so player will be looking at front when finished)
 	 */

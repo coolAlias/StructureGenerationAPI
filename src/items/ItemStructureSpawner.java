@@ -25,6 +25,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.World;
+import coolalias.structuregen.LinkedStructureGenerator;
 import coolalias.structuregen.StructureGenerator;
 import coolalias.structuregen.lib.LogHelper;
 import coolalias.structuregen.lib.SGTKeyBindings;
@@ -232,6 +233,26 @@ public class ItemStructureSpawner extends BaseModItem
 
 		if (!world.isRemote && StructureGenerator.structures.size() > 0)
 		{
+			/*
+			NBTTagCompound tag = itemstack.stackTagCompound;
+			
+			LinkedStructureGenerator link = new LinkedStructureGenerator();
+			Structure hut = StructureGenerator.structures.get(0);
+			
+			link.setRotation(tag.getInteger(data[ROTATIONS]));
+			
+			for (int i = 0; i < 6; ++i) {
+				link.addStructureWithOffset(hut,(i/2) * hut.getWidthZ() - i % 2,0,(i % 2 == 0 ? -1 : 1) * (hut.getWidthX() / 2 + 1));
+				link.setLastRotation(i % 2 == 0 ? 3 : 1);
+			}
+			for (int i = 0; i < 6; ++i) {
+				link.addStructureWithOffset(hut,(i % 2 == 0 ? -1 : 1) * (hut.getWidthX() / 2) - (3 * hut.getWidthX() / 2),0,(i/2 + 2) * hut.getWidthZ() + i % 2 - 2);
+				link.setLastRotation(i % 2 == 0 ? 2 : 0);
+			}
+			
+			link.generateLinkedStructures(player, world, world.rand, x, y+1, z);
+			*/
+			
 			// Necessary for SMP compatibility, as using static variables will fail
 			StructureGenerator gen = new StructureGenerator();
 			NBTTagCompound tag = itemstack.stackTagCompound;
