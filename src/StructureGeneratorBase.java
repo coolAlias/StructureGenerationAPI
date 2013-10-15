@@ -18,7 +18,6 @@
 package coolalias.structuregen;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -26,6 +25,8 @@ import java.util.Random;
 import java.util.logging.Level;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockRedstoneRepeater;
+import net.minecraft.block.BlockRedstoneTorch;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItemFrame;
@@ -63,7 +64,7 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 	
 	/** Valid rotation types. Each type is handled like vanilla blocks of this kind. */
 	public static enum ROTATION {ANVIL, DOOR, GENERIC, PISTON_CONTAINER, QUARTZ, RAIL, REPEATER,
-		SIGNPOST, SKULL, STAIRS, TRAPDOOR, VINE, WALL_MOUNTED, WOOD};
+		SIGNPOST, SKULL, STAIRS, TRAPDOOR, VINE, WALL_MOUNTED, LEVER, WOOD};
 	
 	/** Stores the direction this structure faces. Default is EAST.*/
 	private int structureFacing = EAST, manualRotations = 0;
@@ -366,13 +367,9 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 		List<EntityItemFrame> frames = world.getEntitiesWithinAABB(EntityItemFrame.class, getHangingEntityAxisAligned(x, y, z, direction));
 		if (frames != null && !frames.isEmpty())
 		{
-			Iterator<EntityItemFrame> iterator = frames.iterator();
-
-			while (iterator.hasNext())
-			{
-				EntityItemFrame frame1 = iterator.next();
-				frame1.setDisplayedItem(itemstack);
-				frame1.setItemRotation(itemRotation);
+			for (EntityItemFrame frame : frames) {
+				frame.setDisplayedItem(itemstack);
+				frame.setItemRotation(itemRotation);
 			}
 		}
 	}
@@ -388,11 +385,8 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 		
 		if (paintings != null && !paintings.isEmpty() && name.length() > 0)
 		{
-			Iterator<EntityPainting> iterator = paintings.iterator();
-
-			while (iterator.hasNext())
+			for (EntityPainting toEdit : paintings)
 			{
-				EntityPainting toEdit = iterator.next();
 				EnumArt[] aenumart = EnumArt.values();
 		        int i1 = aenumart.length;
 
@@ -726,10 +720,9 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 		
 		setOffsetFromRotation();
 		
-		Iterator iterator = blockArrayList.iterator();
-		while (iterator.hasNext() && generated)
+		for (int[][][][] blockArray : blockArrayList)
 		{
-			blockArray = (int[][][][]) iterator.next();
+			if (!generated) break;
 			generated = generateLayer(world, random, posX, posY, posZ, rotations);
 			offsetY += blockArray.length;
 		}
@@ -828,7 +821,7 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 			int flag = 2;//(Math.abs(realID) == Block.cloth.blockID ? meta : 2);
 			
 			// add torches and such to a list for after-generation setBlock calls
-			if (blockRotationData.get(realID) != null && blockRotationData.get(realID) == ROTATION.WALL_MOUNTED)
+			if (blockRotationData.get(realID) != null && (blockRotationData.get(realID) == ROTATION.WALL_MOUNTED || blockRotationData.get(realID) == ROTATION.LEVER))
 			{
 				LogHelper.log(Level.FINE, "Block " + realID + " requires post-processing. Adding to list. Meta = " + meta);
 				postGenBlocks.add(new BlockData(x, y, z, fakeID, meta, customData1, customData2));
@@ -865,13 +858,9 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 		{
 			world.setBlockToAir(x, y, z);
 			List <Entity> list = world.getEntitiesWithinAABB(Entity.class, getHangingEntityAxisAligned(x, y, z, Direction.directionToFacing[rotations]).expand(1.0F, 1.0F, 1.0F));
-			Iterator<Entity> iterator = list.iterator();
 			
-			while (iterator.hasNext())
-			{
-				Entity entity = iterator.next();
-				if (!(entity instanceof EntityPlayer))
-					entity.setDead();
+			for (Entity entity : list) {
+				if (!(entity instanceof EntityPlayer)) entity.setDead();
 			}
 		}
 		else {
@@ -887,9 +876,12 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 	 */
 	private final boolean materialsMatch(int realID, int worldID)
 	{
-		return (Block.blocksList[worldID].blockMaterial == Material.grass && Block.blocksList[Math.abs(realID)].blockMaterial == Material.ground) ||
+		return  (Block.blocksList[worldID].blockMaterial == Material.grass && Block.blocksList[Math.abs(realID)].blockMaterial == Material.ground) ||
 				(Block.blocksList[worldID].blockMaterial.isLiquid() && Block.blocksList[Math.abs(realID)].blockMaterial == Block.blocksList[worldID].blockMaterial) ||
-				(Block.blocksList[worldID].blockMaterial == Material.ice && Block.blocksList[Math.abs(realID)].blockMaterial == Material.water);
+				(Block.blocksList[worldID].blockMaterial == Material.ice && Block.blocksList[Math.abs(realID)].blockMaterial == Material.water) ||
+				(Block.blocksList[worldID].blockMaterial == Material.piston && Block.blocksList[Math.abs(realID)].blockMaterial == Material.piston) ||
+				(Block.blocksList[worldID] instanceof BlockRedstoneTorch && Block.blocksList[Math.abs(realID)] instanceof BlockRedstoneTorch) ||
+				(Block.blocksList[worldID] instanceof BlockRedstoneRepeater && Block.blocksList[Math.abs(realID)] instanceof BlockRedstoneRepeater);
 	}
 	
 	/**
@@ -898,12 +890,9 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 	private final void doPostGenProcessing(World world)
 	{
 		int fakeID, realID;
-		BlockData block;
-		Iterator iterator = postGenBlocks.iterator();
-
-		while (iterator.hasNext())
+		
+		for (BlockData block : postGenBlocks)
 		{
-			block = (BlockData) iterator.next();
 			fakeID = block.getBlockID();
 			realID = (Math.abs(fakeID) > 4095 ? getRealBlockID(fakeID, block.getCustomData1()) : fakeID);
 
@@ -1023,6 +1012,9 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 				meta = meta == 1 ? 2 : meta == 2 ? 4 : meta == 4 ? 8 : 1;
 				break;
 			case WALL_MOUNTED:
+				if (meta > 0 && meta < 5) meta = meta == 4 ? 1 : meta == 1 ? 3 : meta == 3 ? 2 : 4;
+				break;
+			case LEVER:
 				meta -= meta > 7 ? 8 : 0; // remove on/off status for setting direction
 				if (meta > 0 && meta < 5) meta = meta == 4 ? 1 : meta == 1 ? 3 : meta == 3 ? 2 : 4;
 				else if (meta == 5 || meta == 6) meta = meta == 5 ? 6 : 5;
@@ -1164,7 +1156,8 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 		
 		blockRotationData.put(Block.vine.blockID, ROTATION.VINE);
 		
-		blockRotationData.put(Block.lever.blockID, ROTATION.WALL_MOUNTED);
+		blockRotationData.put(Block.lever.blockID, ROTATION.LEVER);
+		
 		blockRotationData.put(Block.stoneButton.blockID, ROTATION.WALL_MOUNTED);
 		blockRotationData.put(Block.woodenButton.blockID, ROTATION.WALL_MOUNTED);
 		blockRotationData.put(Block.torchRedstoneActive.blockID, ROTATION.WALL_MOUNTED);

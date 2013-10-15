@@ -33,6 +33,15 @@ public class StructureArrays
 					HOW TO GENERATE YOUR CUSTOM STRUCTURES
 	=====================================================================================
 	!!! MOVED !!! See 'Instructions.md'
+	
+	STRUCTURE FACING
+	Structure facing determines which 'side' of the array faces the player when generated.
+	
+	Facing      Array Setup
+	NORTH       Front: min z, Back: max z, Left (east): max x, Right (west): x = 0
+	SOUTH       Front: max z, Back: min z, Left (west): x = 0, Right (east): max x
+	EAST        Front: max x, Back: x = 0, Left (south): max z, Right (north): z = 0
+	WEST        Front: x = 0, Back: max x, Left (north): z = 0, Right (south): max z
 	*/
 	
 	/**
