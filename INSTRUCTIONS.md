@@ -1,4 +1,3 @@
-
 HOW TO GENERATE YOUR CUSTOM STRUCTURES
 ======================================
 Note: With the addition of the Structure class (see below), I recommend using those
@@ -382,10 +381,11 @@ neighboring block (so the position may be opposite what you think)
 (WALL_MOUNTED) [POST]
 Buttons and Torches (normal and redstone):
 1,2,3,4 pointing east, west, south, north.
-Torches (both) only: 5,6 standing on floor / in ground (what's the difference?)
+Torches (both) only: 5 standing on floor
 
-Levers:
-As buttons with the following: 5,6 ground lever south or east when off;
+(LEVER) [POST]:
+Same as WALL_MOUNTED with the following:
+5,6 ground lever south or east when off;
 7,0 ceiling lever, south or east when off, +8 for switched on
 
 (WOOD)
