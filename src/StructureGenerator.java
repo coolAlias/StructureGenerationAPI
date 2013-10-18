@@ -30,6 +30,7 @@ import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.world.World;
 import coolalias.structuregen.lib.CustomHooks;
 import coolalias.structuregen.lib.LogHelper;
+import coolalias.structuregen.structures.PortcullisArray;
 import coolalias.structuregen.structures.StructureArrays;
 import coolalias.structuregen.structures.WaterMillArray1;
 import coolalias.structuregen.structures.WaterMillArray2;
@@ -282,6 +283,12 @@ public class StructureGenerator extends StructureGeneratorBase
 		structure.addBlockArray(WaterMillArray2.blockArrayWaterMill);
 		structure.addBlockArray(WaterMillArray3.blockArrayWaterMill);
 		structure.setFacing(StructureGeneratorBase.EAST);
+		structures.add(structure);
+		
+		structure = new Structure("Redstone Portcullis");
+		structure.addBlockArray(PortcullisArray.blockArrayPortcullis);
+		structure.setFacing(StructureGeneratorBase.WEST);
+		structure.setStructureOffset(0, -6, 0);
 		structures.add(structure);
 	}
 }

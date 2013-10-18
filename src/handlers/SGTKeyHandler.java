@@ -25,6 +25,7 @@ import net.minecraft.client.settings.KeyBinding;
 import coolalias.structuregen.items.ItemStructureSpawner;
 import coolalias.structuregen.lib.ModInfo;
 import coolalias.structuregen.lib.SGTKeyBindings;
+import cpw.mods.fml.client.FMLClientHandler;
 import cpw.mods.fml.client.registry.KeyBindingRegistry.KeyHandler;
 import cpw.mods.fml.common.TickType;
 import cpw.mods.fml.relauncher.Side;
@@ -53,7 +54,7 @@ public class SGTKeyHandler extends KeyHandler
 	@Override
 	public void keyDown(EnumSet<TickType> types, KeyBinding kb, boolean tickEnd, boolean isRepeat)
 	{
-		if (tickEnd && SGTKeyBindings.SGTKeyMap.containsKey(kb.keyCode))
+		if (tickEnd && SGTKeyBindings.SGTKeyMap.containsKey(kb.keyCode) && FMLClientHandler.instance().getClient().inGameHasFocus)
 		{
 			EntityClientPlayerMP player = Minecraft.getMinecraft().thePlayer;
 			
@@ -70,5 +71,4 @@ public class SGTKeyHandler extends KeyHandler
 	public EnumSet<TickType> ticks() {
 		return tickTypes;
 	}
-
 }

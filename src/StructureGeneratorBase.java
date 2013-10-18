@@ -821,7 +821,7 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 			int flag = 2;//(Math.abs(realID) == Block.cloth.blockID ? meta : 2);
 			
 			// add torches and such to a list for after-generation setBlock calls
-			if (blockRotationData.get(realID) != null && (blockRotationData.get(realID) == ROTATION.WALL_MOUNTED || blockRotationData.get(realID) == ROTATION.LEVER))
+			if (blockRotationData.containsKey(realID) && (blockRotationData.get(realID) == ROTATION.WALL_MOUNTED || blockRotationData.get(realID) == ROTATION.LEVER))
 			{
 				LogHelper.log(Level.FINE, "Block " + realID + " requires post-processing. Adding to list. Meta = " + meta);
 				postGenBlocks.add(new BlockData(x, y, z, fakeID, meta, customData1, customData2));
