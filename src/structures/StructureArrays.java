@@ -2021,4 +2021,180 @@ public class StructureArrays
 			}
 		}
 	};
+	
+	public static final int[][][][] threeByFour =
+	{
+		{
+			{{Block.stone.blockID},{Block.stone.blockID},{Block.stone.blockID},{Block.stone.blockID}},
+			{{Block.stone.blockID},{Block.stone.blockID},{Block.stone.blockID}},
+			{{Block.stone.blockID},{Block.stone.blockID},{Block.stone.blockID}},
+		}
+	};
+	
+	public static final int[][][][] fourByThree =
+	{
+		{
+			{{Block.stone.blockID},{Block.stone.blockID},{Block.stone.blockID}},
+			{{Block.stone.blockID},{Block.stone.blockID},{Block.stone.blockID}},
+			{{Block.stone.blockID},{Block.stone.blockID},{Block.stone.blockID}},
+			{{Block.stone.blockID},{Block.stone.blockID},{Block.stone.blockID}}
+		}
+	};
+	
+	public static final int[][][][] twoBySix =
+	{
+		{
+			{{Block.stone.blockID},{Block.stone.blockID},{Block.stone.blockID},{Block.stone.blockID},{Block.stone.blockID},{Block.stone.blockID}},
+			{{Block.stone.blockID},{Block.stone.blockID},{Block.stone.blockID}}
+		}
+	};
+	
+	public static final int[][][][] sixByTwo =
+	{
+		{
+			{{Block.stone.blockID},{Block.stone.blockID}},
+			{{Block.stone.blockID},{Block.stone.blockID}},
+			{{Block.stone.blockID},{Block.stone.blockID}},
+			{{Block.stone.blockID},{Block.stone.blockID}},
+			{{Block.stone.blockID},{Block.stone.blockID}},
+			{{Block.stone.blockID},{Block.stone.blockID}}
+		}
+	};
+	
+	public static final int[][][][] threeBySix =
+	{
+		{
+			{{Block.stone.blockID},{Block.stone.blockID},{Block.stone.blockID},{Block.stone.blockID},{Block.stone.blockID},{Block.stone.blockID}},
+			{{Block.stone.blockID},{Block.stone.blockID},{Block.stone.blockID}},
+			{{Block.stone.blockID},{Block.stone.blockID},{Block.stone.blockID}}
+		}
+	};
+	
+	public static final int[][][][] sixByThree =
+	{
+		{
+			{{Block.stone.blockID},{Block.stone.blockID},{Block.stone.blockID}},
+			{{Block.stone.blockID},{Block.stone.blockID},{Block.stone.blockID}},
+			{{Block.stone.blockID},{Block.stone.blockID},{Block.stone.blockID}},
+			{{Block.stone.blockID},{Block.stone.blockID},{Block.stone.blockID}},
+			{{Block.stone.blockID},{Block.stone.blockID},{Block.stone.blockID}},
+			{{Block.stone.blockID},{Block.stone.blockID},{Block.stone.blockID}}
+		}
+	};
+	
+	public static final int[][][][] threeBySeven =
+	{
+		{
+			{{Block.stone.blockID},{Block.stone.blockID},{Block.stone.blockID},{Block.stone.blockID},{Block.stone.blockID},{Block.stone.blockID},{Block.stone.blockID}},
+			{{Block.stone.blockID},{Block.stone.blockID},{Block.stone.blockID}},
+			{{Block.stone.blockID},{Block.stone.blockID},{Block.stone.blockID}}
+		}
+	};
+	
+	public static final int[][][][] sevenByThree =
+	{
+		{
+			{{Block.stone.blockID},{Block.stone.blockID},{Block.stone.blockID}},
+			{{Block.stone.blockID},{Block.stone.blockID},{Block.stone.blockID}},
+			{{Block.stone.blockID},{Block.stone.blockID},{Block.stone.blockID}},
+			{{Block.stone.blockID},{Block.stone.blockID},{Block.stone.blockID}},
+			{{Block.stone.blockID},{Block.stone.blockID},{Block.stone.blockID}},
+			{{Block.stone.blockID},{Block.stone.blockID},{Block.stone.blockID}},
+			{{Block.stone.blockID},{Block.stone.blockID},{Block.stone.blockID}}
+		}
+	};
+	
+	public static final int[][][][] eightBySeven =
+	{
+		{
+			{{Block.stone.blockID},{Block.stone.blockID},{Block.stone.blockID},{Block.stone.blockID},{Block.stone.blockID},{Block.stone.blockID},{Block.stone.blockID}},
+	    	{{},{},{Block.stone.blockID}},
+	    	{{},{},{Block.stone.blockID}},
+	    	{{},{},{Block.stone.blockID}},
+	    	{{Block.stone.blockID}},
+	    	{{Block.stone.blockID}},
+	    	{{Block.stone.blockID}},
+	    	{{Block.stone.blockID}}
+		}
+	};
+	
+	public static final int[][][][] sevenByEight =
+	{
+		{
+			{{Block.stone.blockID},{Block.stone.blockID},{Block.stone.blockID},{Block.stone.blockID},{Block.stone.blockID},{Block.stone.blockID},{Block.stone.blockID},{Block.stone.blockID}},
+	    	{{},{},{Block.stone.blockID}},
+	    	{{},{},{Block.stone.blockID}},
+	    	{{},{},{Block.stone.blockID}},
+	    	{{Block.stone.blockID}},
+	    	{{Block.stone.blockID}},
+	    	{{Block.stone.blockID}}
+		}
+	};
+	
+	// 9 x 10
+	public static final int[][][][] dimensionTest =
+	{
+		{
+			/*
+			// DOESN'T WORK!!!
+			// 3 x 6
+			{{Block.stone.blockID},{Block.stone.blockID},{Block.stone.blockID},{Block.stone.blockID},{Block.stone.blockID},{Block.stone.blockID}},
+			{{Block.stone.blockID},{Block.stone.blockID},{Block.stone.blockID}},
+			{{Block.stone.blockID},{Block.stone.blockID},{Block.stone.blockID}}
+			*/
+			/*
+			// 10 x 9
+	    	{{Block.stone.blockID},{Block.stone.blockID},{Block.stone.blockID},{Block.stone.blockID},{Block.stone.blockID},{Block.stone.blockID},{Block.stone.blockID},{Block.stone.blockID},{Block.stone.blockID}},
+	    	{{},{},{Block.stone.blockID}},
+	    	{{},{},{Block.stone.blockID}},
+	    	{{},{},{Block.stone.blockID}},
+	    	{{Block.stone.blockID},{Block.stone.blockID},{Block.stone.blockID},{Block.stone.blockID},{Block.stone.blockID},{Block.stone.blockID},{Block.stone.blockID},{Block.stone.blockID}},
+	    	{{Block.stone.blockID},{Block.stone.blockID},{Block.stone.blockID},{Block.stone.blockID},{Block.stone.blockID},{Block.stone.blockID},{Block.stone.blockID},{Block.stone.blockID}},
+	    	{{Block.stone.blockID},{Block.stone.blockID},{Block.stone.blockID},{Block.stone.blockID},{Block.stone.blockID},{Block.stone.blockID},{Block.stone.blockID},{Block.stone.blockID}},
+	    	{{Block.stone.blockID},{Block.stone.blockID},{Block.stone.blockID},{Block.stone.blockID},{Block.stone.blockID},{Block.stone.blockID},{Block.stone.blockID},{Block.stone.blockID},{Block.stone.blockID}},
+	    	{{Block.stone.blockID},{Block.stone.blockID},{Block.stone.blockID},{Block.stone.blockID},{Block.stone.blockID},{Block.stone.blockID},{Block.stone.blockID},{Block.stone.blockID},{Block.stone.blockID}},
+	    	{{Block.stone.blockID},{Block.stone.blockID},{Block.stone.blockID},{Block.stone.blockID},{Block.stone.blockID},{Block.stone.blockID},{Block.stone.blockID},{Block.stone.blockID},{Block.stone.blockID}}
+	    	*/
+			/*
+			// DOESN'T WORK!!!
+			// 10 x 7
+			{{Block.stone.blockID},{Block.stone.blockID},{Block.stone.blockID},{Block.stone.blockID},{Block.stone.blockID},{Block.stone.blockID},{Block.stone.blockID}},
+	    	{{},{},{Block.stone.blockID}},
+	    	{{},{},{Block.stone.blockID}},
+	    	{{},{},{Block.stone.blockID}},
+	    	{{Block.stone.blockID}},
+	    	{{Block.stone.blockID}},
+	    	{{Block.stone.blockID}},
+	    	{{Block.stone.blockID}},
+	    	{{Block.stone.blockID}},
+	    	{{Block.stone.blockID}}
+	    	*/
+			/*
+			// 11 x 8
+	    	{{Block.stone.blockID},{Block.stone.blockID},{Block.stone.blockID},{Block.stone.blockID},{Block.stone.blockID},{Block.stone.blockID},{Block.stone.blockID},{Block.stone.blockID}},
+	    	{{},{},{Block.stone.blockID}},
+	    	{{},{},{Block.stone.blockID}},
+	    	{{},{},{Block.stone.blockID}},
+	    	{{Block.stone.blockID}},
+	    	{{Block.stone.blockID}},
+	    	{{Block.stone.blockID}},
+	    	{{Block.stone.blockID}},
+	    	{{Block.stone.blockID}},
+	    	{{Block.stone.blockID}},
+	    	{{Block.stone.blockID}}
+	    	*/
+			
+	    	// 9 x 10
+			{{Block.stone.blockID},{Block.stone.blockID},{Block.stone.blockID},{Block.stone.blockID},{Block.stone.blockID},{Block.stone.blockID},{Block.stone.blockID},{Block.stone.blockID},{Block.stone.blockID},{Block.stone.blockID}},
+	    	{{},{},{Block.stone.blockID}},
+	    	{{},{},{Block.stone.blockID}},
+	    	{{},{},{Block.stone.blockID}},
+	    	{{Block.stone.blockID}},
+	    	{{Block.stone.blockID}},
+	    	{{Block.stone.blockID}},
+	    	{{Block.stone.blockID}},
+	    	{{Block.stone.blockID}}
+	    	
+	    }
+	};
 }

@@ -250,6 +250,7 @@ public class StructureGenerator extends StructureGeneratorBase
 		structure.setFacing(StructureGeneratorBase.WEST);
 		structures.add(structure);
 		 */
+		
 		structure = new Structure("Blacksmith");
 		structure.addBlockArray(StructureArrays.blockArrayNPCBlackSmith);
 		structure.setFacing(StructureGeneratorBase.EAST);
@@ -265,16 +266,16 @@ public class StructureGenerator extends StructureGeneratorBase
 		structure.setFacing(StructureGeneratorBase.NORTH);
 		structure.setStructureOffset(0, -2, -2);
 		structures.add(structure);
-
+		
 		structure = new Structure("Spawn Test");
 		structure.addBlockArray(StructureArrays.blockArraySpawnTest);
-		/*
+		
 		structure.addBlockArray(StructureArrays.blockArrayOffsetTest1);
 		structure.addBlockArray(StructureArrays.blockArrayOffsetTest2);
 		structure.addBlockArray(StructureArrays.blockArrayOffsetTest2);
 		structure.addBlockArray(StructureArrays.blockArrayOffsetTest2);
 		structure.addBlockArray(StructureArrays.blockArrayOffsetTest1);
-		 */
+		 
 		structure.setFacing(StructureGeneratorBase.EAST);
 		structures.add(structure);
 
@@ -290,5 +291,63 @@ public class StructureGenerator extends StructureGeneratorBase
 		structure.setFacing(StructureGeneratorBase.WEST);
 		structure.setStructureOffset(0, -6, 0);
 		structures.add(structure);
+		
+		/** DEBUG STRUCTURES for setDefaultOffset */
+		/*
+		structure = new Structure("3 x 4");
+		structure.addBlockArray(StructureArrays.threeByFour);
+		structure.setFacing(StructureGeneratorBase.NORTH);
+		structures.add(structure);
+		
+		structure = new Structure("4 x 3");
+		structure.addBlockArray(StructureArrays.fourByThree);
+		structure.setFacing(StructureGeneratorBase.NORTH);
+		structures.add(structure);
+		
+		structure = new Structure("2 x 6");
+		structure.addBlockArray(StructureArrays.twoBySix);
+		structure.setFacing(StructureGeneratorBase.NORTH);
+		structures.add(structure);
+		
+		structure = new Structure("6 x 2");
+		structure.addBlockArray(StructureArrays.sixByTwo);
+		structure.setFacing(StructureGeneratorBase.NORTH);
+		structures.add(structure);
+		
+		structure = new Structure("6 x 3");
+		structure.addBlockArray(StructureArrays.sixByThree);
+		structure.setFacing(StructureGeneratorBase.NORTH);
+		structures.add(structure);
+		
+		structure = new Structure("3 x 6");
+		structure.addBlockArray(StructureArrays.threeBySix);
+		structure.setFacing(StructureGeneratorBase.NORTH);
+		structures.add(structure);
+		
+		structure = new Structure("7 x 3");
+		structure.addBlockArray(StructureArrays.sevenByThree);
+		structure.setFacing(StructureGeneratorBase.NORTH);
+		structures.add(structure);
+		
+		structure = new Structure("3 x 7");
+		structure.addBlockArray(StructureArrays.threeBySeven);
+		structure.setFacing(StructureGeneratorBase.NORTH);
+		structures.add(structure);
+		
+		structure = new Structure("7 x 8");
+		structure.addBlockArray(StructureArrays.sevenByEight);
+		structure.setFacing(StructureGeneratorBase.NORTH);
+		structures.add(structure);
+		
+		structure = new Structure("8 x 7");
+		structure.addBlockArray(StructureArrays.eightBySeven);
+		structure.setFacing(StructureGeneratorBase.NORTH);
+		structures.add(structure);
+		
+		structure = new Structure("Dimension Test");
+		structure.addBlockArray(StructureArrays.dimensionTest);
+		structure.setFacing(StructureGeneratorBase.NORTH);
+		structures.add(structure);
+		*/
 	}
 }

@@ -173,8 +173,17 @@ public class SGTBlockHighlightHandler
 		Structure structure = spawner.getCurrentStructure(itemstack);
 		int offX = structure.getOffsetX() + spawner.getData(itemstack, ItemStructureSpawner.OFFSET_X);
 		int offZ = structure.getOffsetZ() + spawner.getData(itemstack, ItemStructureSpawner.OFFSET_Z);
-		int length = structure.getFacing() % 2 == 0 ? structure.getWidthX() : structure.getWidthZ();
-		int adj1 = length - (structure.getFacing() % 2 == 0 ? structure.getWidthZ() : structure.getWidthX());
+		
+		/** flagNS is true if structure's facing is north or south */
+		boolean flagNS = structure.getFacing() % 2 == 0;
+		int length = flagNS ? structure.getWidthX() : structure.getWidthZ();
+		int adj1 = length - (flagNS ? structure.getWidthZ() : structure.getWidthX());
+		
+		/** Flag1 tags structures of certain dimension specifications for adjustment */
+		boolean flag1 = (flagNS ? (structure.getWidthX() % 2 == 0 && adj1 % 2 == 1) || (structure.getWidthX() % 2 == 1 && adj1 % 2 == -1) : (structure.getWidthX() % 2 == 0 && adj1 % 2 == -1) || (structure.getWidthX() % 2 == 1 && adj1 % 2 == 1));
+		
+		if (flag1 && !flagNS) { adj1 = -adj1; }
+		
 		int adj2 = (length+1) % 2;
 		int adj3 = adj1 % 2;
 		int adj4 = adj1 / 2 + adj3;
@@ -182,20 +191,20 @@ public class SGTBlockHighlightHandler
 		
 		switch(structure.getFacing()) {
 		case 0: // SOUTH
-			offsetZ = offX + length / 2 - (man == 0 ? adj1 / 2 + (adj3 == 0 ? 0 : adj2) : man == 1 ? (adj3 == 0 ? adj2 : 0) : man == 2 ? adj1 / 2 + (adj3 == 0 ? adj2 : adj3) : 0);
-			offsetX = -offZ + (man == 0 ? adj2 + (adj1 > 0 ? adj4 : 0) : man == 1 ? (adj3 == 0 ? adj2 : adj3) : man == 2 ? (adj1 > 0 ? adj4 : 0) : 0);
+			offsetZ = offX + length / 2 - (man == 0 ? adj1 / 2 + (adj3 == 0 ? 0 : adj1 < 0 && flag1 ? adj3 : adj2) : man == 1 ? (adj3 == 0 ? adj2 : adj1 > 0 && flag1 ? adj3 : 0) : man == 2 ? adj1 / 2 + (adj3 == 0 || flag1 ? adj2 : adj3) : 0);
+			offsetX = -offZ + (man == 0 ? adj2 + (adj1 > 0 && !flag1 ? adj4 : 0) : man == 1 ? (adj3 == 0 ? adj2 : flag1 ? (adj1 < 0 ? -adj3 : 0) : adj3) : man == 2 ? (adj1 > 0 && !flag1 ? adj4 : 0) : 0);
 			break;
 		case 1: // WEST
-			offsetX = offX + length / 2 - (man == 0 ? adj1 / 2 : man == 2 ? adj1 / 2 + (adj3 == 0 ? adj2 : 0) : man == 3 ? (adj3 == 0 ? adj2 : -adj3) : 0);
-			offsetZ = offZ + (man == 1 ? (adj1 < 0 ? adj4 : 0) + (adj3 == 0 ? -adj2 : 0) : man == 2 ? (adj3 == 0 ? -adj2 : adj3) : man == 3 ? (adj1 < 0 ? adj4 : 0) : 0);
+			offsetX = offX + length / 2 - (man == 0 ? (flag1 ? -adj4 : adj1 / 2) : man == 2 ? (flag1 ? (adj1 > 0 ? -adj1 / 2 : -adj4) : adj1 / 2 + (adj3 == 0 ? adj2 : 0)) : man == 3 ? (adj3 == 0 || flag1 ? adj2 : -adj3) : 0);
+			offsetZ = offZ + (man == 1 ? (adj1 < 0 && !flag1 ? adj4 : adj1 > 0 && flag1 ? (adj1 > 1 ? -adj1 / 2 : -adj4) : 0) + (adj3 == 0 ? -adj2 : 0) : man == 2 ? (adj3 == 0 || flag1 ? -adj2 : adj3) : man == 3 ? (adj1 < 0 && !flag1 ? adj4 : 0) : 0);
 			break;
 		case 2: // NORTH
-			offsetZ = -offX - length / 2 + (man == 0 ? adj1 / 2 + (adj3 == 0 ? adj2 : adj3) : man == 2 ? adj1 / 2 : man == 3 ? (adj3 == 0 ? adj2 : 0) : 0);
-			offsetX = offZ - (man == 0 ? (adj1 > 0 ? adj4 : 0) : man == 2 ? (adj3 == 0 ? adj2 : 0) + (adj1 > 0 ? adj4 : 0) : man == 3 ? (adj3 == 0 ? adj2 : adj3) : 0);
+			offsetZ = -offX - length / 2 + (man == 0 ? adj1 / 2 + (adj3 == 0 || flag1 ? adj2 : adj3) : man == 2 ? (flag1 ? adj4 : adj1 / 2) : man == 3 ? (adj3 == 0 || flag1 ? adj2 : 0) : 0);
+			offsetX = offZ - (man == 0 ? (adj3 > 0 ? adj3 - adj2 : 0) : man == 2 ? (adj3 > 0 ? adj3 : adj2) : man == 3 ? (adj3 > 0 ? adj3 - adj2 : adj3 < 0 ? -adj3 : adj2) : 0);
 			break;
 		case 3: // EAST
-			offsetX = -offX - length / 2 + (man == 0 ? adj1 / 2 + (adj3 == 0 ? adj2 : 0) : man == 1 ? (adj3 == 0 ? adj2 : -adj3) : man == 2 ? adj1 / 2 : 0);
-			offsetZ = -offZ - (man == 0 ? (adj3 == 0 ? -adj2 : adj3) : man == 1 ? (adj1 < 0 ? adj4 : 0) : man == 3 ? (adj1 < 0 ? adj4 : 0) + (adj3 == 0 ? -adj2 : 0) : 0);
+			offsetX = -offX - length / 2 + (man == 0 ? adj1 / 2 + (adj3 == 0 ? adj2 : flag1 ? -adj1 + (adj1 > 0 ? adj3 : 0) : 0) : man == 1 ? (adj3 == 0 || flag1 ? adj2 : -adj3) : man == 2 ? (flag1 ? -adj4 : adj1 / 2) : 0);
+			offsetZ = -offZ - (man == 0 ? (adj3 == 0 || flag1 ? -adj2 : adj3) : man == 1 ? (adj1 < 0 && !flag1 ? adj4 : 0) : man == 3 ? (adj1 < 0 && !flag1 ? adj4 : adj1 > 0 && flag1 ? -adj4 : 0) + (adj3 == 0 ? -adj2 : flag1 && adj1 > 1 ? adj3 : 0) : 0);
 			break;
 		}
 		

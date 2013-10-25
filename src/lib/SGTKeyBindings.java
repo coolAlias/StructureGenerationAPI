@@ -39,8 +39,9 @@ public class SGTKeyBindings
 			TOGGLE_REMOVE = 10;
 	
 	/** Key descriptions */
-	private static final String[] desc = {"PlusX", "MinusX", "PlusZ", "MinusZ", "OffsetY","InvertY",
-		"Reset", "Rotate", "NextStruct", "PrevStruct", "ToggleRemove"
+	private static final String[] desc = {"Move structure forward", "Move structure back",
+		"Move structure right", "Move structure left", "Raise/lower structure","Invert raise/lower",
+		"Reset offsets", "Rotate 90 degrees", "Next Structure", "Previous Structure", "Toggle Remove"
 	};
 	
 	/** Default key values */

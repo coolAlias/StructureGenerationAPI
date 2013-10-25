@@ -655,28 +655,37 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 	 */
 	public final void setDefaultOffset(int x, int y, int z)
 	{
-		int length = getOriginalFacing() % 2 == 0 ? getWidthX() : getWidthZ();
-		int adj1 = length - (getOriginalFacing() % 2 == 0 ? getWidthZ() : getWidthX());
+		/** flagNS is true if structure's facing is north or south */
+		boolean flagNS = getOriginalFacing() % 2 == 0;
+		int length = flagNS ? getWidthX() : getWidthZ();
+		int adj1 = length - (flagNS ? getWidthZ() : getWidthX());
+		
+		/** Flag1 tags structures of certain dimension specifications for adjustment */
+		boolean flag1 = (flagNS ? (getWidthX() % 2 == 0 && adj1 % 2 == 1) || (getWidthX() % 2 == 1 && adj1 % 2 == -1)
+				: (getWidthX() % 2 == 0 && adj1 % 2 == -1) || (getWidthX() % 2 == 1 && adj1 % 2 == 1));
+		
+		if (flag1 && !flagNS) { adj1 = -adj1; }
+		
 		int adj2 = (length+1) % 2;
 		int adj3 = adj1 % 2;
 		int adj4 = adj1 / 2 + adj3;
 		
 		switch(getOriginalFacing()) {
-		case SOUTH:
-			offsetZ = x + length / 2 - (manualRotations == 0 ? adj1 / 2 + (adj3 == 0 ? 0 : adj2) : manualRotations == 1 ? (adj3 == 0 ? adj2 : 0) : manualRotations == 2 ? adj1 / 2 + (adj3 == 0 ? adj2 : adj3) : 0);
-			offsetX = -z + (manualRotations == 0 ? adj2 + (adj1 > 0 ? adj4 : 0) : manualRotations == 1 ? (adj3 == 0 ? adj2 : adj3) : manualRotations == 2 ? (adj1 > 0 ? adj4 : 0) : 0);
+		case 0: // SOUTH
+			offsetZ = x + length / 2 - (manualRotations == 0 ? adj1 / 2 + (adj3 == 0 ? 0 : adj1 < 0 && flag1 ? adj3 : adj2) : manualRotations == 1 ? (adj3 == 0 ? adj2 : adj1 > 0 && flag1 ? adj3 : 0) : manualRotations == 2 ? adj1 / 2 + (adj3 == 0 || flag1 ? adj2 : adj3) : 0);
+			offsetX = -z + (manualRotations == 0 ? adj2 + (adj1 > 0 && !flag1 ? adj4 : 0) : manualRotations == 1 ? (adj3 == 0 ? adj2 : flag1 ? (adj1 < 0 ? -adj3 : 0) : adj3) : manualRotations == 2 ? (adj1 > 0 && !flag1 ? adj4 : 0) : 0);
 			break;
-		case WEST:
-			offsetX = x + length / 2 - (manualRotations == 0 ? adj1 / 2 : manualRotations == 2 ? adj1 / 2 + (adj3 == 0 ? adj2 : 0) : manualRotations == 3 ? (adj3 == 0 ? adj2 : -adj3) : 0);
-			offsetZ = z + (manualRotations == 1 ? (adj1 < 0 ? adj4 : 0) + (adj3 == 0 ? -adj2 : 0) : manualRotations == 2 ? (adj3 == 0 ? -adj2 : adj3) : manualRotations == 3 ? (adj1 < 0 ? adj4 : 0) : 0);
+		case 1: // WEST
+			offsetX = x + length / 2 - (manualRotations == 0 ? (flag1 ? -adj4 : adj1 / 2) : manualRotations == 2 ? (flag1 ? (adj1 > 0 ? -adj1 / 2 : -adj4) : adj1 / 2 + (adj3 == 0 ? adj2 : 0)) : manualRotations == 3 ? (adj3 == 0 || flag1 ? adj2 : -adj3) : 0);
+			offsetZ = z + (manualRotations == 1 ? (adj1 < 0 && !flag1 ? adj4 : adj1 > 0 && flag1 ? (adj1 > 1 ? -adj1 / 2 : -adj4) : 0) + (adj3 == 0 ? -adj2 : 0) : manualRotations == 2 ? (adj3 == 0 || flag1 ? -adj2 : adj3) : manualRotations == 3 ? (adj1 < 0 && !flag1 ? adj4 : 0) : 0);
 			break;
-		case NORTH:
-			offsetZ = -x - length / 2 + (manualRotations == 0 ? adj1 / 2 + (adj3 == 0 ? adj2 : adj3) : manualRotations == 2 ? adj1 / 2 : manualRotations == 3 ? (adj3 == 0 ? adj2 : 0) : 0);
-			offsetX = z - (manualRotations == 0 ? (adj1 > 0 ? adj4 : 0) : manualRotations == 2 ? (adj3 == 0 ? adj2 : 0) + (adj1 > 0 ? adj4 : 0) : manualRotations == 3 ? (adj3 == 0 ? adj2 : adj3) : 0);
+		case 2: // NORTH
+			offsetZ = -x - length / 2 + (manualRotations == 0 ? adj1 / 2 + (adj3 == 0 || flag1 ? adj2 : adj3) : manualRotations == 2 ? (flag1 ? adj4 : adj1 / 2) : manualRotations == 3 ? (adj3 == 0 || flag1 ? adj2 : 0) : 0);
+			offsetX = z - (manualRotations == 0 ? (adj3 > 0 ? adj3 - adj2 : 0) : manualRotations == 2 ? (adj3 > 0 ? adj3 : adj2) : manualRotations == 3 ? (adj3 > 0 ? adj3 - adj2 : adj3 < 0 ? -adj3 : adj2) : 0);
 			break;
-		case EAST:
-			offsetX = -x - length / 2 + (manualRotations == 0 ? adj1 / 2 + (adj3 == 0 ? adj2 : 0) : manualRotations == 1 ? (adj3 == 0 ? adj2 : -adj3) : manualRotations == 2 ? adj1 / 2 : 0);
-			offsetZ = -z - (manualRotations == 0 ? (adj3 == 0 ? -adj2 : adj3) : manualRotations == 1 ? (adj1 < 0 ? adj4 : 0) : manualRotations == 3 ? (adj1 < 0 ? adj4 : 0) + (adj3 == 0 ? -adj2 : 0) : 0);
+		case 3: // EAST
+			offsetX = -x - length / 2 + (manualRotations == 0 ? adj1 / 2 + (adj3 == 0 ? adj2 : flag1 ? -adj1 + (adj1 > 0 ? adj3 : 0) : 0) : manualRotations == 1 ? (adj3 == 0 || flag1 ? adj2 : -adj3) : manualRotations == 2 ? (flag1 ? -adj4 : adj1 / 2) : 0);
+			offsetZ = -z - (manualRotations == 0 ? (adj3 == 0 || flag1 ? -adj2 : adj3) : manualRotations == 1 ? (adj1 < 0 && !flag1 ? adj4 : 0) : manualRotations == 3 ? (adj1 < 0 && !flag1 ? adj4 : adj1 > 0 && flag1 ? -adj4 : 0) + (adj3 == 0 ? -adj2 : flag1 && adj1 > 1 ? adj3 : 0) : 0);
 			break;
 		}
 		

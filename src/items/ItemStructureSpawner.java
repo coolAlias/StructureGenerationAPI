@@ -162,7 +162,7 @@ public class ItemStructureSpawner extends BaseModItem
 		if (itemstack.stackTagCompound == null)
 			initNBTCompound(itemstack);
 		int index = itemstack.stackTagCompound.getInteger(data[STRUCTURE_INDEX]) + 1;
-		if (index == StructureGenerator.structures.size()) index = 0;
+		if (index >= StructureGenerator.structures.size()) index = 0;
 		itemstack.stackTagCompound.setInteger(data[STRUCTURE_INDEX], index);
 		return index;
 	}
@@ -288,8 +288,6 @@ public class ItemStructureSpawner extends BaseModItem
 		}
 
 		itemstack.stackTagCompound.setBoolean(data[INVERT_Y], false);
-
-		LogHelper.log(Level.INFO, "NBT Tag initialized for ItemStructureSpawner");
 	}
 
 	/**

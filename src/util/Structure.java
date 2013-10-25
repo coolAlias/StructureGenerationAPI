@@ -21,6 +21,8 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import coolalias.structuregen.StructureGeneratorBase;
+
 public class Structure
 {
 	/** The name of this structure */
@@ -30,7 +32,7 @@ public class Structure
 	private final List<int[][][][]> blockArrayList = new LinkedList();
 	
 	/** Stores the direction this structure faces. Default is EAST.*/
-	private int facing;
+	private int facing = StructureGeneratorBase.EAST;
 	
 	/** Stores default amount to offset structure's location in the world. */
 	private int offsetX = 0, offsetY = 0, offsetZ = 0;
