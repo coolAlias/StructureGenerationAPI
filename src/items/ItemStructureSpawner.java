@@ -192,7 +192,8 @@ public class ItemStructureSpawner extends BaseModItem
 	public static final int getCurrentStructureIndex(ItemStack itemstack) {
 		if (itemstack.stackTagCompound == null)
 			initNBTCompound(itemstack);
-		return itemstack.stackTagCompound.getInteger(data[STRUCTURE_INDEX]);
+		int index = itemstack.stackTagCompound.getInteger(data[STRUCTURE_INDEX]);
+		return index >= StructureGenerator.structures.size() ? 0 : index;
 	}
 	
 	/**
