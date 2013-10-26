@@ -93,7 +93,7 @@ public abstract class ItemStructureSpawnerBase extends BaseModItem
 	/**
 	 * Returns the name of the structure at provided index, or "" if index out of bounds
 	 */
-	public abstract String getStructureName(int index);
+	public abstract String getStructureName(ItemStack itemstack, int index);
 	/*
 	{
 		return (index < StructureGenerator.structures.size() ? StructureGenerator.structures.get(index).name : "");
@@ -279,8 +279,8 @@ public abstract class ItemStructureSpawnerBase extends BaseModItem
 			player.addChatMessage("Offsets x/y/z reset to 0.");
 			break;
 		case SGTKeyBindings.ROTATE: player.addChatMessage("Structure orientation rotated by " + (rotate(itemstack) * 90) + " degrees."); break;
-		case SGTKeyBindings.PREV_STRUCT: player.addChatMessage("Selected structure: " + spawner.getStructureName(spawner.prevStructure(itemstack)) + " at index " + (spawner.getCurrentStructureIndex(itemstack) + 1)); break;
-		case SGTKeyBindings.NEXT_STRUCT: player.addChatMessage("Selected structure: " + spawner.getStructureName(spawner.nextStructure(itemstack)) + " at index " + (spawner.getCurrentStructureIndex(itemstack) + 1)); break;
+		case SGTKeyBindings.PREV_STRUCT: player.addChatMessage("Selected structure: " + spawner.getStructureName(itemstack, spawner.prevStructure(itemstack)) + " at index " + (spawner.getCurrentStructureIndex(itemstack) + 1)); break;
+		case SGTKeyBindings.NEXT_STRUCT: player.addChatMessage("Selected structure: " + spawner.getStructureName(itemstack, spawner.nextStructure(itemstack)) + " at index " + (spawner.getCurrentStructureIndex(itemstack) + 1)); break;
 		case SGTKeyBindings.TOGGLE_REMOVE: player.addChatMessage("Structure will " + (toggleRemove(itemstack) ? "be removed" : "generate") + " on right click."); break;
 		default: LogHelper.log(Level.WARNING, "Structure Spawner received an invalid key id, unable to process.");
 		}

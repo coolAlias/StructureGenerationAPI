@@ -63,7 +63,7 @@ public class ItemStructureSpawner extends ItemStructureSpawnerBase
 	 * Returns the name of the structure at provided index, or "" if index out of bounds
 	 */
 	@Override
-	public final String getStructureName(int index) {
+	public final String getStructureName(ItemStack itemstack, int index) {
 		return (index < StructureGenerator.structures.size() ? StructureGenerator.structures.get(index).name : "");
 	}
 	
