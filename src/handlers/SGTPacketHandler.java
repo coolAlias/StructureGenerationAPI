@@ -10,7 +10,7 @@ import java.util.logging.Level;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.network.INetworkManager;
 import net.minecraft.network.packet.Packet250CustomPayload;
-import coolalias.structuregen.items.ItemStructureSpawner;
+import coolalias.structuregen.items.ItemStructureSpawnerBase;
 import coolalias.structuregen.lib.LogHelper;
 import coolalias.structuregen.lib.ModInfo;
 import cpw.mods.fml.common.network.IPacketHandler;
@@ -72,10 +72,10 @@ public class SGTPacketHandler implements IPacketHandler
 		try {
 			key = inputStream.readByte();
 
-			if (player.getHeldItem() == null || !(player.getHeldItem().getItem() instanceof ItemStructureSpawner))
-				LogHelper.log(Level.SEVERE, "Held item is not an instance of ItemStructureSpawner - unable to process key press packet");
+			if (player.getHeldItem() == null || !(player.getHeldItem().getItem() instanceof ItemStructureSpawnerBase))
+				LogHelper.log(Level.SEVERE, "Held item is not an instance of ItemStructureSpawnerBase - unable to process key press packet");
 			else
-				ItemStructureSpawner.handleKeyPressPacket(key, player.getHeldItem(), player);
+				ItemStructureSpawnerBase.handleKeyPressPacket(key, player.getHeldItem(), player);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

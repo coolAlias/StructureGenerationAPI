@@ -34,7 +34,7 @@ import net.minecraftforge.event.ForgeSubscribe;
 
 import org.lwjgl.opengl.GL11;
 
-import coolalias.structuregen.items.ItemStructureSpawner;
+import coolalias.structuregen.items.ItemStructureSpawnerBase;
 import coolalias.structuregen.lib.LogHelper;
 import coolalias.structuregen.util.Structure;
 
@@ -51,9 +51,9 @@ public class SGTBlockHighlightHandler
 	{
 		if (!event.player.isSneaking()) { return; }
 		
-		if(event.currentItem != null && event.currentItem.getItem() instanceof ItemStructureSpawner)
+		if (event.currentItem != null && event.currentItem.getItem() instanceof ItemStructureSpawnerBase)
 		{
-			Structure structure = ItemStructureSpawner.getCurrentStructure(event.currentItem);
+			Structure structure = ((ItemStructureSpawnerBase) event.currentItem.getItem()).getCurrentStructure(event.currentItem);
 			
 			if (structure == null) {
 				LogHelper.log(Level.WARNING, "Null structure during block highlight event.");
@@ -101,10 +101,10 @@ public class SGTBlockHighlightHandler
 	 */
 	private int getRotations(ItemStack itemstack, EntityPlayer player)
 	{
-		ItemStructureSpawner spawner = (ItemStructureSpawner) itemstack.getItem();
+		ItemStructureSpawnerBase spawner = (ItemStructureSpawnerBase) itemstack.getItem();
 		Structure structure = spawner.getCurrentStructure(itemstack);
 		int orientation = MathHelper.floor_double((double)((player.rotationYaw * 4F) / 360f) + 0.5D) &3;
-		int facing = (spawner.getData(itemstack, ItemStructureSpawner.ROTATIONS) + structure.getFacing()) % 4;
+		int facing = (spawner.getData(itemstack, ItemStructureSpawnerBase.ROTATIONS) + structure.getFacing()) % 4;
 		return ((facing % 2 != structure.getFacing() % 2 ? facing + 2 : facing) + orientation) % 4;
 	}
 	
@@ -169,10 +169,10 @@ public class SGTBlockHighlightHandler
 	
 	private final void setDefaultOffset(ItemStack itemstack)
 	{
-		ItemStructureSpawner spawner = (ItemStructureSpawner) itemstack.getItem();
+		ItemStructureSpawnerBase spawner = (ItemStructureSpawnerBase) itemstack.getItem();
 		Structure structure = spawner.getCurrentStructure(itemstack);
-		int offX = structure.getOffsetX() + spawner.getData(itemstack, ItemStructureSpawner.OFFSET_X);
-		int offZ = structure.getOffsetZ() + spawner.getData(itemstack, ItemStructureSpawner.OFFSET_Z);
+		int offX = structure.getOffsetX() + spawner.getData(itemstack, ItemStructureSpawnerBase.OFFSET_X);
+		int offZ = structure.getOffsetZ() + spawner.getData(itemstack, ItemStructureSpawnerBase.OFFSET_Z);
 		
 		/** flagNS is true if structure's facing is north or south */
 		boolean flagNS = structure.getFacing() % 2 == 0;
@@ -187,7 +187,7 @@ public class SGTBlockHighlightHandler
 		int adj2 = (length+1) % 2;
 		int adj3 = adj1 % 2;
 		int adj4 = adj1 / 2 + adj3;
-		int man = spawner.getData(itemstack, ItemStructureSpawner.ROTATIONS);
+		int man = spawner.getData(itemstack, ItemStructureSpawnerBase.ROTATIONS);
 		
 		switch(structure.getFacing()) {
 		case 0: // SOUTH
@@ -204,13 +204,13 @@ public class SGTBlockHighlightHandler
 			break;
 		case 3: // EAST
 			offsetX = -offX - length / 2 + (man == 0 ? adj1 / 2 + (adj3 == 0 ? adj2 : flag1 ? -adj1 + (adj1 > 0 ? adj3 : 0) : 0) : man == 1 ? (adj3 == 0 || flag1 ? adj2 : -adj3) : man == 2 ? (flag1 ? -adj4 : adj1 / 2) : 0);
-			offsetZ = -offZ - (man == 0 ? (adj3 == 0 || flag1 ? -adj2 : adj3) : man == 1 ? (adj1 < 0 && !flag1 ? adj4 : 0) : man == 3 ? (adj1 < 0 && !flag1 ? adj4 : adj1 > 0 && flag1 ? -adj4 : 0) + (adj3 == 0 ? -adj2 : flag1 && adj1 > 1 ? adj3 : 0) : 0);
+			offsetZ = -offZ - (man == 0 ? (adj3 == 0 || flag1 ? -adj2 : adj3) : man == 1 ? (adj3 != 0 && !flag1 ? adj4 : 0) : man == 3 ? (adj3 < 0 && !flag1 ? adj4 : adj3 > 0 && flag1 ? -adj4 : 0) + (adj3 == 0 ? -adj2 : flag1 && adj1 > 1 ? adj3 : 0) : 0);
 			break;
 		}
 		
 		int j, k;
 
-		for (int i = 0; i < spawner.getData(itemstack, ItemStructureSpawner.ROTATIONS); ++i)
+		for (int i = 0; i < spawner.getData(itemstack, ItemStructureSpawnerBase.ROTATIONS); ++i)
 		{
 			j = -offsetZ;
 			k = offsetX;

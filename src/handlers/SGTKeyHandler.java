@@ -22,7 +22,7 @@ import java.util.EnumSet;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityClientPlayerMP;
 import net.minecraft.client.settings.KeyBinding;
-import coolalias.structuregen.items.ItemStructureSpawner;
+import coolalias.structuregen.items.ItemStructureSpawnerBase;
 import coolalias.structuregen.lib.ModInfo;
 import coolalias.structuregen.lib.SGTKeyBindings;
 import cpw.mods.fml.client.FMLClientHandler;
@@ -58,7 +58,7 @@ public class SGTKeyHandler extends KeyHandler
 		{
 			EntityClientPlayerMP player = Minecraft.getMinecraft().thePlayer;
 			
-			if (player.getHeldItem() != null && player.getHeldItem().getItem() instanceof ItemStructureSpawner) {
+			if (player.getHeldItem() != null && player.getHeldItem().getItem() instanceof ItemStructureSpawnerBase) {
 				SGTPacketHandler.sendPacketKeyPress(SGTKeyBindings.SGTKeyMap.get(kb.keyCode));
 			}
 		}
