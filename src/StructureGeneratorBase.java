@@ -310,6 +310,43 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 	}
 	
 	/**
+	 * Returns an AxisAlignedBB suitable for a hanging entity at x/y/z facing direction
+	 */
+	public static final AxisAlignedBB getHangingEntityAxisAligned(int x, int y, int z, int direction)
+	{
+		double minX = (double) x, minZ = (double) z, maxX = minX, maxZ =  minZ;
+		
+		switch(direction) {
+		case 2: // frame facing NORTH
+			minX += 0.25D;
+			maxX += 0.75D;
+			minZ += 0.5D;
+			maxZ += 1.5D;
+			break;
+		case 3: // frame facing SOUTH
+			minX += 0.25D;
+			maxX += 0.75D;
+			minZ -= 0.5D;
+			maxZ += 0.5D;
+			break;
+		case 4: // frame facing WEST
+			minX += 0.5D;
+			maxX += 1.5D;
+			minZ += 0.25D;
+			maxZ += 0.75D;
+			break;
+		case 5: // frame facing EAST
+			minX -= 0.5D;
+			maxX += 0.5D;
+			minZ += 0.25D;
+			maxZ += 0.75D;
+			break;
+		}
+		
+		return AxisAlignedBB.getBoundingBox(minX, (double) y, minZ, maxX, (double) y + 1, maxZ);
+	}
+	
+	/**
 	 * Places a hanging item entity in the world at the correct location and facing.
 	 * Note that you MUST use a WALL_MOUNTED type block id (such as torch) for your custom
 	 * block id's getRealBlockID return value in order for orientation to be correct.
@@ -573,8 +610,7 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 			setStructureFacing(structure.getFacing());
 			//setOffset(structure.getOffsetX(), structure.getOffsetY(), structure.getOffsetZ());
 		}
-		else
-			LogHelper.log(Level.SEVERE, "NULL Structure cannot be set!");
+		else LogHelper.log(Level.SEVERE, "NULL Structure cannot be set!");
 	}
 	
 	/**
@@ -673,11 +709,11 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 		switch(getOriginalFacing()) {
 		case 0: // SOUTH
 			offsetZ = x + length / 2 - (manualRotations == 0 ? adj1 / 2 + (adj3 == 0 ? 0 : adj1 < 0 && flag1 ? adj3 : adj2) : manualRotations == 1 ? (adj3 == 0 ? adj2 : adj1 > 0 && flag1 ? adj3 : 0) : manualRotations == 2 ? adj1 / 2 + (adj3 == 0 || flag1 ? adj2 : adj3) : 0);
-			offsetX = -z + (manualRotations == 0 ? adj2 + (adj1 > 0 && !flag1 ? adj4 : 0) : manualRotations == 1 ? (adj3 == 0 ? adj2 : flag1 ? (adj1 < 0 ? -adj3 : 0) : adj3) : manualRotations == 2 ? (adj1 > 0 && !flag1 ? adj4 : 0) : 0);
+			offsetX = -z + (manualRotations == 0 ? adj2 + (adj3 > 0 && !flag1 ? adj4 : 0) : manualRotations == 1 ? (adj3 == 0 ? adj2 : flag1 ? (adj3 < 0 ? -adj3 : 0) : adj3) : manualRotations == 2 ? (adj3 > 0 && !flag1 ? adj4 : 0) : 0);
 			break;
 		case 1: // WEST
 			offsetX = x + length / 2 - (manualRotations == 0 ? (flag1 ? -adj4 : adj1 / 2) : manualRotations == 2 ? (flag1 ? (adj1 > 0 ? -adj1 / 2 : -adj4) : adj1 / 2 + (adj3 == 0 ? adj2 : 0)) : manualRotations == 3 ? (adj3 == 0 || flag1 ? adj2 : -adj3) : 0);
-			offsetZ = z + (manualRotations == 1 ? (adj1 < 0 && !flag1 ? adj4 : adj1 > 0 && flag1 ? (adj1 > 1 ? -adj1 / 2 : -adj4) : 0) + (adj3 == 0 ? -adj2 : 0) : manualRotations == 2 ? (adj3 == 0 || flag1 ? -adj2 : adj3) : manualRotations == 3 ? (adj1 < 0 && !flag1 ? adj4 : 0) : 0);
+			offsetZ = z + (manualRotations == 1 ? (adj3 < 0 && !flag1 ? adj4 : adj3 > 0 && flag1 ? (adj1 > 1 ? -adj1 / 2 : -adj4) : 0) + (adj3 == 0 ? -adj2 : 0) : manualRotations == 2 ? (adj3 == 0 || flag1 ? -adj2 : adj3) : manualRotations == 3 ? (adj3 < 0 && !flag1 ? adj4 : 0) : 0);
 			break;
 		case 2: // NORTH
 			offsetZ = -x - length / 2 + (manualRotations == 0 ? adj1 / 2 + (adj3 == 0 || flag1 ? adj2 : adj3) : manualRotations == 2 ? (flag1 ? adj4 : adj1 / 2) : manualRotations == 3 ? (adj3 == 0 || flag1 ? adj2 : 0) : 0);
@@ -1055,43 +1091,6 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 			offsetX = x;
 			offsetZ = z;
 		}
-	}
-	
-	/**
-	 * Returns an AxisAlignedBB suitable for a hanging entity at x/y/z facing direction
-	 */
-	public static final AxisAlignedBB getHangingEntityAxisAligned(int x, int y, int z, int direction)
-	{
-		double minX = (double) x, minZ = (double) z, maxX = minX, maxZ =  minZ;
-		
-		switch(direction) {
-		case 2: // frame facing NORTH
-			minX += 0.25D;
-			maxX += 0.75D;
-			minZ += 0.5D;
-			maxZ += 1.5D;
-			break;
-		case 3: // frame facing SOUTH
-			minX += 0.25D;
-			maxX += 0.75D;
-			minZ -= 0.5D;
-			maxZ += 0.5D;
-			break;
-		case 4: // frame facing WEST
-			minX += 0.5D;
-			maxX += 1.5D;
-			minZ += 0.25D;
-			maxZ += 0.75D;
-			break;
-		case 5: // frame facing EAST
-			minX -= 0.5D;
-			maxX += 0.5D;
-			minZ += 0.25D;
-			maxZ += 0.75D;
-			break;
-		}
-		
-		return AxisAlignedBB.getBoundingBox(minX, (double) y, minZ, maxX, (double) y + 1, maxZ);
 	}
 	
 	/**

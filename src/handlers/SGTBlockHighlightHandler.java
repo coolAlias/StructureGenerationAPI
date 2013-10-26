@@ -192,11 +192,11 @@ public class SGTBlockHighlightHandler
 		switch(structure.getFacing()) {
 		case 0: // SOUTH
 			offsetZ = offX + length / 2 - (man == 0 ? adj1 / 2 + (adj3 == 0 ? 0 : adj1 < 0 && flag1 ? adj3 : adj2) : man == 1 ? (adj3 == 0 ? adj2 : adj1 > 0 && flag1 ? adj3 : 0) : man == 2 ? adj1 / 2 + (adj3 == 0 || flag1 ? adj2 : adj3) : 0);
-			offsetX = -offZ + (man == 0 ? adj2 + (adj1 > 0 && !flag1 ? adj4 : 0) : man == 1 ? (adj3 == 0 ? adj2 : flag1 ? (adj1 < 0 ? -adj3 : 0) : adj3) : man == 2 ? (adj1 > 0 && !flag1 ? adj4 : 0) : 0);
+			offsetX = -offZ + (man == 0 ? adj2 + (adj3 > 0 && !flag1 ? adj4 : 0) : man == 1 ? (adj3 == 0 ? adj2 : flag1 ? (adj3 < 0 ? -adj3 : 0) : adj3) : man == 2 ? (adj3 > 0 && !flag1 ? adj4 : 0) : 0);
 			break;
 		case 1: // WEST
 			offsetX = offX + length / 2 - (man == 0 ? (flag1 ? -adj4 : adj1 / 2) : man == 2 ? (flag1 ? (adj1 > 0 ? -adj1 / 2 : -adj4) : adj1 / 2 + (adj3 == 0 ? adj2 : 0)) : man == 3 ? (adj3 == 0 || flag1 ? adj2 : -adj3) : 0);
-			offsetZ = offZ + (man == 1 ? (adj1 < 0 && !flag1 ? adj4 : adj1 > 0 && flag1 ? (adj1 > 1 ? -adj1 / 2 : -adj4) : 0) + (adj3 == 0 ? -adj2 : 0) : man == 2 ? (adj3 == 0 || flag1 ? -adj2 : adj3) : man == 3 ? (adj1 < 0 && !flag1 ? adj4 : 0) : 0);
+			offsetZ = offZ + (man == 1 ? (adj3 < 0 && !flag1 ? adj4 : adj3 > 0 && flag1 ? (adj1 > 1 ? -adj1 / 2 : -adj4) : 0) + (adj3 == 0 ? -adj2 : 0) : man == 2 ? (adj3 == 0 || flag1 ? -adj2 : adj3) : man == 3 ? (adj3 < 0 && !flag1 ? adj4 : 0) : 0);
 			break;
 		case 2: // NORTH
 			offsetZ = -offX - length / 2 + (man == 0 ? adj1 / 2 + (adj3 == 0 || flag1 ? adj2 : adj3) : man == 2 ? (flag1 ? adj4 : adj1 / 2) : man == 3 ? (adj3 == 0 || flag1 ? adj2 : 0) : 0);
