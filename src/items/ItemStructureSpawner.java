@@ -26,6 +26,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.world.World;
+import coolalias.structuregen.LinkedStructureGenerator;
 import coolalias.structuregen.StructureGenerator;
 import coolalias.structuregen.lib.LogHelper;
 import coolalias.structuregen.util.Structure;
@@ -98,12 +99,12 @@ public class ItemStructureSpawner extends ItemStructureSpawnerBase
 			link.setRotation(getData(itemstack, ROTATIONS));
 			
 			for (int i = 0; i < 6; ++i) {
-				link.addStructureWithOffset(structure,(i/2) * structure.getWidthZ() - i % 2,0,(i % 2 == 0 ? -1 : 1) * (structure.getWidthX() / 2 + 1));
+				link.addStructureWithOffset(structure,(i/2) * structure.getWidthZ() - i % 2,0,(i % 2 == 0 ? 1 : -1) * (structure.getWidthX() / 2 + 1));
 				link.setLastRotation(i % 2 == 0 ? 3 : 1);
 			}
 			for (int i = 0; i < 6; ++i) {
-				link.addStructureWithOffset(structure,(i % 2 == 0 ? -1 : 1) * (structure.getWidthX() / 2) - (3 * structure.getWidthX() / 2),0,(i/2 + 2) * structure.getWidthZ() + i % 2 - 2);
-				link.setLastRotation(i % 2 == 0 ? 2 : 0);
+				link.addStructureWithOffset(structure,(i % 2 == 0 ? -1 : -2) * structure.getWidthX() - (i % 2 == 0 ? 0 : 1),0,(i/2 + 2) * structure.getWidthZ() - (i % 2 == 0 ? 1 : 0));
+				link.setLastRotation(i % 2 == 0 ? 0 : 2);
 			}
 			
 			link.generateLinkedStructures(player, world, world.rand, x, y+1, z);

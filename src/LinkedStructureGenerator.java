@@ -83,7 +83,7 @@ public class LinkedStructureGenerator
 	}
 	
 	private void addOffset(int x, int y, int z) {
-		offsets.add(new int[] {z, y, x});
+		offsets.add(new int[] {-z, y, x});
 	}
 	
 	/**
@@ -95,7 +95,7 @@ public class LinkedStructureGenerator
 		if (!structures.isEmpty())
 		{
 			if (offsets.size() < structures.size()) addOffset(x, y, z);
-			else offsets.set(offsets.size() - 1, new int[] {z, y, x});
+			else offsets.set(offsets.size() - 1, new int[] {-z, y, x});
 		}
 	}
 	
