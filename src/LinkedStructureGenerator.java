@@ -29,6 +29,8 @@ import coolalias.structuregen.util.Structure;
 
 public class LinkedStructureGenerator
 {
+	private StructureGeneratorBase gen = null;
+	
 	private final List<Structure> structures = new LinkedList<Structure>();
 	
 	/** Individual offsets for each structure */
@@ -43,6 +45,10 @@ public class LinkedStructureGenerator
 	private int rotation = 0;
 	
 	public LinkedStructureGenerator() {}
+	
+	public <T extends StructureGeneratorBase> void setGenerator(T generator) {
+		this.gen = generator;
+	}
 	
 	/**
 	 * Increments rotation for all linked structures
@@ -127,7 +133,8 @@ public class LinkedStructureGenerator
 			return;
 		}
 		
-		StructureGenerator gen = new StructureGenerator();
+		// StructureGenerator gen = new StructureGenerator();
+		if (this.gen == null) { gen = new StructureGenerator(); }
 		if (player != null) { gen.setPlayerFacing(player); }
 		setOffsetFromRotation(player != null ? gen.getPlayerFacing() : -1);
 		
@@ -150,7 +157,7 @@ public class LinkedStructureGenerator
 		
 		for (int[] offset : offsets)
 		{
-			for (int i = 0; i < (facing < 0 ? rotation : facing); ++i)
+			for (int i = 0; i < (facing > 0 ? facing : 0); ++i)
 			{
 				x = -offset[Z];
 				z = offset[X];
