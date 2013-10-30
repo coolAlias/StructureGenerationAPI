@@ -3,10 +3,10 @@ package coolalias.structuregen.tutorial;
 import java.util.LinkedList;
 import java.util.List;
 
-import coolalias.structuregen.StructureGeneratorBase;
-import coolalias.structuregen.util.Structure;
 import net.minecraft.entity.Entity;
 import net.minecraft.world.World;
+import coolalias.structuregen.api.util.Structure;
+import coolalias.structuregen.api.util.StructureGeneratorBase;
 
 public class MyStructureGenerator extends StructureGeneratorBase
 {
