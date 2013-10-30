@@ -47,12 +47,10 @@ KNOWN BUGS
 ==========
 - Large entities such as horses have problems spawning in confined spaces
 
-DEMO MOD INCLUDED
-=================
-NOW SMP Compatible!
-
-A ready-to-go mod that will help familiarize you with the capabilities and functionality of the Structure Generation
-Tool. There is currently no recipe for the item that spawns structures, so try it in Creative.
+DEMO MOD AVAILABLE
+==================
+Download the StructureGenMod to help familiarize you with the capabilities and functionality of the Structure
+Generation API, or just for fun! SMP compatible.
 
 Several structures are included and can be easily toggled between in-game:
 - "Hut" - A highly modified village hut. Enter at your own risk.
