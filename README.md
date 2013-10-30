@@ -92,26 +92,26 @@ world loading times will be longer than normal.
 INSTALLATION
 ============
 DEMO MOD
+
 1. Download the pre-compiled and zipped mod file and place it in your minecraft/mods folder. You're good to go!
+
 2. Alternatively, follow the directions below to add the 'StructureGenMod' files to your project, giving you access
 to a secondary API for easily creating new Items capable of spawning structures with all the pre-made functionality.
 
 API
+
 1. Download the folder 'StructureGenAPI'
+
 2. Place the entire folder either in your project or as a required project on your project's build path
+
 3. Build your own structures / structure arrays by following the guidelines in the Instructions
+
 4. If you are using custom hooks, either edit the included StructureGenerator.java file or create your own class that
    extends StructureGeneratorBase to handle your custom hooks
+
 5. Use your StructureGenerator class to generate your structures from whatever location you choose, such as a block
    or item, or create a class that implements IWorldGenerator (such as the included WorldStructureGenerator) to
    generate structures during world generation
-
-Let me know if you find any bugs, but if it has to do with metadata blocks, please, before you submit a bug report,
-double and triple-check that you are setting metadata correctly. Each block has it's own way of determining facing,
-so you MUST read each entry carefully every time you are setting metadata. Trust me, even looking at the reference
-I still set metadata blocks backwards half the time.
-
-Anyways, hope this is useful!
 
 SCREEN SHOTS
 ============
