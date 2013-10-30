@@ -15,7 +15,7 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package coolalias.structuregen.api.util;
+package coolalias.structuregenapi.util;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;

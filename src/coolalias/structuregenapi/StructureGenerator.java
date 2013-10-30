@@ -15,11 +15,11 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package coolalias.structuregen.api;
+package coolalias.structuregenapi;
 
-import coolalias.structuregen.api.util.StructureGeneratorBase;
 import net.minecraft.entity.Entity;
 import net.minecraft.world.World;
+import coolalias.structuregenapi.util.StructureGeneratorBase;
 
 /**
  * This class is responsible for handling custom block hooks used in your block arrays,

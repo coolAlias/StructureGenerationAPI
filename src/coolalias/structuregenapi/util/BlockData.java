@@ -15,7 +15,7 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package coolalias.structuregen.api.util;
+package coolalias.structuregenapi.util;
 
 /**
  * Stores all data needed for post-gen processing, specifically for custom 'hooks'

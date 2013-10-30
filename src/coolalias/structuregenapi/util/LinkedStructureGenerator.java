@@ -15,7 +15,7 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package coolalias.structuregen.api.util;
+package coolalias.structuregenapi.util;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -24,7 +24,7 @@ import java.util.logging.Level;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.world.World;
-import coolalias.structuregen.api.StructureGenerator;
+import coolalias.structuregenapi.StructureGenerator;
 
 public class LinkedStructureGenerator
 {
