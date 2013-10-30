@@ -1,137 +1,193 @@
-HOW TO GENERATE YOUR CUSTOM STRUCTURES
-======================================
-Note: With the addition of the Structure class (see below), I recommend using those
-instead as it entails all the same steps but gives extra benefits.
+THE STRUCTURE GENERATION API
+============================
+Include the structuregen.api folder directly into the project's source folder or as a
+separate project that is included in the build path. For best results, files located
+in api.util should NOT be modified, but modifications to the StructureGenerator class
+will be needed if using custom hooks.
 
-Here I explain in detail how to generate and manipulate the position for your custom
-structure. Only steps 1 and 5 are absolutely required, and step 3 is pretty much also
-absolutely required, but you could skip it. Steps 2 and 4 just give you further
-control over exactly where and how the structure is generated.
+There can be multiple StructureGenerator classes, allowing for the same hook id to be
+used differently depending on which generator is referenced; this prevents potential
+id conflicts from multiple mods using the api.
 
-Step 1: ABSOLUTELY REQUIRED! Add your blockArray to the generator's list
+See below for complete instructions or check out the tutorial series to get started.
 
-Once you have your blockArray(s) set up correctly (see below), you will need to add
-them to the WorldGenStructure generator's list of arrays to generate.
+GENERATING CUSTOM STRUCTURES
+============================
+In order to use the API, a class extending StructureGeneratorBase must first be created. The auto-
+generated methods are sufficient for most cases.
 
-This is done with one of four methods:
-"addBlockArray(int[][][][])" - adds a blockArray to current list
-"setBlockArray(int[][][][])" - overwrites current list with provided blockArray
-"addBlockArrayList(List<int[][][][]>)" - adds a list of blockArrays to current list
-"setBlockArrayList(List<int[][][][]>)" - overwrites current list with provided list
+The examples used in the following steps assume the use of the StructureGenerator class included
+with the API, but the steps will be the same for any class extending StructureGeneratorBase.
 
-If you have more than one layer, they should be added from the bottom up, so first
-the base, then the layer on top of the base, and so on until the final topmost layer
-is added.
+Step 1: Choose a method from which to generate the structure
+    
+    "onItemUse", "onBlockActivated", and classes extending IWorldGenerator are all suitable choices, but
+    structures can be generated from any class or method with access to a World object and the server.
 
-Step 2: Set your structure's facing (defaults to EAST if not specifically set)
+Step 2: Create a new StructureGenerator object within the chosen method
+    
+    Creating a new instance is only necessary for multi-player compatibility; otherwise, a static
+    instance of the StructureGenerator could be created once and used for all generation.
+    
+    StructureGeneratorBase gen = new StructureGenerator();
 
-"setStructureFacing(StructureGeneratorBase.DIRECTION)"
+Step 3: Set the Structure to be generated
+    
+    An object of the Structure class (see below) can be set directly or with optional rotation:
+        "setStructure(Structure)"
+        "setStructureWithRotation(Structure, int)" - sets and rotates structure off it's default facing
+    
+    Alternatively, int[][][][] blockArray(s) (see below) can be added directly to the Generator;
+    note that with this approach, the structure's facing must be set manually.
+        "addBlockArray(int[][][][])" - adds a blockArray to current list of arrays
+        "setBlockArray(int[][][][])" - overwrites current list with provided blockArray
+        "addBlockArrayList(List<int[][][][]>)" - adds a list of blockArrays to current list
+        "setBlockArrayList(List<int[][][][]>)" - overwrites current list with provided list
+   
+    gen.setStructure(structure); // See below for how to set up a Structure class object
+
+Step 4: (Optional) Set the structure's facing and rotation
+    
+    FACING
+    If the Structure class was used, a facing should have already been set; otherwise, a facing should
+    be set with the method "setStructureFacing(StructureGeneratorBase.DIRECTION)":
+    
+        gen.setStructureFacing(StructureGeneratorBase.NORTH);
  
-Valid DIRECTION values are NORTH, SOUTH, EAST, WEST, enumerated in StructureGeneratorBase.
+    Valid DIRECTION values are NORTH, SOUTH, EAST, WEST, enumerated in StructureGeneratorBase. If no
+    facing is set, EAST will be used as the default value.
+    
+    See below for more information on choosing a default facing for the structure.
+    
+    ROTATION
+    Additionally, a structure can be rotated manually off of it's default facing. Each rotation rotates the
+    structure 90 degrees clockwise, so rotating the above structure once will cause it to face EAST. This
+    is useful when generating the same structure multiple times with different facings each time, but where
+    the default facing needs to be maintained for future use.
+    
+        gen.rotateStructureFacing(); // rotates the structure 90 degrees clockwise once only
+        gen.rotateStructureFacing(3); // rotates the structure 3 more times, 90 degrees each time
 
-See below for more information on choosing a default facing for your structure.
+Step 5: (Optional) Account for the player's facing
+    
+    If it's important to have the structure's front side facing the player, then the player's facing must be
+    set in the StructureGenerator. This requires access to an EntityPlayer object, of course.
+    
+        gen.setPlayerFacing(par2EntityPlayer); // using par2EntityPlayer from the method "onItemUse"
+    
+    Manual rotations will now cause the structure to rotate with respect to the player as well as with respect
+    to the structure's default facing.
 
-Step 3: REQUIRED! Set how much to offset the structure's position when generated
+Step 6: (Optional) Set structure's offset
+    
+    Usually while generating a structure, the x/y/z coordinates at which to generate it are retrieved from the
+    method parameters from which it will generate. It's position can be changed by setting x/y/z offsets.
+    
+    If the structure is generating in relation to a player, then the following methods are recommended:
+        "setDefaultOffset()" - sets offset so the structure generates completely in front of the player
+        "setDefaultOffset(int x, int y, int z)" - as above, but with additional offsets added in
+    
+    Additionally, the offsets can be set with complete manual control, but this is generally not recommended:
+        "setOffset(int offX, int offY, int offZ)"
+    
+    Increasing offset X moves the structure further away from the player, while decreasing offset X moves it
+    closer to or even behind the player. Increasing offset Z moves the structure to the player's right, while
+    decreasing Z moves it to the player's right. Offset Y moves up and down, respectively.
+    
+    During world generation, the player is not a factor and setting offsets should not be necessary unless
+    using the LinkedStructureGenerator (see below).
+    
+Step 7: Generate the structure
+    
+    The final step is to call the generate method of the StructureGenerator class.
+    
+        "generate(World world, Random random, int x, int y, int z)"
+    
+    gen.generate(par3World, par3World.rand, par4, par5, par6); // using the default parameters from "onItemUse"
 
-This can be done in one of three ways:
+LINKED STRUCTURE GENERATION
+===========================
 
-- Automatically so structure always generates completely in front of player:
-            "setDefaultOffset()" [recommended method]
+(instructions pending)
 
-- Automatically, but with custom adjustments relative to default:
-            "setDefaultOffset(int x, int y, int z)" [also recommended]
+THE STRUCTURE CLASS
+===================
+The Structure class is a simple utility class that stores all information needed to properly
+generate a structure. Its use is not required, but convenient for several reasons:
 
-- Manually: [not recommended for most users]
-            "setOffset(int offX, int offY, int offZ)"
-
-- Do nothing:
-            Your structure will probably generate on top of you. You were warned.
-            This, however, wouldn't be a problem if the structure is being generated
-            during world gen and not with an item or block.
-
-Negative offX values place the structure further away from the player, +offX will move
-toward the player. Thinking about inverting this.
-
-Step 4: Set the player's facing (optional but generally recommended)
-
-"setPlayerFacing(Entity)"
-
-This will ensure the structure always orients itself toward the player; important if
-you put the front door on the structureFacing side, but not important if generating
-the structure during world gen.
-
-Step 5: ABSOLUTELY REQUIRED! Generate your structure
-
-The final step is to call the generate method. This is a vanilla method signature used
-by all classes extending WorldGenerator:
-
-"generate(World world, Random random, int x, int y, int z)"
-
-USING THE NEW STRUCTURE CLASS
-=============================
-The Structure class is a simple utility class that stores all information needed to
-properly generate a structure. Its use is not required, but convenient for several
-reasons:
-
-- Give your structure a displayable name
-- Set a specific offset for your structure independent of any other offset
+- The structure can be named, providing a means to display what structure is selected
+- Set a specific offset for the structure independent of any other offset
 - Easily switch between entire structures by using a List<Structure>
 
-To setup a Structure object, you must first declare a new Structure.
+To setup a Structure object, see the following steps:
 
-Step 1: Declare a new Structure object; this must include your structure's name.
+Step 1: Declare a new Structure object, including the Structure's name, if applicable.
      
-        Structure structure = new Structure("Hut");
+    Structure structure = new Structure("Hut");
+    Structure unnamed = new Structure();
+        
+    NOTE: A Structure's name is final, so if it has a name it must be set from the constructor.
 
 Step 2: Add all necessary blockArrays (see below) to the structure
         
-        An example for a structure with only a single layer:
-            structure.addBlockArray(StructureArrays.blockArrayNPCHut);
+    An example for a structure with only a single layer:
+    structure.addBlockArray(StructureArrays.blockArrayNPCHut);
+        
+    An example for a structure with multiple layers, some of which are the same:
+        structure.addBlockArray(StructureArrays.blockArrayOffsetTest1);
+        structure.addBlockArray(StructureArrays.blockArrayOffsetTest2);
+        structure.addBlockArray(StructureArrays.blockArrayOffsetTest2);
+        structure.addBlockArray(StructureArrays.blockArrayOffsetTest2);
+        structure.addBlockArray(StructureArrays.blockArrayOffsetTest1);
+        
+    If a List<int[][][][]> of block arrays is available, the entire list can be added:
+        structure.addBlockArrayList(anotherStructure.blockArrayList());
+        
+    This could be used to easily copy a structure or add a duplicate multi-layer.
+        
+    If the structure has more than one layer, they should be added from the bottom up, so first
+    the base, then the layer on top of the base, and so on until the final topmost layer.
             
-        An example for a structure with multiple layers, some of which are the same:
-            structure.addBlockArray(StructureArrays.blockArrayOffsetTest1);
-            structure.addBlockArray(StructureArrays.blockArrayOffsetTest2);
-            structure.addBlockArray(StructureArrays.blockArrayOffsetTest2);
-            structure.addBlockArray(StructureArrays.blockArrayOffsetTest2);
-            structure.addBlockArray(StructureArrays.blockArrayOffsetTest1);
-            
-Step 3: Set the default direction you want the structure to face:
+Step 3: Set the default direction the structure faces:
+    
+    structure.setFacing(StructureGeneratorBase.EAST);
 
-        structure.setFacing(StructureGeneratorBase.EAST);
-
-Step 4: (Optional) Set custom offsets, if needed:
-
-        // This structure has a buffer layer on the bottom in case there is no ground;
-        // need to offset y by -1 to generate at ground level
+Step 4: (Optional) Set structure-specific offsets
+    
+    See "Generating Custom Structures" Step 6 for more information on how setting offsets affects
+    a structure's generated position.
+    
+    This structure has a buffer layer that should only generate if there is empty space underneath,
+    so the default offset is set to lower the Y position by one so the structure still generates at
+    ground level.
         
         structure.setStructureOffset(0, -1, 0);
 
-Step 5: (Optional) Add the new structure to your List<Structure>, if you have one
+Step 5: (Optional) Add the completed structure to a List<Structure> for easy access
         
-        /** A good place for this list would be in your StructureGenerator class */
-        List<Structure> structures = new LinkedList();
+    /** A good place for this list would be in the StructureGenerator class */
+    List<Structure> structures = new LinkedList();
+    
+    structures.add(structure); // adds the "Hut" that was set up above
 
-        structures.add(structure); // adds the "Hut" we set up above
-
-That's it! Basically the same steps as needed for generating your structure in the first
-place, but now you can have all the benefits above for the same amount of work.
+To generate a completed structure, see "Generating Custom Structures".
 
 SETTING UP A STRUCTURE'S BLOCK ARRAY
 ====================================
-TIP: You can use MCEdit first and convert the 'generate' methods from that to a block
-array much more easily than building one from scratch. This has the added benefit of
-providing all the correct metadata values for block facing - I highly recommend you
-use MCEdit first and use it as a template to manually convert the array. 
+TIP: Using MCEdit first and converting the 'generate' methods from that to a block
+array is much easier than building one from scratch. This has the added benefit of
+providing all the correct metadata values for block facing - it is therefore highly
+recommended to use MCEdit first and use it as a reference for building the array. 
 
 STRUCTURE FACING
 
 Structure facing determines which 'side' of the array faces the player when generated.
 
 Facing      Array Setup
-NORTH       Front: min z, Back: max z, Left (east): max x, Right (west): x = 0
-SOUTH       Front: max z, Back: min z, Left (west): x = 0, Right (east): max x
-EAST        Front: max x, Back: x = 0, Left (south): max z, Right (north): z = 0
-WEST        Front: x = 0, Back: max x, Left (north): z = 0, Right (south): max z
+NORTH       Front: min z, Back: max z, Left (east): max x, Right (west): min x
+SOUTH       Front: max z, Back: min z, Left (west): min z, Right (east): max x
+EAST        Front: max x, Back: min x, Left (south): max z, Right (north): min z
+WEST        Front: min x, Back: max x, Left (north): min z, Right (south): max z
 
 Choose a default structure facing that is easy for you to visualize while making the array;
 you can always rotate the structure later to get any facing you desire. I recommend building
