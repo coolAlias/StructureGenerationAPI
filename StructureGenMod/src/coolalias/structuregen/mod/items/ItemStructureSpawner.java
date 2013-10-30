@@ -18,15 +18,19 @@
 package coolalias.structuregen.mod.items;
 
 import java.util.List;
+import java.util.logging.Level;
 
+import net.minecraft.block.Block;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.world.World;
+import coolalias.structuregen.api.StructureGenerator;
 import coolalias.structuregen.api.util.LinkedStructureGenerator;
+import coolalias.structuregen.api.util.LogHelper;
 import coolalias.structuregen.api.util.Structure;
-import coolalias.structuregen.mod.PsionStructureGenerator;
+import coolalias.structuregen.api.util.StructureGeneratorBase;
 import coolalias.structuregen.mod.gen.ModStructureGenerator;
 
 public class ItemStructureSpawner extends ItemStructureSpawnerBase
@@ -90,36 +94,6 @@ public class ItemStructureSpawner extends ItemStructureSpawnerBase
 
 		if (!world.isRemote && ModStructureGenerator.structures.size() > 0)
 		{
-			
-			LinkedStructureGenerator link = new LinkedStructureGenerator();
-			link.setGenerator(new PsionStructureGenerator());
-			Structure structure = PsionStructureGenerator.getTreeBase();
-			int height = 0, rotBase = getData(itemstack, ROTATIONS);//world.rand.nextInt(64) % 4;
-			if (structure != null) {
-				link.setRotation(rotBase);
-				link.addStructure(structure);
-				height = structure.getHeight() - world.rand.nextInt(6);
-			}
-			structure = PsionStructureGenerator.getTreeCanopy();
-			if (structure != null) {
-				int rotTop = 1;//world.rand.nextInt(64) % 4;
-				int absRot = Math.abs(rotBase - rotTop), f = rotTop < rotBase ? 1 : -1;
-				int adjX, adjZ, tX, tZ;
-				adjX = (rotTop % 2 == 1 ? -1 : rotTop == 0 ? 2 : 1);
-				adjZ = rotTop == 1 ? -1 : 0;
-				
-				for (int i = 0; i < absRot; ++i) {
-					tX = absRot % 2 == 1 ? f * (rotTop == 3 || rotTop == 0 ? adjZ : adjX) : f * -adjZ;
-					tZ = absRot % 2 == 1 ? f * (rotTop == 3 || rotTop == 0 ? -adjX : -adjZ) : f * adjX;
-					adjX = tX;
-					adjZ = tZ;
-				}
-				
-				link.addStructureWithOffsetAndRotation(structure, adjX, height, adjZ, rotTop);
-			}
-			
-			link.generateLinkedStructures(null, world, world.rand, x, y-world.rand.nextInt(7)+1, z);
-			
 			/*
 			LinkedStructureGenerator link = new LinkedStructureGenerator();
 			Structure structure = getCurrentStructure(itemstack);
@@ -137,9 +111,9 @@ public class ItemStructureSpawner extends ItemStructureSpawnerBase
 			
 			link.generateLinkedStructures(player, world, world.rand, x, y+1, z);
 			*/
-			/*
+			
 			// Necessary for SMP compatibility, as using static variables will fail
-			StructureGenerator gen = new StructureGenerator();
+			StructureGeneratorBase gen = new StructureGenerator();
 			Structure structure = getCurrentStructure(itemstack);
 			
 			if (structure == null) {
@@ -154,7 +128,7 @@ public class ItemStructureSpawner extends ItemStructureSpawnerBase
 			gen.setStructureWithRotation(structure, getData(itemstack, ROTATIONS));
 			gen.setDefaultOffset(structure.getOffsetX() + getData(itemstack, OFFSET_X), structure.getOffsetY() + getData(itemstack, OFFSET_Y), structure.getOffsetZ() + getData(itemstack, OFFSET_Z));
 			gen.generate(world, world.rand, x, y, z);
-			*/
+			
 		}
 
 		return true;

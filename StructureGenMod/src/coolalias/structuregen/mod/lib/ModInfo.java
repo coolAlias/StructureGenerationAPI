@@ -19,7 +19,7 @@ package coolalias.structuregen.mod.lib;
 
 public class ModInfo
 {
-	public static final String MOD_ID = "structuregen",
+	public static final String MOD_ID = "structuregenmod",
 			MOD_NAME = "coolAliasStructureGenMod",
 			VERSION = "1.0.0",
 			CLIENT_PROXY = "coolalias.structuregen.mod.proxy.ClientProxy",

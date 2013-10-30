@@ -537,12 +537,20 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 	}
 	
 	/**
-	 * This will manually rotate the structure's default facing 90 degrees clockwise.
+	 * This will manually rotate the structure's facing 90 degrees clockwise.
 	 * Note that a different side will now face the player when generated.
 	 */
 	public final void rotateStructureFacing() {
 		structureFacing = ++structureFacing % 4;
 		manualRotations = ++manualRotations % 4;
+	}
+	
+	/**
+	 * Manually rotates the structure's facing a specified number of times.
+	 */
+	public final void rotateStructureFacing(int rotations) {
+		structureFacing = (structureFacing + rotations) % 4;
+		manualRotations = (manualRotations + rotations) % 4;
 	}
 	
 	/**
