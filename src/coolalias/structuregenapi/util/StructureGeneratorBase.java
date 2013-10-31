@@ -565,7 +565,7 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 	 */
 	public final void addBlockArray(int blocks[][][][])
 	{
-		if (FMLCommonHandler.instance().getEffectiveSide() == Side.SERVER) {
+		if (FMLCommonHandler.instance().getEffectiveSide().isServer()) {
 			blockArrayList.add(blocks);
 			if (blockArray == null)
 				blockArray = blocks;
@@ -772,11 +772,12 @@ public abstract class StructureGeneratorBase extends WorldGenerator
 		
 		setOffsetFromRotation();
 		
-		for (int[][][][] blockArray : blockArrayList)
+		for (int[][][][] blocks : blockArrayList)
 		{
 			if (!generated) break;
+			this.blockArray = blocks;
 			generated = generateLayer(world, random, posX, posY, posZ, rotations);
-			offsetY += blockArray.length;
+			offsetY += blocks.length;
 		}
 		
 		if (generated)
