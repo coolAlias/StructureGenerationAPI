@@ -15,22 +15,40 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package coolalias.structuregenapi.util;
+package structuregenapi.util;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import cpw.mods.fml.common.FMLLog;
-
 public class LogHelper
 {
-	private static Logger logger = Logger.getLogger("STRUCTURE GEN API");
-	
-	public static void init() {
-		logger.setParent(FMLLog.getLogger());
-	}
-	
+	private static Logger logger = Logger.getLogger("StructureGenAPI");
+
 	public static void log(Level logLevel, String message) {
 		logger.log(logLevel, message);
+	}
+
+	public static void severe(String message) {
+		logger.log(Level.SEVERE, message);
+	}
+
+	public static void warning(String message) {
+		logger.log(Level.WARNING, message);
+	}
+
+	public static void info(String message) {
+		logger.log(Level.INFO, message);
+	}
+
+	public static void fine(String message) {
+		logger.log(Level.FINE, message);
+	}
+
+	public static void finer(String message) {
+		logger.log(Level.FINER, message);
+	}
+
+	public static void finest(String message) {
+		logger.log(Level.FINEST, message);
 	}
 }

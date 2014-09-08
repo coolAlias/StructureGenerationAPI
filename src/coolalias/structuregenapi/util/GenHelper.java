@@ -15,10 +15,9 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package coolalias.structuregenapi.util;
+package structuregenapi.util;
 
 import java.util.List;
-import java.util.logging.Level;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockRedstoneRepeater;
@@ -27,18 +26,15 @@ import net.minecraft.block.material.Material;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItemFrame;
 import net.minecraft.entity.item.EntityPainting;
+import net.minecraft.entity.item.EntityPainting.EnumArt;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemHangingEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.network.packet.Packet25EntityPainting;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntitySign;
 import net.minecraft.tileentity.TileEntitySkull;
 import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.EnumArt;
 import net.minecraft.world.World;
-import net.minecraftforge.common.FakePlayer;
-import cpw.mods.fml.common.network.PacketDispatcher;
 
 /**
  * 
@@ -52,98 +48,88 @@ public class GenHelper
 	 * implements IInventory (and thus, by extension, ISidedInventory)
 	 * @return true if entire itemstack was added
 	 */
-	public static final boolean addItemToTileInventory(World world, ItemStack itemstack, int x, int y, int z)
-	{
-		TileEntity tile = world.getBlockTileEntity(x, y, z);
-		
+	public static final boolean addItemToTileInventory(World world, ItemStack itemstack, int x, int y, int z) {
+		TileEntity tile = world.getTileEntity(x, y, z);
 		if (tile == null || !(tile instanceof IInventory)) {
-			LogHelper.log(Level.WARNING, "Tile Entity at " + x + "/" + y + "/" + z + " is " + (tile != null ? "not an IInventory" : "null"));
+			LogHelper.warning("Tile Entity at " + x + "/" + y + "/" + z + " is " + (tile != null ? "not an IInventory" : "null"));
 			return false;
 		}
-		
+
 		if (itemstack.stackSize < 1) {
-			LogHelper.log(Level.WARNING, "Trying to add ItemStack of size 0 to Tile Inventory");
+			LogHelper.warning("Trying to add ItemStack of size 0 to Tile Inventory");
 			return false;
 		}
-		
+
 		IInventory inventory = (IInventory) tile;
 		int remaining = itemstack.stackSize;
-		
-		for (int i = 0; i < inventory.getSizeInventory() && remaining > 0; ++i)
-		{
+
+		for (int i = 0; i < inventory.getSizeInventory() && remaining > 0; ++i) {
 			ItemStack slotstack = inventory.getStackInSlot(i);
-			
-			if (slotstack == null && inventory.isItemValidForSlot(i, itemstack))
-			{
+			if (slotstack == null && inventory.isItemValidForSlot(i, itemstack)) {
 				remaining -= inventory.getInventoryStackLimit();
 				itemstack.stackSize = (remaining > 0 ? inventory.getInventoryStackLimit() : itemstack.stackSize);
 				inventory.setInventorySlotContents(i, itemstack);
-				inventory.onInventoryChanged();
-			}
-			else if (slotstack != null && itemstack.isStackable() && inventory.isItemValidForSlot(i, itemstack))
-			{
-				if (slotstack.itemID == itemstack.itemID  && (!itemstack.getHasSubtypes() || 
-					itemstack.getItemDamage() == slotstack.getItemDamage()) && ItemStack.areItemStackTagsEqual(itemstack, slotstack))
+				inventory.markDirty();
+			} else if (slotstack != null && itemstack.isStackable() && inventory.isItemValidForSlot(i, itemstack)) {
+				if (slotstack.getItem() == itemstack.getItem()  && (!itemstack.getHasSubtypes() || 
+						itemstack.getItemDamage() == slotstack.getItemDamage()) && ItemStack.areItemStackTagsEqual(itemstack, slotstack))
 				{
 					int l = slotstack.stackSize + remaining;
 
-                    if (l <= itemstack.getMaxStackSize() && l <= inventory.getInventoryStackLimit())
-                    {
-                    	remaining = 0;
-                        slotstack.stackSize = l;
-                        inventory.onInventoryChanged();
-                    }
-                    else if (slotstack.stackSize < itemstack.getMaxStackSize() && itemstack.getMaxStackSize() <= inventory.getInventoryStackLimit())
-                    {
-                        remaining -= itemstack.getMaxStackSize() - slotstack.stackSize;
-                        slotstack.stackSize = itemstack.getMaxStackSize();
-                        inventory.onInventoryChanged();
-                    }
+					if (l <= itemstack.getMaxStackSize() && l <= inventory.getInventoryStackLimit()) {
+						remaining = 0;
+						slotstack.stackSize = l;
+						inventory.markDirty();
+					} else if (slotstack.stackSize < itemstack.getMaxStackSize() && itemstack.getMaxStackSize() <= inventory.getInventoryStackLimit()) {
+						remaining -= itemstack.getMaxStackSize() - slotstack.stackSize;
+						slotstack.stackSize = itemstack.getMaxStackSize();
+						inventory.markDirty();
+					}
 				}
 			}
 		}
-		
+
 		return remaining < 1;
 	}
-	
+
 	/**
 	 * Sets an entity's location so that it doesn't spawn inside of walls.
 	 * Automatically removes placeholder block at coordinates x/y/z.
 	 * @return false if no suitable location found
 	 */
-	public static final boolean setEntityInStructure(World world, Entity entity, int x, int y, int z)
-	{
-		if (entity == null) { return false; }
-		int i = 0, iMax = (entity.width > 1.0F ? 16 : 4), factor = 1;
-		
+	public static final boolean setEntityInStructure(World world, Entity entity, int x, int y, int z) {
+		if (entity == null) {
+			return false;
+		}
+		int i = 0;
+		int iMax = (entity.width > 1.0F ? 16 : 4);
+		int factor = 1;
+
 		world.setBlockToAir(x, y, z);
-		
+
 		entity.setLocationAndAngles(x, y, z, 0.0F, 0.0F);
-		
-		while (entity.isEntityInsideOpaqueBlock() && i < iMax)
-		{
+
+		while (entity.isEntityInsideOpaqueBlock() && i < iMax) {
 			if (i == 4 && entity.isEntityInsideOpaqueBlock() && entity.width > 1.0F) {
 				entity.setLocationAndAngles(x, y, z, 90.0F, 0.0F);
-				LogHelper.log(Level.FINEST, "Large entity; rotating 90 degrees");
-			}
-			else if (i == 8 && entity.isEntityInsideOpaqueBlock() && entity.width > 1.0F) {
+				LogHelper.finest("Large entity; rotating 90 degrees");
+			} else if (i == 8 && entity.isEntityInsideOpaqueBlock() && entity.width > 1.0F) {
 				entity.setLocationAndAngles(x, y, z, 180.0F, 0.0F);
-				LogHelper.log(Level.FINEST, "Large entity; rotating 180 degrees");
-			}
-			else if (i == 12 && entity.isEntityInsideOpaqueBlock() && entity.width > 1.0F) {
+				LogHelper.finest("Large entity; rotating 180 degrees");
+			} else if (i == 12 && entity.isEntityInsideOpaqueBlock() && entity.width > 1.0F) {
 				entity.setLocationAndAngles(x, y, z, 270.0F, 0.0F);
-				LogHelper.log(Level.FINEST, "Large entity; rotating 270 degrees");
+				LogHelper.finest("Large entity; rotating 270 degrees");
 			}
-			
-			LogHelper.log(Level.FINER, "Entity inside opaque block at " + entity.posX + "/" + entity.posY + "/" + entity.posZ);
-			
+
+			LogHelper.finer("Entity inside opaque block at " + entity.posX + "/" + entity.posY + "/" + entity.posZ);
+
 			switch(i % 4) {
 			case 0: entity.setPosition(entity.posX + 0.5D, entity.posY, entity.posZ + 0.5D); break;
 			case 1: entity.setPosition(entity.posX, entity.posY, entity.posZ - 1.0D); break;
 			case 2: entity.setPosition(entity.posX - 1.0D, entity.posY, entity.posZ); break;
 			case 3: entity.setPosition(entity.posX, entity.posY, entity.posZ + 1.0D); break;
 			}
-			
+
 			++i;
 			/*
 			if (i == 12 && factor == 1 && entity.isEntityInsideOpaqueBlock() && entity.width > 1.0F) {
@@ -151,41 +137,36 @@ public class GenHelper
 				factor = 2;
 				i = 0;
 			}
-			*/
+			 */
 		}
 		if (entity.isEntityInsideOpaqueBlock()) {
-			LogHelper.log(Level.WARNING, "Failed to set entity in open space. Returning to default position.");
+			LogHelper.warning("Failed to set entity in open space. Returning to default position.");
 			entity.setPosition(entity.posX + 0.5D, entity.posY, entity.posZ + 0.5D);
 			return false;
 		}
-		
+
 		return true;
 	}
-	
+
 	/**
 	 * Spawns an entity in the structure by using setEntityInStructure.
 	 * @return true if entity spawned without collision (entity will still spawn if false, but may be in a wall)
 	 */
-	public static final boolean spawnEntityInStructure(World world, Entity entity, int x, int y, int z)
-	{
-		if (world.isRemote || entity == null) { return false; }
-		
+	public static final boolean spawnEntityInStructure(World world, Entity entity, int x, int y, int z) {
+		if (world.isRemote || entity == null) {
+			return false;
+		}
 		boolean collided = setEntityInStructure(world, entity, x, y, z);
-		
 		world.spawnEntityInWorld(entity);
-		
-		LogHelper.log(Level.FINEST, "Spawned entity at " + entity.posX + "/" + entity.posY + "/" + entity.posZ);
-		
+		LogHelper.finest("Spawned entity at " + entity.posX + "/" + entity.posY + "/" + entity.posZ);
 		return collided;
 	}
-	
+
 	/**
 	 * Returns an AxisAlignedBB suitable for a hanging entity at x/y/z facing direction
 	 */
-	public static final AxisAlignedBB getHangingEntityAxisAligned(int x, int y, int z, int direction)
-	{
+	public static final AxisAlignedBB getHangingEntityAxisAligned(int x, int y, int z, int direction) {
 		double minX = (double) x, minZ = (double) z, maxX = minX, maxZ =  minZ;
-		
 		switch(direction) {
 		case 2: // frame facing NORTH
 			minX += 0.25D;
@@ -212,10 +193,10 @@ public class GenHelper
 			maxZ += 0.75D;
 			break;
 		}
-		
+
 		return AxisAlignedBB.getBoundingBox(minX, (double) y, minZ, maxX, (double) y + 1, maxZ);
 	}
-	
+
 	/**
 	 * Places a hanging item entity in the world at the correct location and facing.
 	 * Note that you MUST use a WALL_MOUNTED type block id (such as torch) for your custom
@@ -227,35 +208,33 @@ public class GenHelper
 	 * @param hanging Must be an instance of ItemHangingEntity, such as Item.painting
 	 * @return Returns direction for further processing such as for ItemFrames, or -1 if no entity set
 	 */
-	public static final int setHangingEntity(World world, ItemStack hanging, int x, int y, int z)
-	{
+	public static final int setHangingEntity(World world, ItemStack hanging, int x, int y, int z) {
 		if (hanging.getItem() == null || !(hanging.getItem() instanceof ItemHangingEntity)) {
 			return -1;
 		}
-		
+
 		if (world.getBlockMetadata(x, y, z) < 1 || world.getBlockMetadata(x, y, z) > 5) {
-			LogHelper.log(Level.WARNING, "Hanging entity has invalid metadata of " + world.getBlockMetadata(x, y, z) + ". Valid values are 1,2,3,4");
+			LogHelper.warning("Hanging entity has invalid metadata of " + world.getBlockMetadata(x, y, z) + ". Valid values are 1,2,3,4");
 			return - 1;
 		}
-		
+
 		int[] metaToFacing = {5, 4, 3, 2};
 		int direction = metaToFacing[world.getBlockMetadata(x, y, z) - 1];
-		FakePlayer player = new FakePlayer(world,"fake");
-		
+		//FakePlayer player = new FakePlayer(world,"fake");
+
 		world.setBlockToAir(x, y, z);
-		
 		switch(direction) {
 		case 2: ++z; break; // frame facing NORTH
 		case 3: --z; break; // frame facing SOUTH
 		case 4: ++x; break; // frame facing WEST
 		case 5: --x; break; // frame facing EAST
 		}
-		
-		((ItemHangingEntity) hanging.getItem()).onItemUse(hanging, player, world, x, y, z, direction, 0, 0, 0);
-		
+
+		// TODO ((ItemHangingEntity) hanging.getItem()).onItemUse(hanging, player, world, x, y, z, direction, 0, 0, 0);
+
 		return direction;
 	}
-	
+
 	/**
 	 * Set's the itemstack contained in ItemFrame at x/y/z with default rotation.
 	 * @param direction Use the value returned from the setHangingEntity method
@@ -263,97 +242,83 @@ public class GenHelper
 	public static final void setItemFrameStack(World world, ItemStack itemstack, int x, int y, int z, int direction) {
 		setItemFrameStack(world, itemstack, x, y, z, direction, 0);
 	}
-	
+
 	/**
 	 * Set's the itemstack contained in ItemFrame at x/y/z with specified rotation.
 	 * @param direction Use the value returned from the setHangingEntity method
 	 * @param itemRotation 0,1,2,3 starting at default and rotating 90 degrees clockwise
 	 */
-	public static final void setItemFrameStack(World world, ItemStack itemstack, int x, int y, int z, int direction, int itemRotation)
-	{
+	public static final void setItemFrameStack(World world, ItemStack itemstack, int x, int y, int z, int direction, int itemRotation) {
 		List<EntityItemFrame> frames = world.getEntitiesWithinAABB(EntityItemFrame.class, getHangingEntityAxisAligned(x, y, z, direction));
-		if (frames != null && !frames.isEmpty())
-		{
+		if (frames != null && !frames.isEmpty()) {
 			for (EntityItemFrame frame : frames) {
 				frame.setDisplayedItem(itemstack);
 				frame.setItemRotation(itemRotation);
 			}
 		}
 	}
-	
+
 	/**
 	 * Sets the art for a painting at location x/y/z and sends a packet to update players.
 	 * @param direction Use the value returned from the setHangingEntity method
 	 * @return false if 'name' didn't match any EnumArt values.
 	 */
-	public static final boolean setPaintingArt(World world, String name, int x, int y, int z, int direction)
-	{
+	public static final boolean setPaintingArt(World world, String name, int x, int y, int z, int direction) {
 		List<EntityPainting> paintings = world.getEntitiesWithinAABB(EntityPainting.class, getHangingEntityAxisAligned(x, y, z, direction));
-		
-		if (paintings != null && !paintings.isEmpty() && name.length() > 0)
-		{
-			for (EntityPainting toEdit : paintings)
-			{
+		if (paintings != null && !paintings.isEmpty() && name.length() > 0) {
+			for (EntityPainting toEdit : paintings) {
 				EnumArt[] aenumart = EnumArt.values();
-		        int i1 = aenumart.length;
-
-		        for (int j1 = 0; j1 < i1; ++j1)
-		        {
-		            EnumArt enumart = aenumart[j1];
-
-		            if (enumart.title.equals(name))
-		            {
-		                toEdit.art = enumart;
-		                PacketDispatcher.sendPacketToAllAround(x, y, z, 64, world.provider.dimensionId, new Packet25EntityPainting(toEdit));
-		                return true;
-		            }
-		        }
-		        LogHelper.log(Level.WARNING, name + " does not match any values in EnumArt; unable to set painting art.");
+				int i1 = aenumart.length;
+				for (int j1 = 0; j1 < i1; ++j1) {
+					EnumArt enumart = aenumart[j1];
+					if (enumart.title.equals(name)) {
+						toEdit.art = enumart;
+						// TODO PacketDispatcher.sendPacketToAllAround(x, y, z, 64, world.provider.dimensionId, new Packet25EntityPainting(toEdit));
+						return true;
+					}
+				}
+				LogHelper.warning(name + " does not match any values in EnumArt; unable to set painting art.");
 			}
 		}
-		LogHelper.log(Level.WARNING, "No EntityPainting was found at " + x + "/" + y + "/" + z);
+		LogHelper.warning("No EntityPainting was found at " + x + "/" + y + "/" + z);
 		return false;
 	}
-	
+
 	/**
 	 * Adds text to a sign in the world. Use EnumChatFormatting to set colors. Text of more
 	 * than 15 characters per line will be truncated automatically.
 	 * @param text A String array of no more than 4 elements; additional elements will be ignored
 	 * @return false if no sign tile entity was found at x/y/z
 	 */
-	public static final boolean setSignText(World world, String[] text, int x, int y, int z)
-	{
-		TileEntitySign sign = (world.getBlockTileEntity(x, y, z) instanceof TileEntitySign ? (TileEntitySign) world.getBlockTileEntity(x, y, z) : null);
-		
-		if (sign != null)
-		{
-			for (int i = 0; i < sign.signText.length && i < text.length; ++i)
-			{
+	public static final boolean setSignText(World world, String[] text, int x, int y, int z) {
+		TileEntitySign sign = (world.getTileEntity(x, y, z) instanceof TileEntitySign ? (TileEntitySign) world.getTileEntity(x, y, z) : null);
+		if (sign != null) {
+			for (int i = 0; i < sign.signText.length && i < text.length; ++i) {
 				if (text[i] == null) {
-					LogHelper.log(Level.WARNING, "Uninitialized String element while setting sign text at index " + i);
+					LogHelper.warning("Uninitialized String element while setting sign text at index " + i);
 					continue;
-				}
-				else if (text[i].length() > 15) {
-					LogHelper.log(Level.WARNING, text[i] + " is too long to fit on a sign; maximum length is 15 characters.");
+				} else if (text[i].length() > 15) {
+					LogHelper.warning(text[i] + " is too long to fit on a sign; maximum length is 15 characters.");
 					sign.signText[i] = text[i].substring(0, 15);
+				} else {
+					sign.signText[i] = text[i];
 				}
-				else sign.signText[i] = text[i];
 			}
-			
+
 			return true;
 		}
-		
-		LogHelper.log(Level.WARNING, "No TileEntitySign was found at " + x + "/" + y + "/" + z);
+
+		LogHelper.warning("No TileEntitySign was found at " + x + "/" + y + "/" + z);
 		return false;
 	}
-	
+
 	/**
 	 * Method to set skulls not requiring extra rotation data (i.e. wall-mounted skulls whose rotation is determined by metadata)
 	 */
 	public static final boolean setSkullData(World world, String name, int type, int x, int y, int z) {
 		return setSkullData(world, name, type, -1, x, y, z);
 	}
-	
+
 	/**
 	 * Sets skull type and name for a TileEntitySkull at x/y/z
 	 * @param name Must be a valid player username
@@ -363,23 +328,27 @@ public class GenHelper
 	 */
 	public static final boolean setSkullData(World world, String name, int type, int rot, int x, int y, int z)
 	{
-		TileEntitySkull skull = (world.getBlockTileEntity(x, y, z) instanceof TileEntitySkull ? (TileEntitySkull) world.getBlockTileEntity(x, y, z) : null);
-		
+		TileEntitySkull skull = (world.getTileEntity(x, y, z) instanceof TileEntitySkull ? (TileEntitySkull) world.getTileEntity(x, y, z) : null);
+
 		if (skull != null)
 		{
 			if (type > 4 || type < 0) {
-				LogHelper.log(Level.WARNING, "Custom data value " + type + " not valid for skulls. Valid values are 0 to 4.");
+				LogHelper.warning("Custom data value " + type + " not valid for skulls. Valid values are 0 to 4.");
 				type = 0;
 			}
-			
-			skull.setSkullType(type, name);
-			
-			if (rot > -1) { skull.setSkullRotation(rot % 16); }
-			
+			// func_152107_a is setType(int)
+			skull.func_152107_a(type);
+			//setSkullType(type, name);
+
+			if (rot > -1) {
+				// func_145903_a is setSkullRotation(int)
+				skull.func_145903_a(rot % 16);
+			}
+
 			return true;
 		}
-		
-		LogHelper.log(Level.WARNING, "No TileEntitySkull found at " + x + "/" + y + "/" + z);
+
+		LogHelper.warning("No TileEntitySkull found at " + x + "/" + y + "/" + z);
 		return false;
 	}
 	/**
@@ -394,21 +363,25 @@ public class GenHelper
 	 * Please read the blockArray notes very carefully and test out your structure to make
 	 * sure everything is oriented how you thought it was.
 	 * 
-	 * @param rotations number of rotations to apply
-	 * @param id block id
-	 * @param origMeta the block's original metadata value
+	 * @param rotations	The number of rotations to apply
+	 * @param block		The block being rotated
+	 * @param origMeta	The block's original metadata value
 	 */
-	public static final int getMetadata(int rotations, int id, int origMeta)
-	{
-		if (BlockRotationData.getBlockRotationType(id) == null) return 0;
-		int meta = origMeta, bitface, tickDelay = meta >> 2, bit9 = meta >> 3,
-			bit4 = meta & 4, bit8 = meta & 8, extra = meta & ~3;
-		
-		for (int i = 0; i < rotations; ++i)
-		{
+	public static final int getMetadata(int rotations, Block block, int origMeta) {
+		if (BlockRotationData.getBlockRotationType(block) == null) {
+			return origMeta; // no rotation data, return original metadata value
+		}
+		int meta = origMeta;
+		int bitface;
+		int tickDelay = (meta >> 2);// used by repeaters, comparators, etc.
+		int bit4 = (meta & 4);		// most commonly used for actual rotation
+		int bit8 = (meta & 8);		// usually 'on' or 'off' flag, but also top/bottom for doors
+		int bit9 = (meta >> 3);		// used by pistons for something, can't remember what...
+		int extra = (meta & ~3);	// used by doors for hinge orientation, I think
+
+		for (int i = 0; i < rotations; ++i) {
 			bitface = meta % 4;
-			
-			switch(BlockRotationData.getBlockRotationType(id)) {
+			switch(BlockRotationData.getBlockRotationType(block)) {
 			case ANVIL:
 				meta ^= 1;
 				break;
@@ -468,37 +441,37 @@ public class GenHelper
 				break;
 			}
 		}
-		
+
 		return meta;
 	}
-	
+
 	/**
 	 * Fixes blocks metadata after they've been placed in the world, specifically for blocks
 	 * such as rails, furnaces, etc. whose orientation is automatically determined by the block
 	 * when placed via the onBlockAdded method.
 	 */
-	public static final void setMetadata(World world, int x, int y, int z, int origMeta)
-	{
-		int id = world.getBlockId(x, y, z); 
-		
-		if (BlockRotationData.getBlockRotationType(id) == null) { return; }
-		
-		switch(BlockRotationData.getBlockRotationType(id)) {
+	public static final void setMetadata(World world, int x, int y, int z, int origMeta) {
+		Block block = world.getBlock(x, y, z); 
+		if (BlockRotationData.getBlockRotationType(block) == null) {
+			return;
+		}
+
+		switch(BlockRotationData.getBlockRotationType(block)) {
 		case PISTON_CONTAINER: world.setBlockMetadataWithNotify(x, y, z, origMeta, 2); break;
 		case RAIL: world.setBlockMetadataWithNotify(x, y, z, origMeta, 2); break;
 		default: break;
 		}
 	}
-	
+
 	/**
 	 * Returns true if material for realID matches or is compatible with worldID material
 	 */
-	public static final boolean materialsMatch(int realID, int worldID) {
-		return  (Block.blocksList[worldID].blockMaterial == Material.grass && Block.blocksList[Math.abs(realID)].blockMaterial == Material.ground) ||
-				(Block.blocksList[worldID].blockMaterial.isLiquid() && Block.blocksList[Math.abs(realID)].blockMaterial == Block.blocksList[worldID].blockMaterial) ||
-				(Block.blocksList[worldID].blockMaterial == Material.ice && Block.blocksList[Math.abs(realID)].blockMaterial == Material.water) ||
-				(Block.blocksList[worldID].blockMaterial == Material.piston && Block.blocksList[Math.abs(realID)].blockMaterial == Material.piston) ||
-				(Block.blocksList[worldID] instanceof BlockRedstoneTorch && Block.blocksList[Math.abs(realID)] instanceof BlockRedstoneTorch) ||
-				(Block.blocksList[worldID] instanceof BlockRedstoneRepeater && Block.blocksList[Math.abs(realID)] instanceof BlockRedstoneRepeater);
+	public static final boolean materialsMatch(Block block1, Block block2) {
+		return  (block1.getMaterial() == Material.grass && block2.getMaterial() == Material.ground) ||
+				(block1.getMaterial().isLiquid() && block2.getMaterial() == block1.getMaterial()) ||
+				(block1.getMaterial() == Material.ice && block2.getMaterial() == Material.water) ||
+				(block1.getMaterial() == Material.piston && block2.getMaterial() == Material.piston) ||
+				(block1 instanceof BlockRedstoneTorch && block2 instanceof BlockRedstoneTorch) ||
+				(block1 instanceof BlockRedstoneRepeater && block2 instanceof BlockRedstoneRepeater);
 	}
 }
